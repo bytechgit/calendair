@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "64934311180",
+    "project_id": "calendair-8abb9",
+    "storage_bucket": "calendair-8abb9.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:64934311180:android:c5ff71a5fb888dc93e0529",
+        "android_client_info": {
+          "package_name": "com.example.calendair"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "64934311180-b7sqkhi609re8g9a7hd7jenmuui2kkjc.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.calendair",
+            "certificate_hash": "b399291a335d8897d3cc59eb038989514702b1f2"
+          }
+        },
+        {
+          "client_id": "64934311180-ur80ord9qo262td8suibipg3u975onmv.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBqG2Sz_5QpdlL0AG9L_WAC7NVlgI49kZY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "64934311180-ur80ord9qo262td8suibipg3u975onmv.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
