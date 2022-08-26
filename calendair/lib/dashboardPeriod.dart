@@ -25,9 +25,7 @@ class _DashboardPeriodState extends State<DashboardPeriod> {
             Icons.arrow_back_ios,
             color: Colors.black,
           ),
-          onPressed: () {
-            Get.back();
-          },
+          onPressed: () {},
         ),
       ),
       bottomNavigationBar: Container(
