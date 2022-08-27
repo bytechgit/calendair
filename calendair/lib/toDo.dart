@@ -1,8 +1,15 @@
+import 'package:calendair/settings.dart';
 import 'package:calendair/toDoCheck.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+
+import 'bottomNavBar.dart';
+import 'dashboard.dart';
+import 'models/nbar.dart';
 
 class ToDo extends StatefulWidget {
-  const ToDo({Key? key}) : super(key: key);
+  final String day;
+  const ToDo({Key? key, required this.day}) : super(key: key);
 
   @override
   State<ToDo> createState() => _ToDoState();
@@ -21,23 +28,26 @@ class _ToDoState extends State<ToDo> {
               Icons.arrow_back_ios,
               color: Colors.black,
             ),
-            onPressed: () {},
+            onPressed: () {
+              Get.back();
+            },
           ),
         ),
-        bottomNavigationBar: Container(
-          height: 60,
-          color: const Color.fromRGBO(93, 159, 196, 1),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              Image.asset('assets/images/calendarRounded.png'),
-              Image.asset(
-                'assets/images/home1.png',
-                scale: 1.7,
-              ),
-              Image.asset('assets/images/settings.png'),
-            ],
-          ),
+        bottomNavigationBar: BottomNavBar(
+          items: [
+            NBar(
+              slika: 'calendar',
+              widget: const dashboard(),
+            ),
+            NBar(
+              slika: 'home',
+            ),
+            NBar(
+              slika: 'settings',
+              widget: const Settings(),
+            )
+          ],
+          selected: 0,
         ),
         body: SafeArea(
           child: Center(
@@ -50,10 +60,10 @@ class _ToDoState extends State<ToDo> {
                     padding: const EdgeInsets.only(top: 30.0),
                     child: SizedBox(
                       width: width * 0.65,
-                      child: const FittedBox(
+                      child: FittedBox(
                         child: Text(
-                          'Saturday',
-                          style: TextStyle(
+                          widget.day,
+                          style: const TextStyle(
                             color: Colors.black,
                             fontSize: 22,
                             fontWeight: FontWeight.w800,

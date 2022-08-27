@@ -1,4 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+
+import 'bottomNavBar.dart';
+import 'models/nbar.dart';
 
 class AddClassReminder extends StatefulWidget {
   const AddClassReminder({Key? key}) : super(key: key);
@@ -22,15 +26,13 @@ class _AddClassReminderState extends State<AddClassReminder> {
             onPressed: () {},
           ),
         ),
-        bottomNavigationBar: Container(
-          height: 60,
-          color: Color.fromRGBO(93, 159, 196, 1),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              Image.asset('assets/images/home.png'),
-            ],
-          ),
+        bottomNavigationBar: BottomNavBar(
+          items: [
+            NBar(
+              slika: 'home',
+            ),
+          ],
+          selected: 0,
         ),
         body: SafeArea(
             child: Center(

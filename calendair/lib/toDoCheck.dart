@@ -1,4 +1,6 @@
+import 'package:calendair/dayToDo.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
 class ToDoCheck extends StatefulWidget {
   Color color;
@@ -62,31 +64,40 @@ class _ToDoCheckState extends State<ToDoCheck> {
           ),
           // Expanded(child: Container()),
           Expanded(
-            child: Padding(
-              padding: const EdgeInsets.only(left: 10),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: [
-                  FittedBox(
-                    alignment: Alignment.centerLeft,
-                    child: Text(
-                      widget.name,
-                      style: const TextStyle(
-                        fontSize: 25,
-                        fontWeight: FontWeight.bold,
-                        decoration: TextDecoration.underline,
+            child: InkWell(
+              onTap: () {
+                Get.to(
+                  const DayToDo(),
+                  transition: Transition.circularReveal,
+                  duration: const Duration(milliseconds: 800),
+                );
+              },
+              child: Padding(
+                padding: const EdgeInsets.only(left: 10),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    FittedBox(
+                      alignment: Alignment.centerLeft,
+                      child: Text(
+                        widget.name,
+                        style: const TextStyle(
+                          fontSize: 25,
+                          fontWeight: FontWeight.bold,
+                          decoration: TextDecoration.underline,
+                        ),
                       ),
                     ),
-                  ),
-                  FittedBox(
-                    child: Text(
-                      "${widget.number} Minutes",
-                      style: const TextStyle(
-                          fontSize: 14, color: Color.fromRGBO(75, 76, 77, 1)),
+                    FittedBox(
+                      child: Text(
+                        "${widget.number} Minutes",
+                        style: const TextStyle(
+                            fontSize: 14, color: Color.fromRGBO(75, 76, 77, 1)),
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
           ),

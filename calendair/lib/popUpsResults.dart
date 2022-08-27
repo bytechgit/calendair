@@ -1,8 +1,13 @@
+import 'package:calendair/result.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter/src/foundation/key.dart';
 import 'package:flutter/src/widgets/framework.dart';
 import 'package:get/get.dart';
+
+import 'bottomNavBar.dart';
+import 'models/nbar.dart';
 
 class PopUpsResults extends StatefulWidget {
   const PopUpsResults({Key? key}) : super(key: key);
@@ -29,13 +34,13 @@ class _PopUpsResultsState extends State<PopUpsResults> {
           },
         ),
       ),
-      bottomNavigationBar: Container(
-        height: 60,
-        color: const Color.fromRGBO(93, 159, 196, 1),
-        child: IconButton(
-          icon: Image.asset('assets/images/home.png'),
-          onPressed: (() {}),
-        ),
+      bottomNavigationBar: BottomNavBar(
+        items: [
+          NBar(
+            slika: 'home',
+          ),
+        ],
+        selected: 0,
       ),
       body: Center(
         child: Column(
@@ -64,9 +69,11 @@ class _PopUpsResultsState extends State<PopUpsResults> {
                 color: Color.fromRGBO(223, 223, 223, 1),
               ),
             ),
-            const FittedBox(
+            SizedBox(
+              width: width * 0.8,
               child: Text(
-                "Genetics Lab",
+                "Pop-Up Results",
+                textAlign: TextAlign.center,
                 style: TextStyle(
                   color: Color.fromRGBO(93, 159, 196, 1),
                   fontSize: 50,
@@ -77,103 +84,11 @@ class _PopUpsResultsState extends State<PopUpsResults> {
             const SizedBox(
               height: 30,
             ),
-            Column(
-              children: const [
-                Text(
-                  'How much time would you ',
-                  style: TextStyle(
-                    color: Colors.black,
-                    fontSize: 22,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                Text(
-                  'recommend for this',
-                  style: TextStyle(
-                    color: Colors.black,
-                    fontSize: 22,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                Text(
-                  'assignment?',
-                  style: TextStyle(
-                    color: Colors.black,
-                    fontSize: 22,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ],
-            ),
-            Padding(
-              padding: const EdgeInsets.only(top: 15.0, bottom: 35),
-              child: SizedBox(
-                width: width * 0.7,
-                //height: 40,
-                child: TextField(
-                  style: const TextStyle(
-                      color: Color.fromRGBO(38, 64, 78, 1), fontSize: 25),
-                  textAlignVertical: TextAlignVertical.center,
-                  textAlign: TextAlign.center,
-                  decoration: InputDecoration(
-                    contentPadding:
-                        const EdgeInsets.symmetric(horizontal: 10.0),
-                    border: OutlineInputBorder(
-                      borderSide: BorderSide.none,
-                      borderRadius: BorderRadius.circular(15.0),
-                    ),
-                    filled: true,
-                    hintStyle: const TextStyle(
-                        color: Color.fromRGBO(38, 64, 78, 1), fontSize: 25),
-                    hintText: "MINS",
-                    fillColor: const Color.fromRGBO(94, 159, 197, 1),
-                  ),
-                ),
-              ),
-            ),
-            const Text(
-              'Note to the Class',
-              style: TextStyle(
-                color: Colors.black,
-                fontSize: 22,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.only(top: 5.0),
-              child: SizedBox(
-                width: width * 0.7,
-                //height: 40,
-                child: TextField(
-                  maxLines: 3,
-                  minLines: 1,
-                  keyboardType: TextInputType.multiline,
-                  style: const TextStyle(
-                      color: Color.fromRGBO(38, 64, 78, 1), fontSize: 25),
-                  textAlignVertical: TextAlignVertical.center,
-                  textAlign: TextAlign.center,
-                  decoration: InputDecoration(
-                    contentPadding:
-                        const EdgeInsets.symmetric(horizontal: 10.0),
-                    border: OutlineInputBorder(
-                      borderSide: BorderSide.none,
-                      borderRadius: BorderRadius.circular(15.0),
-                    ),
-                    filled: true,
-                    hintStyle: const TextStyle(
-                        color: Color.fromRGBO(38, 64, 78, 1), fontSize: 25),
-                    hintText: "Please Enter",
-                    fillColor: const Color.fromRGBO(94, 159, 197, 1),
-                  ),
-                ),
-              ),
-            ),
-            const Expanded(child: SizedBox()),
             Padding(
               padding: const EdgeInsets.all(20.0),
               child: SizedBox(
-                width: width * 0.60,
-                height: 70,
+                width: width * 0.80,
+                height: 90,
                 child: ElevatedButton(
                   style: ElevatedButton.styleFrom(
                       shadowColor: const Color.fromRGBO(247, 247, 247, 1),
@@ -183,16 +98,68 @@ class _PopUpsResultsState extends State<PopUpsResults> {
                         borderRadius: BorderRadius.circular(10.0),
                       )),
                   onPressed: () {
-                    Get.back();
+                    Get.to(
+                      const Results(),
+                      transition: Transition.circularReveal,
+                      duration: const Duration(milliseconds: 800),
+                    );
                   },
 
-                  child: const Text(
-                    'Update',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      color: Colors.black,
-                      fontSize: 26,
-                      fontWeight: FontWeight.bold,
+                  child: FittedBox(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        FittedBox(
+                          child: Row(
+                            children: const [
+                              Text(
+                                'See ',
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                  color: Color.fromRGBO(216, 218, 215, 1),
+                                  fontSize: 30,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              Text(
+                                '00/00/00',
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                  color: Color.fromRGBO(75, 77, 76, 1),
+                                  fontSize: 30,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        FittedBox(
+                          fit: BoxFit.scaleDown,
+                          child: Row(
+                            children: const [
+                              Text(
+                                'Question ',
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                  color: Color.fromRGBO(75, 77, 76, 1),
+                                  fontSize: 30,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              Text(
+                                'Results',
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                  color: Color.fromRGBO(216, 218, 215, 1),
+                                  fontSize: 30,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ],
+                          ),
+                        )
+                      ],
                     ),
                   ), // <-- Text
                 ),

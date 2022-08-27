@@ -1,10 +1,10 @@
-import 'package:flutter/cupertino.dart';
+import 'package:calendair/popUpsAdd.dart';
+import 'package:calendair/popUpsResults.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/src/foundation/key.dart';
-import 'package:flutter/src/widgets/framework.dart';
 import 'package:get/get.dart';
 
-import 'assignmentsUpdate.dart';
+import 'bottomNavBar.dart';
+import 'models/nbar.dart';
 
 class PopUps extends StatefulWidget {
   const PopUps({Key? key}) : super(key: key);
@@ -31,13 +31,13 @@ class _PopUpsState extends State<PopUps> {
           },
         ),
       ),
-      bottomNavigationBar: Container(
-        height: 60,
-        color: const Color.fromRGBO(93, 159, 196, 1),
-        child: IconButton(
-          icon: Image.asset('assets/images/home.png'),
-          onPressed: (() {}),
-        ),
+      bottomNavigationBar: BottomNavBar(
+        items: [
+          NBar(
+            slika: 'home',
+          ),
+        ],
+        selected: 0,
       ),
       body: Center(
         child: Column(
@@ -77,7 +77,7 @@ class _PopUpsState extends State<PopUps> {
               ),
             ),
             const SizedBox(
-              height: 30,
+              height: 10,
             ),
             Expanded(
               child: SingleChildScrollView(
@@ -125,6 +125,7 @@ class _PopUpsState extends State<PopUps> {
               ),
             ),
             Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
                 Padding(
                   padding:
@@ -141,13 +142,17 @@ class _PopUpsState extends State<PopUps> {
                             borderRadius: BorderRadius.circular(10.0),
                           )),
                       onPressed: () {
-                        Get.back();
+                        Get.to(
+                          const PopUpsResults(),
+                          transition: Transition.circularReveal,
+                          duration: const Duration(milliseconds: 800),
+                        );
                       },
                       child: const Text(
-                        'Update',
+                        'Pop-Up Results',
                         textAlign: TextAlign.center,
                         style: TextStyle(
-                          color: Colors.black,
+                          color: Colors.white,
                           fontSize: 26,
                           fontWeight: FontWeight.bold,
                         ),
@@ -170,13 +175,17 @@ class _PopUpsState extends State<PopUps> {
                             borderRadius: BorderRadius.circular(10.0),
                           )),
                       onPressed: () {
-                        Get.back();
+                        Get.to(
+                          const PopUpsAdd(),
+                          transition: Transition.circularReveal,
+                          duration: const Duration(milliseconds: 800),
+                        );
                       },
                       child: const Text(
-                        'Update',
+                        'Add   Pop-Up',
                         textAlign: TextAlign.center,
                         style: TextStyle(
-                          color: Colors.black,
+                          color: Colors.white,
                           fontSize: 26,
                           fontWeight: FontWeight.bold,
                         ),

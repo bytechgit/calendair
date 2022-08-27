@@ -5,6 +5,10 @@ import 'package:flutter/src/foundation/key.dart';
 import 'package:flutter/src/widgets/framework.dart';
 import 'package:get/get.dart';
 
+import 'bottomNavBar.dart';
+import 'dashboard.dart';
+import 'models/nbar.dart';
+
 class TeacherDashboard extends StatefulWidget {
   const TeacherDashboard({Key? key}) : super(key: key);
 
@@ -25,13 +29,17 @@ class _TeacherDashboardState extends State<TeacherDashboard> {
         leading: null,
         automaticallyImplyLeading: false,
       ),
-      bottomNavigationBar: Container(
-        height: 60,
-        color: Color.fromRGBO(93, 159, 196, 1),
-        child: IconButton(
-          icon: Image.asset('assets/images/home.png'),
-          onPressed: (() {}),
-        ),
+      bottomNavigationBar: BottomNavBar(
+        items: [
+          NBar(
+            slika: 'calendar',
+            widget: const dashboard(),
+          ),
+          NBar(
+            slika: 'home',
+          ),
+        ],
+        selected: 0,
       ),
       body: SafeArea(
         child: Center(

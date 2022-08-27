@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
 class DayToDo extends StatefulWidget {
   const DayToDo({Key? key}) : super(key: key);
@@ -20,7 +21,9 @@ class _DayToDoState extends State<DayToDo> {
               Icons.arrow_back_ios,
               color: Colors.black,
             ),
-            onPressed: () {},
+            onPressed: () {
+              Get.back();
+            },
           ),
         ),
         body: SafeArea(

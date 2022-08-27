@@ -4,6 +4,9 @@ import 'package:flutter/src/foundation/key.dart';
 import 'package:flutter/src/widgets/framework.dart';
 import 'package:get/get.dart';
 
+import 'bottomNavBar.dart';
+import 'models/nbar.dart';
+
 class PopUpsConfidenceMeter extends StatefulWidget {
   const PopUpsConfidenceMeter({Key? key}) : super(key: key);
 
@@ -29,13 +32,13 @@ class _PopUpsConfidenceMeterState extends State<PopUpsConfidenceMeter> {
           },
         ),
       ),
-      bottomNavigationBar: Container(
-        height: 60,
-        color: const Color.fromRGBO(93, 159, 196, 1),
-        child: IconButton(
-          icon: Image.asset('assets/images/home.png'),
-          onPressed: (() {}),
-        ),
+      bottomNavigationBar: BottomNavBar(
+        items: [
+          NBar(
+            slika: 'home',
+          ),
+        ],
+        selected: 0,
       ),
       body: Center(
         child: Column(
@@ -64,83 +67,24 @@ class _PopUpsConfidenceMeterState extends State<PopUpsConfidenceMeter> {
                 color: Color.fromRGBO(223, 223, 223, 1),
               ),
             ),
-            const FittedBox(
-              child: Text(
-                "Genetics Lab",
-                style: TextStyle(
-                  color: Color.fromRGBO(93, 159, 196, 1),
-                  fontSize: 50,
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-            ),
             const SizedBox(
               height: 30,
             ),
-            Column(
-              children: const [
-                Text(
-                  'How much time would you ',
+            SizedBox(
+              width: width * 0.8,
+              child: FittedBox(
+                child: const Text(
+                  'Confidence Meter Question',
                   style: TextStyle(
                     color: Colors.black,
-                    fontSize: 22,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                Text(
-                  'recommend for this',
-                  style: TextStyle(
-                    color: Colors.black,
-                    fontSize: 22,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                Text(
-                  'assignment?',
-                  style: TextStyle(
-                    color: Colors.black,
-                    fontSize: 22,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ],
-            ),
-            Padding(
-              padding: const EdgeInsets.only(top: 15.0, bottom: 35),
-              child: SizedBox(
-                width: width * 0.7,
-                //height: 40,
-                child: TextField(
-                  style: const TextStyle(
-                      color: Color.fromRGBO(38, 64, 78, 1), fontSize: 25),
-                  textAlignVertical: TextAlignVertical.center,
-                  textAlign: TextAlign.center,
-                  decoration: InputDecoration(
-                    contentPadding:
-                        const EdgeInsets.symmetric(horizontal: 10.0),
-                    border: OutlineInputBorder(
-                      borderSide: BorderSide.none,
-                      borderRadius: BorderRadius.circular(15.0),
-                    ),
-                    filled: true,
-                    hintStyle: const TextStyle(
-                        color: Color.fromRGBO(38, 64, 78, 1), fontSize: 25),
-                    hintText: "MINS",
-                    fillColor: const Color.fromRGBO(94, 159, 197, 1),
+                    fontSize: 25,
+                    fontWeight: FontWeight.w900,
                   ),
                 ),
               ),
             ),
-            const Text(
-              'Note to the Class',
-              style: TextStyle(
-                color: Colors.black,
-                fontSize: 22,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
             Padding(
-              padding: const EdgeInsets.only(top: 5.0),
+              padding: const EdgeInsets.only(top: 5.0, bottom: 20),
               child: SizedBox(
                 width: width * 0.7,
                 //height: 40,

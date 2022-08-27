@@ -1,5 +1,6 @@
 import 'package:calendair/pom/inputClassCode.dart';
 import 'package:calendair/pom/makeClass.dart';
+import 'package:calendair/studentDashboard.dart';
 import 'package:calendair/teacherDashboard.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -70,7 +71,7 @@ class _RegisterWhatUserState extends State<RegisterWhatUser> {
                   InkWell(
                     onTap: (() {
                       Get.to(
-                        const InputClassCode(),
+                        const studentDashboard(),
                         transition: Transition.circularReveal,
                         duration: const Duration(milliseconds: 800),
                       );

@@ -1,3 +1,5 @@
+import 'package:calendair/Classes/Authentication.dart';
+import 'package:calendair/Classes/googleClassroom.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/src/foundation/key.dart';
 import 'package:flutter/src/widgets/framework.dart';
@@ -8,6 +10,7 @@ class Login extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final u = UserAuthentication();
     final width = MediaQuery.of(context).size.width;
     return Scaffold(
       resizeToAvoidBottomInset: false,
@@ -68,7 +71,10 @@ class Login extends StatelessWidget {
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(25.0),
                             )),
-                        onPressed: () {},
+                        onPressed: () async {
+                          final result = await u.signInwithGoogle();
+                          if (result) {}
+                        },
 
                         icon: Image.asset(
                           'assets/images/google.png',

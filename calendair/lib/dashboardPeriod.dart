@@ -1,9 +1,14 @@
 import 'package:calendair/assignments.dart';
 import 'package:calendair/popUps.dart';
+import 'package:calendair/reminders.dart';
+import 'package:calendair/students.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/src/foundation/key.dart';
 import 'package:flutter/src/widgets/framework.dart';
 import 'package:get/get.dart';
+
+import 'bottomNavBar.dart';
+import 'models/nbar.dart';
 
 class DashboardPeriod extends StatefulWidget {
   const DashboardPeriod({Key? key}) : super(key: key);
@@ -25,16 +30,18 @@ class _DashboardPeriodState extends State<DashboardPeriod> {
             Icons.arrow_back_ios,
             color: Colors.black,
           ),
-          onPressed: () {},
+          onPressed: () {
+            Get.back();
+          },
         ),
       ),
-      bottomNavigationBar: Container(
-        height: 60,
-        color: const Color.fromRGBO(93, 159, 196, 1),
-        child: IconButton(
-          icon: Image.asset('assets/images/home.png'),
-          onPressed: (() {}),
-        ),
+      bottomNavigationBar: BottomNavBar(
+        items: [
+          NBar(
+            slika: 'home',
+          ),
+        ],
+        selected: 0,
       ),
       body: SafeArea(
         child: Center(
@@ -81,7 +88,13 @@ class _DashboardPeriodState extends State<DashboardPeriod> {
                   Padding(
                     padding: const EdgeInsets.only(bottom: 20, top: 20),
                     child: InkWell(
-                      onTap: (() {}),
+                      onTap: (() {
+                        Get.to(
+                          const Students(),
+                          transition: Transition.circularReveal,
+                          duration: const Duration(milliseconds: 800),
+                        );
+                      }),
                       child: SizedBox(
                         height: 60,
                         width: width * 0.8,
@@ -95,7 +108,7 @@ class _DashboardPeriodState extends State<DashboardPeriod> {
                                   style: TextStyle(
                                     color: Color.fromRGBO(93, 159, 196, 1),
                                     fontSize: 50,
-                                    fontWeight: FontWeight.w500,
+                                    fontWeight: FontWeight.normal,
                                   ),
                                 ),
                               ),
@@ -138,7 +151,7 @@ class _DashboardPeriodState extends State<DashboardPeriod> {
                                   style: TextStyle(
                                     color: Color.fromRGBO(93, 159, 196, 1),
                                     fontSize: 50,
-                                    fontWeight: FontWeight.w500,
+                                    fontWeight: FontWeight.normal,
                                   ),
                                 ),
                               ),
@@ -161,7 +174,13 @@ class _DashboardPeriodState extends State<DashboardPeriod> {
                   Padding(
                     padding: const EdgeInsets.only(bottom: 20, top: 20),
                     child: InkWell(
-                      onTap: (() {}),
+                      onTap: (() {
+                        Get.to(
+                          const Reminders(),
+                          transition: Transition.circularReveal,
+                          duration: const Duration(milliseconds: 800),
+                        );
+                      }),
                       child: SizedBox(
                         height: 60,
                         width: width * 0.8,
@@ -175,7 +194,7 @@ class _DashboardPeriodState extends State<DashboardPeriod> {
                                   style: TextStyle(
                                     color: Color.fromRGBO(93, 159, 196, 1),
                                     fontSize: 50,
-                                    fontWeight: FontWeight.w500,
+                                    fontWeight: FontWeight.normal,
                                   ),
                                 ),
                               ),
@@ -218,7 +237,7 @@ class _DashboardPeriodState extends State<DashboardPeriod> {
                                   style: TextStyle(
                                     color: Color.fromRGBO(93, 159, 196, 1),
                                     fontSize: 50,
-                                    fontWeight: FontWeight.w500,
+                                    fontWeight: FontWeight.normal,
                                   ),
                                 ),
                               ),

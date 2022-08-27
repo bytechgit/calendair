@@ -123,7 +123,7 @@ class _RegisterEnterSchoolCodeState extends State<RegisterEnterSchoolCode> {
                           textAlign: TextAlign.center,
                           style: TextStyle(
                               color: Color.fromRGBO(123, 123, 123, 1),
-                              fontWeight: FontWeight.w600,
+                              fontWeight: FontWeight.normal,
                               fontSize: 18),
                         ),
                       ),

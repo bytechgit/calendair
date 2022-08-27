@@ -1,8 +1,12 @@
+import 'package:calendair/popUpsConfidenceMeter.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/src/foundation/key.dart';
 import 'package:flutter/src/widgets/framework.dart';
 import 'package:get/get.dart';
+
+import 'bottomNavBar.dart';
+import 'models/nbar.dart';
 
 class PopUpsAdd extends StatefulWidget {
   const PopUpsAdd({Key? key}) : super(key: key);
@@ -29,13 +33,13 @@ class _PopUpsAddState extends State<PopUpsAdd> {
           },
         ),
       ),
-      bottomNavigationBar: Container(
-        height: 60,
-        color: const Color.fromRGBO(93, 159, 196, 1),
-        child: IconButton(
-          icon: Image.asset('assets/images/home.png'),
-          onPressed: (() {}),
-        ),
+      bottomNavigationBar: BottomNavBar(
+        items: [
+          NBar(
+            slika: 'home',
+          ),
+        ],
+        selected: 0,
       ),
       body: Center(
         child: Column(
@@ -64,49 +68,19 @@ class _PopUpsAddState extends State<PopUpsAdd> {
                 color: Color.fromRGBO(223, 223, 223, 1),
               ),
             ),
-            const FittedBox(
-              child: Text(
-                "Genetics Lab",
-                style: TextStyle(
-                  color: Color.fromRGBO(93, 159, 196, 1),
-                  fontSize: 50,
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-            ),
             const SizedBox(
               height: 30,
             ),
-            Column(
-              children: const [
-                Text(
-                  'How much time would you ',
-                  style: TextStyle(
-                    color: Colors.black,
-                    fontSize: 22,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                Text(
-                  'recommend for this',
-                  style: TextStyle(
-                    color: Colors.black,
-                    fontSize: 22,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                Text(
-                  'assignment?',
-                  style: TextStyle(
-                    color: Colors.black,
-                    fontSize: 22,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ],
+            const Text(
+              'Pop-Up Title',
+              style: TextStyle(
+                color: Colors.black,
+                fontSize: 25,
+                fontWeight: FontWeight.w900,
+              ),
             ),
             Padding(
-              padding: const EdgeInsets.only(top: 15.0, bottom: 35),
+              padding: const EdgeInsets.only(top: 5.0, bottom: 20),
               child: SizedBox(
                 width: width * 0.7,
                 //height: 40,
@@ -125,22 +99,26 @@ class _PopUpsAddState extends State<PopUpsAdd> {
                     filled: true,
                     hintStyle: const TextStyle(
                         color: Color.fromRGBO(38, 64, 78, 1), fontSize: 25),
-                    hintText: "MINS",
+                    hintText: "Please Enter",
                     fillColor: const Color.fromRGBO(94, 159, 197, 1),
                   ),
                 ),
               ),
             ),
-            const Text(
-              'Note to the Class',
-              style: TextStyle(
-                color: Colors.black,
-                fontSize: 22,
-                fontWeight: FontWeight.bold,
+            SizedBox(
+              width: width * 0.85,
+              child: const Text(
+                'Due Date/ Date Pop-Up will be Removed',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  color: Colors.black,
+                  fontSize: 25,
+                  fontWeight: FontWeight.w900,
+                ),
               ),
             ),
             Padding(
-              padding: const EdgeInsets.only(top: 5.0),
+              padding: const EdgeInsets.only(top: 5.0, bottom: 20),
               child: SizedBox(
                 width: width * 0.7,
                 //height: 40,
@@ -168,6 +146,50 @@ class _PopUpsAddState extends State<PopUpsAdd> {
                 ),
               ),
             ),
+            SizedBox(
+              width: width * 0.8,
+              child: const Text(
+                'Pop-Up Attachment',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  color: Colors.black,
+                  fontSize: 25,
+                  fontWeight: FontWeight.w900,
+                ),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.only(bottom: 20.0, top: 5),
+              child: SizedBox(
+                width: width * 0.70,
+                height: 48,
+                child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                      shadowColor: const Color.fromRGBO(247, 247, 247, 1),
+                      primary: const Color.fromRGBO(94, 159, 197, 1),
+                      elevation: 0,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10.0),
+                      )),
+                  onPressed: () {
+                    Get.to(
+                      const PopUpsConfidenceMeter(),
+                      transition: Transition.circularReveal,
+                      duration: const Duration(milliseconds: 800),
+                    );
+                  },
+
+                  child: const Text(
+                    'Confidence Meter',
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(
+                        color: Color.fromRGBO(38, 64, 78, 1),
+                        fontSize: 25,
+                        fontWeight: FontWeight.w400),
+                  ), // <-- Text
+                ),
+              ),
+            ),
             const Expanded(child: SizedBox()),
             Padding(
               padding: const EdgeInsets.all(20.0),
@@ -187,7 +209,7 @@ class _PopUpsAddState extends State<PopUpsAdd> {
                   },
 
                   child: const Text(
-                    'Update',
+                    'Send',
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       color: Colors.black,

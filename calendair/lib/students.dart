@@ -1,4 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+
+import 'bottomNavBar.dart';
+import 'models/nbar.dart';
 
 class Students extends StatefulWidget {
   const Students({Key? key}) : super(key: key);
@@ -20,18 +24,18 @@ class _StudentsState extends State<Students> {
             Icons.arrow_back_ios,
             color: Colors.black,
           ),
-          onPressed: () {},
+          onPressed: () {
+            Get.back();
+          },
         ),
       ),
-      bottomNavigationBar: Container(
-        height: 60,
-        color: Color.fromRGBO(93, 159, 196, 1),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: [
-            Image.asset('assets/images/home.png'),
-          ],
-        ),
+      bottomNavigationBar: BottomNavBar(
+        items: [
+          NBar(
+            slika: 'home',
+          ),
+        ],
+        selected: 0,
       ),
       body: SafeArea(
         child: Center(
@@ -89,15 +93,15 @@ class _StudentsState extends State<Students> {
                               });
                             },
                             child: Container(
-                              height: 50,
+                              height: 55,
                               width: width * 0.75,
                               decoration: BoxDecoration(
                                   color: selected == false
                                       ? const Color.fromRGBO(217, 217, 217, 1)
                                       : const Color.fromRGBO(159, 198, 220, 1),
-                                  borderRadius: BorderRadius.only(
-                                      topRight: Radius.circular(30),
-                                      bottomRight: Radius.circular(30))),
+                                  borderRadius: const BorderRadius.only(
+                                      topRight: const Radius.circular(30),
+                                      bottomRight: const Radius.circular(30))),
                               child: Padding(
                                 padding: const EdgeInsets.only(left: 10),
                                 child: Row(
@@ -106,25 +110,25 @@ class _StudentsState extends State<Students> {
                                     Container(
                                       height: 40,
                                       width: width * 0.07,
-                                      decoration: BoxDecoration(
+                                      decoration: const BoxDecoration(
                                           shape: BoxShape.circle,
-                                          color: const Color.fromRGBO(
-                                              93, 159, 196, 1)),
+                                          color:
+                                              Color.fromRGBO(93, 159, 196, 1)),
                                     ),
-                                    Expanded(
+                                    const Expanded(
                                       child: FittedBox(
                                         alignment: Alignment.centerLeft,
                                         fit: BoxFit.scaleDown,
                                         child: Padding(
-                                          padding: const EdgeInsets.only(
+                                          padding: EdgeInsets.only(
                                               right: 20, left: 10),
                                           child: Text(
                                             'John',
                                             textAlign: TextAlign.center,
                                             style: TextStyle(
                                                 color: Colors.black,
-                                                fontSize: 30,
-                                                fontWeight: FontWeight.w600),
+                                                fontSize: 35,
+                                                fontWeight: FontWeight.w500),
                                           ),
                                         ),
                                       ),

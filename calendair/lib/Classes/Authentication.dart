@@ -43,9 +43,11 @@ class UserAuthentication with ChangeNotifier {
   }
 
   CollectionReference users = FirebaseFirestore.instance.collection('Users');
-  final GoogleSignIn _googleSignIn = GoogleSignIn(
-    scopes: <String>[
+  final googleSignIn = new GoogleSignIn(
+    scopes: [
       'email',
+      'https://www.googleapis.com/auth/contacts.readonly',
+      'https://www.googleapis.com/auth/classroom.courses'
     ],
   );
 
@@ -64,16 +66,16 @@ class UserAuthentication with ChangeNotifier {
 
   Future<void> signout() async {
     Events.add("SignOut");
-    await _googleSignIn.signOut();
+    await googleSignIn.signOut();
     user = null;
     saveUserToLocalDb(null);
   }
 
-  Future<String> signInwithGoogle() async {
+  Future<bool> signInwithGoogle() async {
     signout();
     try {
       final GoogleSignInAccount? googleSignInAccount =
-          await _googleSignIn.signIn();
+          await googleSignIn.signIn();
       if (googleSignInAccount != null) {
         final GoogleSignInAuthentication googleSignInAuthentication =
             await googleSignInAccount.authentication;
@@ -86,17 +88,20 @@ class UserAuthentication with ChangeNotifier {
         UserCredential uc = await _auth.signInWithCredential(credential);
         notifyListeners();
         final user = await _auth.currentUser;
+        inspect(user);
+        Get.snackbar("Welcome ", user?.displayName ?? "",
+            duration: Duration(seconds: 3));
         final idToken = await user?.getIdToken();
         print("token");
         print(googleAuth.accessToken);
-        return 'Uspesno ste prijavljeni!';
+        return true;
       }
 
-      return 'Greska, pokusajte ponovo';
+      return false;
     } on FirebaseAuthException catch (e) {
-      return e.message ?? 'Greska';
+      return false;
     } on Exception catch (e) {
-      return 'Gresaka, pokusajte ponovo!';
+      return false;
     }
   }
 

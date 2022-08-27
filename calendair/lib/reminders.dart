@@ -1,4 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+
+import 'bottomNavBar.dart';
+import 'models/nbar.dart';
 
 class Reminders extends StatefulWidget {
   const Reminders({Key? key}) : super(key: key);
@@ -19,18 +23,18 @@ class _RemindersState extends State<Reminders> {
             Icons.arrow_back_ios,
             color: Colors.black,
           ),
-          onPressed: () {},
+          onPressed: () {
+            Get.back();
+          },
         ),
       ),
-      bottomNavigationBar: Container(
-        height: 60,
-        color: Color.fromRGBO(93, 159, 196, 1),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: [
-            Image.asset('assets/images/home.png'),
-          ],
-        ),
+      bottomNavigationBar: BottomNavBar(
+        items: [
+          NBar(
+            slika: 'home',
+          ),
+        ],
+        selected: 0,
       ),
       body: Center(
         child: Column(
@@ -143,8 +147,8 @@ class _RemindersState extends State<Reminders> {
                   padding:
                       const EdgeInsets.only(top: 20.0, bottom: 20, right: 10),
                   child: SizedBox(
-                    width: width * 0.45,
-                    height: 80,
+                    width: width * 0.5,
+                    height: 100,
                     child: ElevatedButton(
                       style: ElevatedButton.styleFrom(
                           shadowColor: const Color.fromRGBO(247, 247, 247, 1),

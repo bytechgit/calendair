@@ -2,6 +2,9 @@ import 'package:calendair/assignmentsUpdate.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
+import 'bottomNavBar.dart';
+import 'models/nbar.dart';
+
 class Assignments extends StatefulWidget {
   const Assignments({Key? key}) : super(key: key);
 
@@ -27,13 +30,13 @@ class _AssignmentsState extends State<Assignments> {
           },
         ),
       ),
-      bottomNavigationBar: Container(
-        height: 60,
-        color: const Color.fromRGBO(93, 159, 196, 1),
-        child: IconButton(
-          icon: Image.asset('assets/images/home.png'),
-          onPressed: (() {}),
-        ),
+      bottomNavigationBar: BottomNavBar(
+        items: [
+          NBar(
+            slika: 'home',
+          ),
+        ],
+        selected: 0,
       ),
       body: SafeArea(
         child: Center(

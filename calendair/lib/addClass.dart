@@ -1,4 +1,6 @@
+import 'package:calendair/joinNotification.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
 class addClass extends StatefulWidget {
   const addClass({Key? key}) : super(key: key);
@@ -22,7 +24,9 @@ class _addClassState extends State<addClass> {
                   padding: const EdgeInsets.all(10.0),
                   child: IconButton(
                     icon: const Icon(Icons.arrow_back_ios),
-                    onPressed: () {},
+                    onPressed: () {
+                      Get.back();
+                    },
                   )),
             ),
             IgnorePointer(
@@ -75,6 +79,7 @@ class _addClassState extends State<addClass> {
                               color: Color.fromRGBO(38, 64, 78, 1),
                               fontSize: 25),
                           textAlignVertical: TextAlignVertical.center,
+                          textAlign: TextAlign.center,
                           decoration: InputDecoration(
                             contentPadding:
                                 const EdgeInsets.symmetric(horizontal: 10.0),
@@ -115,7 +120,13 @@ class _addClassState extends State<addClass> {
                           elevation: 0,
                           shape: const CircleBorder(),
                         ),
-                        onPressed: () {},
+                        onPressed: () {
+                          Get.to(
+                            const joinNotification(),
+                            transition: Transition.circularReveal,
+                            duration: const Duration(milliseconds: 800),
+                          );
+                        },
 
                         child: Icon(
                           Icons.arrow_forward_ios_rounded,

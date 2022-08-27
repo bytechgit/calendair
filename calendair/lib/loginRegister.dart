@@ -4,6 +4,8 @@ import 'package:calendair/registerEnterSchoolCode.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
+import 'Classes/googleClassroom.dart';
+
 class LoginRegister extends StatefulWidget {
   const LoginRegister({Key? key}) : super(key: key);
 
@@ -12,6 +14,7 @@ class LoginRegister extends StatefulWidget {
 }
 
 class _LoginRegisterState extends State<LoginRegister> {
+  final gc = Get.find<GoogleClassroom>();
   @override
   Widget build(BuildContext context) {
     final width = MediaQuery.of(context).size.width;

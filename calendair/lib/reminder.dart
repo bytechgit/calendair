@@ -1,4 +1,10 @@
+import 'package:calendair/settings.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:get/get.dart';
+
+import 'bottomNavBar.dart';
+import 'models/nbar.dart';
 
 class Reminder extends StatefulWidget {
   const Reminder({Key? key}) : super(key: key);
@@ -8,6 +14,26 @@ class Reminder extends StatefulWidget {
 }
 
 class _ReminderState extends State<Reminder> {
+  @override
+  void initState() {
+    super.initState();
+    SystemChrome.setPreferredOrientations([
+      DeviceOrientation.landscapeRight,
+      DeviceOrientation.landscapeLeft,
+      DeviceOrientation.portraitUp,
+      DeviceOrientation.portraitDown,
+    ]);
+  }
+
+  @override
+  dispose() {
+    SystemChrome.setPreferredOrientations([
+      DeviceOrientation.landscapeRight,
+      DeviceOrientation.landscapeLeft,
+    ]);
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     final width = MediaQuery.of(context).size.width;
@@ -19,19 +45,22 @@ class _ReminderState extends State<Reminder> {
               Icons.arrow_back_ios,
               color: Colors.black,
             ),
-            onPressed: () {},
+            onPressed: () async {
+              Get.back();
+            },
           ),
         ),
-        bottomNavigationBar: Container(
-          height: 60,
-          color: Color.fromRGBO(93, 159, 196, 1),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              Image.asset('assets/images/home.png'),
-              Image.asset('assets/images/settings.png'),
-            ],
-          ),
+        bottomNavigationBar: BottomNavBar(
+          items: [
+            NBar(
+              slika: 'home',
+            ),
+            NBar(
+              slika: 'settings',
+              widget: const Settings(),
+            )
+          ],
+          selected: 0,
         ),
         body: SafeArea(
             child: Center(
@@ -62,10 +91,10 @@ class _ReminderState extends State<Reminder> {
           ),
           SizedBox(
             width: width * 0.7,
-            child: Padding(
-              padding: const EdgeInsets.only(top: 20),
-              child: const Text(
-                'What would you like to name your class?',
+            child: const Padding(
+              padding: EdgeInsets.only(top: 20),
+              child: Text(
+                'Reminder Title',
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   color: Colors.black,
@@ -157,11 +186,13 @@ class _ReminderState extends State<Reminder> {
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(10.0),
                     )),
-                onPressed: () {},
+                onPressed: () async {
+                  Get.back();
+                },
 
-                child: FittedBox(
+                child: const FittedBox(
                   fit: BoxFit.scaleDown,
-                  child: const Text(
+                  child: Text(
                     'Add',
                     textAlign: TextAlign.center,
                     style: TextStyle(

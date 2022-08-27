@@ -5,6 +5,9 @@ import 'package:flutter/src/foundation/key.dart';
 import 'package:flutter/src/widgets/framework.dart';
 import 'package:get/get.dart';
 
+import 'bottomNavBar.dart';
+import 'models/nbar.dart';
+
 class GeneratingClassCode extends StatelessWidget {
   const GeneratingClassCode({Key? key}) : super(key: key);
 
@@ -28,13 +31,13 @@ class GeneratingClassCode extends StatelessWidget {
         //   },
         // ),
       ),
-      bottomNavigationBar: Container(
-        height: 60,
-        color: const Color.fromRGBO(93, 159, 196, 1),
-        child: IconButton(
-          icon: Image.asset('assets/images/home.png'),
-          onPressed: (() {}),
-        ),
+      bottomNavigationBar: BottomNavBar(
+        items: [
+          NBar(
+            slika: 'home',
+          ),
+        ],
+        selected: 0,
       ),
       body: SafeArea(
         child: Stack(

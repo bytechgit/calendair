@@ -1,8 +1,11 @@
+import 'package:calendair/Classes/Authentication.dart';
 import 'package:calendair/registerWhatUser.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/src/foundation/key.dart';
 import 'package:flutter/src/widgets/framework.dart';
 import 'package:get/get.dart';
+
+import 'Classes/googleClassroom.dart';
 
 class RegisterGoogle extends StatelessWidget {
   const RegisterGoogle({Key? key}) : super(key: key);
@@ -10,6 +13,8 @@ class RegisterGoogle extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final width = MediaQuery.of(context).size.width;
+    final gc = Get.find<GoogleClassroom>();
+    final u = UserAuthentication();
     return Scaffold(
       resizeToAvoidBottomInset: false,
       body: SafeArea(
@@ -69,7 +74,10 @@ class RegisterGoogle extends StatelessWidget {
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(25.0),
                             )),
-                        onPressed: () {},
+                        onPressed: () async {
+                          await u.signInwithGoogle();
+                          gc.getCourseList();
+                        },
 
                         icon: Image.asset(
                           'assets/images/google.png',

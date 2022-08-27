@@ -1,4 +1,11 @@
+import 'package:calendair/models/nbar.dart';
+import 'package:calendair/settings.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+
+import 'bottomNavBar.dart';
+import 'calendar.dart';
+import 'dashboard.dart';
 
 class AccountSettings extends StatefulWidget {
   const AccountSettings({Key? key}) : super(key: key);
@@ -19,23 +26,26 @@ class _AccountSettingsState extends State<AccountSettings> {
             Icons.arrow_back_ios,
             color: Colors.black,
           ),
-          onPressed: () {},
+          onPressed: () {
+            Get.back();
+          },
         ),
       ),
-      bottomNavigationBar: Container(
-        height: 60,
-        color: Color.fromRGBO(93, 159, 196, 1),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: [
-            Image.asset('assets/images/calendar.png'),
-            Image.asset(
-              'assets/images/home1.png',
-              scale: 1.7,
-            ),
-            Image.asset('assets/images/settingsRounded.png'),
-          ],
-        ),
+      bottomNavigationBar: BottomNavBar(
+        items: [
+          NBar(
+            slika: 'calendar',
+            widget: const dashboard(),
+          ),
+          NBar(
+            slika: 'home',
+          ),
+          NBar(
+            slika: 'settings',
+            widget: const Settings(),
+          )
+        ],
+        selected: 2,
       ),
       body: SafeArea(
           child: Center(
@@ -60,10 +70,11 @@ class _AccountSettingsState extends State<AccountSettings> {
             Expanded(child: Container()),
             SizedBox(
               width: width * 0.13,
-              child: FittedBox(
-                child: Text(
+              child: const FittedBox(
+                child: const Text(
                   'Icon',
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  style: const TextStyle(
+                      fontSize: 18, fontWeight: FontWeight.bold),
                 ),
               ),
             ),
@@ -76,7 +87,7 @@ class _AccountSettingsState extends State<AccountSettings> {
                   color: Color.fromRGBO(93, 159, 196, 1),
                   shape: BoxShape.circle,
                 ),
-                child: Center(
+                child: const Center(
                     child: SizedBox(
                   width: 140,
                   child: Text(
@@ -91,7 +102,7 @@ class _AccountSettingsState extends State<AccountSettings> {
               padding: const EdgeInsets.only(top: 20),
               child: SizedBox(
                 width: width * 0.13,
-                child: FittedBox(
+                child: const FittedBox(
                   child: Text(
                     'Name',
                     style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
@@ -142,11 +153,13 @@ class _AccountSettingsState extends State<AccountSettings> {
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(10.0),
                       )),
-                  onPressed: () {},
+                  onPressed: () {
+                    Get.back();
+                  },
 
-                  child: FittedBox(
+                  child: const FittedBox(
                     fit: BoxFit.scaleDown,
-                    child: const Text(
+                    child: Text(
                       'Update',
                       textAlign: TextAlign.center,
                       style: TextStyle(
