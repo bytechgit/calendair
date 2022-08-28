@@ -9,16 +9,13 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import './LocalDatabase.dart';
-//import 'package:moj_majstor/models/Majstor.dart';
 import 'package:calendair/models/User.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:http/http.dart' as http;
 
-class UserAuthentication with ChangeNotifier {
+class UserAuthentication extends GetxController {
   static final UserAuthentication _singleton = UserAuthentication._internal();
-
-  StreamController<String> Events = StreamController.broadcast();
   factory UserAuthentication() {
     return _singleton;
   }
@@ -28,7 +25,7 @@ class UserAuthentication with ChangeNotifier {
   UserData? user;
   String _verificationCode = '000000';
 
-  final _auth = FirebaseAuth.instance;
+  final auth = FirebaseAuth.instance;
   final firestore = FirebaseFirestore.instance;
 
   UserAuthentication._internal() {
@@ -36,18 +33,17 @@ class UserAuthentication with ChangeNotifier {
     _hive = initializeHive().then((value) {
       getUserFromLocalDb().then((value) {
         user = value;
-        notifyListeners();
-        if (user != null) Events.add("SignIn");
       });
     });
   }
 
   CollectionReference users = FirebaseFirestore.instance.collection('Users');
-  final googleSignIn = new GoogleSignIn(
+  final googleSignIn = GoogleSignIn(
     scopes: [
       'email',
       'https://www.googleapis.com/auth/contacts.readonly',
-      'https://www.googleapis.com/auth/classroom.courses'
+      'https://www.googleapis.com/auth/classroom.courses',
+      'https://www.googleapis.com/auth/classroom.rosters'
     ],
   );
 
@@ -65,7 +61,6 @@ class UserAuthentication with ChangeNotifier {
   }
 
   Future<void> signout() async {
-    Events.add("SignOut");
     await googleSignIn.signOut();
     user = null;
     saveUserToLocalDb(null);
@@ -74,8 +69,11 @@ class UserAuthentication with ChangeNotifier {
   Future<bool> signInwithGoogle() async {
     signout();
     try {
+      print("object");
       final GoogleSignInAccount? googleSignInAccount =
-          await googleSignIn.signIn();
+          await googleSignIn.signInSilently();
+      print("object");
+      inspect(googleSignInAccount);
       if (googleSignInAccount != null) {
         final GoogleSignInAuthentication googleSignInAuthentication =
             await googleSignInAccount.authentication;
@@ -85,15 +83,11 @@ class UserAuthentication with ChangeNotifier {
         );
         final googleAuth = await googleSignInAccount.authentication;
         googleAuth.accessToken;
-        UserCredential uc = await _auth.signInWithCredential(credential);
-        notifyListeners();
-        final user = await _auth.currentUser;
+        UserCredential uc = await auth.signInWithCredential(credential);
+        final user = await auth.currentUser;
         inspect(user);
         Get.snackbar("Welcome ", user?.displayName ?? "",
             duration: Duration(seconds: 3));
-        final idToken = await user?.getIdToken();
-        print("token");
-        print(googleAuth.accessToken);
         return true;
       }
 

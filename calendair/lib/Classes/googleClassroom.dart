@@ -51,6 +51,33 @@ class GoogleClassroom extends GetxController {
       courses.refresh();
     }
   }
+
+  Future<void> createCourse() async {
+    if (ua.googleSignIn.currentUser != null) {
+      final baseClient = Client();
+      final authenticateClient = AuthenticateClient(
+          await ua.googleSignIn.currentUser!.authHeaders, baseClient);
+      final cra = ClassroomApi(authenticateClient);
+
+      final c =
+          await cra.courses.create(Course(name: 'proba kurs', ownerId: 'me'));
+      inspect(c);
+    }
+  }
+
+  Future<void> joinCourse(String courseId) async {
+    if (ua.googleSignIn.currentUser != null) {
+      final baseClient = Client();
+      final authenticateClient = AuthenticateClient(
+          await ua.googleSignIn.currentUser!.authHeaders, baseClient);
+      final cra = ClassroomApi(authenticateClient);
+
+      final c = await cra.courses.students.create(
+          Student(userId: 'me'), '544383080444',
+          enrollmentCode: "rrwzs42");
+      inspect(c);
+    }
+  }
 }
 
 class AuthenticateClient extends BaseClient {
