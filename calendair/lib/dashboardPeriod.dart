@@ -6,18 +6,22 @@ import 'package:flutter/material.dart';
 import 'package:flutter/src/foundation/key.dart';
 import 'package:flutter/src/widgets/framework.dart';
 import 'package:get/get.dart';
+import 'package:googleapis/classroom/v1.dart';
 
+import 'Classes/googleClassroom.dart';
 import 'bottomNavBar.dart';
 import 'models/nbar.dart';
 
 class DashboardPeriod extends StatefulWidget {
-  const DashboardPeriod({Key? key}) : super(key: key);
+  Course course;
+  DashboardPeriod({Key? key, required this.course}) : super(key: key);
 
   @override
   State<DashboardPeriod> createState() => _DashboardPeriodState();
 }
 
 class _DashboardPeriodState extends State<DashboardPeriod> {
+  final gc = Get.find<GoogleClassroom>();
   @override
   Widget build(BuildContext context) {
     final width = MediaQuery.of(context).size.width;
@@ -50,13 +54,14 @@ class _DashboardPeriodState extends State<DashboardPeriod> {
               Padding(
                 padding: const EdgeInsets.only(top: 10.0),
                 child: SizedBox(
-                  width: width * 0.5,
-                  child: const FittedBox(
+                  width: width * 0.8,
+                  child: FittedBox(
+                    fit: BoxFit.scaleDown,
                     child: Text(
-                      'Period 1',
-                      style: TextStyle(
+                      widget.course.name ?? "No name",
+                      style: const TextStyle(
                         color: Colors.black,
-                        fontSize: 22,
+                        fontSize: 35,
                         fontWeight: FontWeight.w900,
                       ),
                     ),
@@ -133,7 +138,9 @@ class _DashboardPeriodState extends State<DashboardPeriod> {
                     child: InkWell(
                       onTap: (() {
                         Get.to(
-                          const Assignments(),
+                          Assignments(
+                            course: widget.course,
+                          ),
                           transition: Transition.circularReveal,
                           duration: const Duration(milliseconds: 800),
                         );
@@ -219,7 +226,7 @@ class _DashboardPeriodState extends State<DashboardPeriod> {
                     child: InkWell(
                       onTap: (() {
                         Get.to(
-                          const PopUps(),
+                          PopUps(course: widget.course),
                           transition: Transition.circularReveal,
                           duration: const Duration(milliseconds: 800),
                         );

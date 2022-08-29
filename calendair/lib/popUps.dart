@@ -1,19 +1,26 @@
+import 'dart:developer';
+
 import 'package:calendair/popUpsAdd.dart';
 import 'package:calendair/popUpsResults.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:googleapis/classroom/v1.dart';
 
+import 'Classes/googleClassroom.dart';
 import 'bottomNavBar.dart';
 import 'models/nbar.dart';
 
 class PopUps extends StatefulWidget {
-  const PopUps({Key? key}) : super(key: key);
+  Course course;
+  PopUps({Key? key, required this.course}) : super(key: key);
 
   @override
   State<PopUps> createState() => _PopUpsState();
 }
 
 class _PopUpsState extends State<PopUps> {
+  final gc = Get.find<GoogleClassroom>();
   @override
   Widget build(BuildContext context) {
     final width = MediaQuery.of(context).size.width;
@@ -46,12 +53,13 @@ class _PopUpsState extends State<PopUps> {
               padding: const EdgeInsets.only(top: 10.0),
               child: SizedBox(
                 width: width * 0.5,
-                child: const FittedBox(
+                child: FittedBox(
+                  fit: BoxFit.scaleDown,
                   child: Text(
-                    'Period 1',
-                    style: TextStyle(
+                    widget.course.name ?? "",
+                    style: const TextStyle(
                       color: Colors.black,
-                      fontSize: 22,
+                      fontSize: 40,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
@@ -80,49 +88,76 @@ class _PopUpsState extends State<PopUps> {
               height: 10,
             ),
             Expanded(
-              child: SingleChildScrollView(
-                // physics: FixedExtentScrollPhysics(),
-                child: Column(
-                  children: [
-                    for (int i = 0; i < 10; i++)
-                      Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: SizedBox(
-                          height: 40,
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
-                              Padding(
-                                padding: const EdgeInsets.all(8.0),
-                                child: Image.asset(
-                                  'assets/images/triangle.png',
-                                  width: 20,
-                                  height: 20,
-                                ),
-                              ),
-                              SizedBox(
-                                width: width * 0.55,
-                                child: const FittedBox(
-                                  alignment: Alignment.centerLeft,
-                                  fit: BoxFit.scaleDown,
-                                  child: Text(
-                                    "00/00/00 Question",
-                                    style: TextStyle(
-                                      color: Colors.black,
-                                      fontSize: 25,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
+              child: StreamBuilder(
+                  stream: FirebaseFirestore.instance
+                      .collection('Popups')
+                      .where("ClassId", isEqualTo: widget.course.id)
+                      .orderBy("order")
+                      .snapshots(),
+                  builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
+                    if (snapshot.hasData) {
+                      // snapshot.data!.docs.sort((a, b) {
+                      //   if ((a["order"] as Timestamp).microsecondsSinceEpoch >
+                      //       (b["order"] as Timestamp).millisecondsSinceEpoch) {
+                      //     return 2;
+                      //   }
+                      //   return -1;
+                      // });
+
+                      return SingleChildScrollView(
+                        child: Column(
+                          children: [
+                            ...snapshot.data!.docs.reversed
+                                .map((d) => Padding(
+                                      padding: const EdgeInsets.all(8.0),
+                                      child: SizedBox(
+                                        height: 40,
+                                        child: Row(
+                                          mainAxisSize: MainAxisSize.min,
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.center,
+                                          children: [
+                                            Padding(
+                                              padding:
+                                                  const EdgeInsets.all(8.0),
+                                              child: Image.asset(
+                                                'assets/images/triangle.png',
+                                                width: 20,
+                                                height: 20,
+                                              ),
+                                            ),
+                                            SizedBox(
+                                              width: width * 0.55,
+                                              child: FittedBox(
+                                                alignment: Alignment.centerLeft,
+                                                fit: BoxFit.scaleDown,
+                                                child: Text(
+                                                  (d['Date'] ?? "") +
+                                                          " " +
+                                                          d['Title'] ??
+                                                      '',
+                                                  style: TextStyle(
+                                                    color: Colors.black,
+                                                    fontSize: 25,
+                                                    fontWeight: FontWeight.bold,
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ))
+                                .toList()
+                          ],
                         ),
-                      )
-                  ],
-                ),
-              ),
+                      );
+                    } else {
+                      return Center(
+                        child: CircularProgressIndicator(),
+                      );
+                    }
+                  }),
             ),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -143,7 +178,9 @@ class _PopUpsState extends State<PopUps> {
                           )),
                       onPressed: () {
                         Get.to(
-                          const PopUpsResults(),
+                          PopUpsResults(
+                            course: widget.course,
+                          ),
                           transition: Transition.circularReveal,
                           duration: const Duration(milliseconds: 800),
                         );
@@ -176,7 +213,7 @@ class _PopUpsState extends State<PopUps> {
                           )),
                       onPressed: () {
                         Get.to(
-                          const PopUpsAdd(),
+                          PopUpsAdd(course: widget.course),
                           transition: Transition.circularReveal,
                           duration: const Duration(milliseconds: 800),
                         );

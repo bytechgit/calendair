@@ -6,7 +6,8 @@ import 'package:syncfusion_flutter_core/theme.dart';
 import 'package:syncfusion_flutter_sliders/sliders.dart';
 
 class Results extends StatefulWidget {
-  const Results({Key? key}) : super(key: key);
+  double rez;
+  Results({Key? key, required this.rez}) : super(key: key);
 
   @override
   State<Results> createState() => _ResultsState();
@@ -36,6 +37,7 @@ class _ResultsState extends State<Results> {
   double _value = 21.0;
   @override
   Widget build(BuildContext context) {
+    print(widget.rez);
     final width = MediaQuery.of(context).size.width;
     return Scaffold(
       resizeToAvoidBottomInset: false,
@@ -69,13 +71,7 @@ class _ResultsState extends State<Results> {
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(10.0),
                       )),
-                  onPressed: () {
-                    Get.to(
-                      const PopUpsConfidenceMeter(),
-                      transition: Transition.circularReveal,
-                      duration: const Duration(milliseconds: 800),
-                    );
-                  },
+                  onPressed: () {},
 
                   child: const Text(
                     'Results',
@@ -124,7 +120,7 @@ class _ResultsState extends State<Results> {
                           max: 100.0,
                           interval: 49,
                           showDividers: true,
-                          value: _value,
+                          value: widget.rez,
                           dividerShape: DividerShape(),
                           onChanged: (dynamic newValue) {
                             // setState(() {

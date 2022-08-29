@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:developer';
+import 'package:calendair/assignments.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -14,6 +15,8 @@ import 'package:path_provider/path_provider.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:http/http.dart' as http;
 
+import 'firestore.dart';
+
 class UserAuthentication extends GetxController {
   static final UserAuthentication _singleton = UserAuthentication._internal();
   factory UserAuthentication() {
@@ -23,6 +26,7 @@ class UserAuthentication extends GetxController {
   LocalDatabase l = LocalDatabase();
   late Future<void> _hive;
   UserData? user;
+  User? currentUser;
   String _verificationCode = '000000';
 
   final auth = FirebaseAuth.instance;
@@ -30,11 +34,11 @@ class UserAuthentication extends GetxController {
 
   UserAuthentication._internal() {
     _initializeFirebase();
-    _hive = initializeHive().then((value) {
-      getUserFromLocalDb().then((value) {
-        user = value;
-      });
-    });
+    // _hive = initializeHive().then((value) {
+    //   getUserFromLocalDb().then((value) {
+    //     user = value;
+    //   });
+    // });
   }
 
   CollectionReference users = FirebaseFirestore.instance.collection('Users');
@@ -43,27 +47,28 @@ class UserAuthentication extends GetxController {
       'email',
       'https://www.googleapis.com/auth/contacts.readonly',
       'https://www.googleapis.com/auth/classroom.courses',
-      'https://www.googleapis.com/auth/classroom.rosters'
+      'https://www.googleapis.com/auth/classroom.rosters',
+      'https://www.googleapis.com/auth/classroom.coursework.students'
     ],
   );
 
-  UserData? get currentUser {
-    if (user != null) {
-      return user;
-    }
-    getUserFromLocalDb().then((value) {
-      user = value;
-      if (user != null) {
-        return user;
-      }
-    });
-    return null;
-  }
+  // UserData? get currentUser {
+  //   if (user != null) {
+  //     return user;
+  //   }
+  //   getUserFromLocalDb().then((value) {
+  //     user = value;
+  //     if (user != null) {
+  //       return user;
+  //     }
+  //   });
+  //   return null;
+  // }
 
   Future<void> signout() async {
     await googleSignIn.signOut();
     user = null;
-    saveUserToLocalDb(null);
+    //  saveUserToLocalDb(null);
   }
 
   Future<bool> signInwithGoogle() async {
@@ -71,7 +76,7 @@ class UserAuthentication extends GetxController {
     try {
       print("object");
       final GoogleSignInAccount? googleSignInAccount =
-          await googleSignIn.signInSilently();
+          await googleSignIn.signIn();
       print("object");
       inspect(googleSignInAccount);
       if (googleSignInAccount != null) {
@@ -84,9 +89,9 @@ class UserAuthentication extends GetxController {
         final googleAuth = await googleSignInAccount.authentication;
         googleAuth.accessToken;
         UserCredential uc = await auth.signInWithCredential(credential);
-        final user = await auth.currentUser;
-        inspect(user);
-        Get.snackbar("Welcome ", user?.displayName ?? "",
+        currentUser = await auth.currentUser;
+        Firestore().addUserIfNotExist(currentUser!.uid);
+        Get.snackbar("Welcome ", currentUser?.displayName ?? "",
             duration: Duration(seconds: 3));
         return true;
       }

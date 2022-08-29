@@ -5,6 +5,7 @@ import 'package:calendair/teacherDashboard.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
+import 'Classes/googleClassroom.dart';
 import 'loginRegister.dart';
 
 class RegisterWhatUser extends StatefulWidget {
@@ -15,6 +16,7 @@ class RegisterWhatUser extends StatefulWidget {
 }
 
 class _RegisterWhatUserState extends State<RegisterWhatUser> {
+  final gc = Get.find<GoogleClassroom>();
   @override
   Widget build(BuildContext context) {
     final width = MediaQuery.of(context).size.width;
@@ -70,6 +72,7 @@ class _RegisterWhatUserState extends State<RegisterWhatUser> {
                   ),
                   InkWell(
                     onTap: (() {
+                      gc.getCourseListStudent();
                       Get.to(
                         const studentDashboard(),
                         transition: Transition.circularReveal,
@@ -103,6 +106,7 @@ class _RegisterWhatUserState extends State<RegisterWhatUser> {
                   ),
                   InkWell(
                     onTap: () {
+                      gc.getCourseListTeacher();
                       Get.to(
                         const TeacherDashboard(),
                         transition: Transition.circularReveal,

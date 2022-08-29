@@ -50,6 +50,8 @@ dependencies:
   googleapis: ^9.1.0
   drag_and_drop_lists: ^0.3.3
   expandable: ^5.0.1
+  form_field_validator: ^1.1.0
+  progress_indicators: ^1.0.0
 
 dev_dependencies:
   flutter_test:

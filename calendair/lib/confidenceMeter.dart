@@ -1,3 +1,4 @@
+import 'package:calendair/Classes/firestore.dart';
 import 'package:calendair/popUpsConfidenceMeter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -6,7 +7,16 @@ import 'package:syncfusion_flutter_core/theme.dart';
 import 'package:syncfusion_flutter_sliders/sliders.dart';
 
 class ConfidenceMeter extends StatefulWidget {
-  const ConfidenceMeter({Key? key}) : super(key: key);
+  String id;
+  String message;
+  String question;
+
+  ConfidenceMeter(
+      {Key? key,
+      required this.id,
+      required this.message,
+      required this.question})
+      : super(key: key);
 
   @override
   State<ConfidenceMeter> createState() => _ConfidenceMeterState();
@@ -42,10 +52,11 @@ class _ConfidenceMeterState extends State<ConfidenceMeter> {
       appBar: AppBar(
         elevation: 0,
         title: Text(
-          "00/00/00 Question",
-          style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
+          widget.question,
+          style:
+              const TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
         ),
-        backgroundColor: Color.fromRGBO(247, 247, 247, 1),
+        backgroundColor: const Color.fromRGBO(247, 247, 247, 1),
         leading: IconButton(
           icon: const Icon(
             Icons.arrow_back_ios,
@@ -75,11 +86,11 @@ class _ConfidenceMeterState extends State<ConfidenceMeter> {
                           borderRadius: BorderRadius.circular(10.0),
                         )),
                     onPressed: () {
-                      Get.to(
-                        const PopUpsConfidenceMeter(),
-                        transition: Transition.circularReveal,
-                        duration: const Duration(milliseconds: 800),
-                      );
+                      // Get.to(
+                      //    PopUpsConfidenceMeter(course: widget.,),
+                      //   transition: Transition.circularReveal,
+                      //   duration: const Duration(milliseconds: 800),
+                      // );
                     },
 
                     child: const Text(
@@ -105,10 +116,11 @@ class _ConfidenceMeterState extends State<ConfidenceMeter> {
                     children: [
                       SizedBox(
                         width: width * 0.55,
-                        child: const FittedBox(
+                        child: FittedBox(
+                          fit: BoxFit.scaleDown,
                           child: Text(
-                            'How do you feel about todays lesson?',
-                            style: TextStyle(
+                            widget.message,
+                            style: const TextStyle(
                               color: Colors.black,
                               fontSize: 35,
                               fontWeight: FontWeight.bold,
@@ -161,6 +173,8 @@ class _ConfidenceMeterState extends State<ConfidenceMeter> {
                             borderRadius: BorderRadius.circular(10.0),
                           )),
                       onPressed: () {
+                        Firestore().addPopUpRate(widget.id, _value.round());
+                        //posalji value
                         Get.back();
                       },
 
@@ -217,6 +231,6 @@ class DividerShape extends SfDividerShape {
           ..style = PaintingStyle.fill
           ..color = isActive
               ? themeData.activeTrackColor!
-              : Color.fromRGBO(202, 225, 239, 1));
+              : const Color.fromRGBO(202, 225, 239, 1));
   }
 }

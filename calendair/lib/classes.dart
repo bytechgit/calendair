@@ -154,7 +154,9 @@ class _classesState extends State<classes> {
                                                       ),
                                                       onTap: () {
                                                         Get.to(
-                                                          const rate(),
+                                                          rate(
+                                                            name: e.name!,
+                                                          ),
                                                           transition: Transition
                                                               .circularReveal,
                                                           duration:

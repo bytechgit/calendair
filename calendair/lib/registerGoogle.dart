@@ -76,7 +76,7 @@ class RegisterGoogle extends StatelessWidget {
                             )),
                         onPressed: () async {
                           await u.signInwithGoogle();
-                          gc.getCourseList();
+                          // gc.getCourseListTeacher();
                         },
 
                         icon: Image.asset(
@@ -104,11 +104,15 @@ class RegisterGoogle extends StatelessWidget {
                             borderRadius: BorderRadius.circular(18.0),
                           )),
                       onPressed: () {
-                        Get.to(
-                          const RegisterWhatUser(),
-                          transition: Transition.circularReveal,
-                          duration: const Duration(milliseconds: 800),
-                        );
+                        if (gc.ua.googleSignIn.currentUser != null) {
+                          Get.to(
+                            const RegisterWhatUser(),
+                            transition: Transition.circularReveal,
+                            duration: const Duration(milliseconds: 800),
+                          );
+                        } else {
+                          Get.snackbar('Sign in', 'Please sign in first');
+                        }
                       },
 
                       child: const FittedBox(

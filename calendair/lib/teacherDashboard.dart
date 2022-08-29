@@ -5,6 +5,7 @@ import 'package:flutter/src/foundation/key.dart';
 import 'package:flutter/src/widgets/framework.dart';
 import 'package:get/get.dart';
 
+import 'Classes/googleClassroom.dart';
 import 'bottomNavBar.dart';
 import 'dashboard.dart';
 import 'models/nbar.dart';
@@ -18,6 +19,7 @@ class TeacherDashboard extends StatefulWidget {
 
 class _TeacherDashboardState extends State<TeacherDashboard> {
   changeTabIndex(int i) {}
+  final gc = Get.find<GoogleClassroom>();
   int tabIndex = 0;
   @override
   Widget build(BuildContext context) {
@@ -75,50 +77,57 @@ class _TeacherDashboardState extends State<TeacherDashboard> {
                     child: Stack(
                       children: [
                         SingleChildScrollView(
-                          child: Column(children: [
-                            for (int i = 0; i < 10; i++)
-                              Padding(
-                                padding: const EdgeInsets.symmetric(
-                                    horizontal: 20, vertical: 10),
-                                child: InkWell(
-                                  onTap: (() {
-                                    Get.to(
-                                      const DashboardPeriod(),
-                                      transition: Transition.circularReveal,
-                                      duration:
-                                          const Duration(milliseconds: 800),
-                                    );
-                                  }),
-                                  child: Container(
-                                    padding: const EdgeInsets.all(10),
-                                    decoration: const BoxDecoration(
-                                        color: Color.fromRGBO(94, 159, 197, 1),
-                                        borderRadius: BorderRadius.all(
-                                            Radius.circular(10))),
-                                    height: 65,
-                                    child: const Center(
-                                      child: FittedBox(
-                                        child: Text(
-                                          'Period 1: AP Biology',
-                                          textAlign: TextAlign.center,
-                                          style: TextStyle(
-                                            color:
-                                                Color.fromRGBO(38, 65, 78, 1),
-                                            fontSize: 36,
+                          child: Obx(
+                            () => Column(children: [
+                              ...gc.courses.value
+                                  .map((e) => Padding(
+                                        padding: const EdgeInsets.symmetric(
+                                            horizontal: 20, vertical: 10),
+                                        child: InkWell(
+                                          onTap: (() {
+                                            Get.to(
+                                              DashboardPeriod(
+                                                course: e,
+                                              ),
+                                              transition:
+                                                  Transition.circularReveal,
+                                              duration: const Duration(
+                                                  milliseconds: 800),
+                                            );
+                                          }),
+                                          child: Container(
+                                            padding: const EdgeInsets.all(10),
+                                            decoration: const BoxDecoration(
+                                                color: Color.fromRGBO(
+                                                    94, 159, 197, 1),
+                                                borderRadius: BorderRadius.all(
+                                                    Radius.circular(10))),
+                                            height: 65,
+                                            child: Center(
+                                              child: FittedBox(
+                                                child: Text(
+                                                  e.name ?? "",
+                                                  textAlign: TextAlign.center,
+                                                  style: const TextStyle(
+                                                    color: Color.fromRGBO(
+                                                        38, 65, 78, 1),
+                                                    fontSize: 36,
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
                                           ),
                                         ),
-                                      ),
-                                    ),
-                                  ),
+                                      ))
+                                  .toList(),
+                              Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Container(
+                                  height: 100,
                                 ),
                               ),
-                            Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: Container(
-                                height: 100,
-                              ),
-                            ),
-                          ]),
+                            ]),
+                          ),
                         ),
                         Align(
                           alignment: Alignment.bottomRight,

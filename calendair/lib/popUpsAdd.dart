@@ -1,21 +1,29 @@
+import 'package:calendair/Classes/firestore.dart';
 import 'package:calendair/popUpsConfidenceMeter.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/src/foundation/key.dart';
 import 'package:flutter/src/widgets/framework.dart';
 import 'package:get/get.dart';
+import 'package:googleapis/classroom/v1.dart';
 
+import 'Classes/googleClassroom.dart';
 import 'bottomNavBar.dart';
 import 'models/nbar.dart';
 
 class PopUpsAdd extends StatefulWidget {
-  const PopUpsAdd({Key? key}) : super(key: key);
+  Course course;
+  PopUpsAdd({Key? key, required this.course}) : super(key: key);
 
   @override
   State<PopUpsAdd> createState() => _PopUpsAddState();
 }
 
 class _PopUpsAddState extends State<PopUpsAdd> {
+  final titleController = TextEditingController();
+  final dateController = TextEditingController();
+  final gc = Get.find<GoogleClassroom>();
+  //final titleController=TextEditingController();
   @override
   Widget build(BuildContext context) {
     final width = MediaQuery.of(context).size.width;
@@ -48,12 +56,13 @@ class _PopUpsAddState extends State<PopUpsAdd> {
               padding: const EdgeInsets.only(top: 10.0),
               child: SizedBox(
                 width: width * 0.5,
-                child: const FittedBox(
+                child: FittedBox(
+                  fit: BoxFit.scaleDown,
                   child: Text(
-                    'Period 1',
-                    style: TextStyle(
+                    widget.course.name ?? 'Period 1',
+                    style: const TextStyle(
                       color: Colors.black,
-                      fontSize: 22,
+                      fontSize: 40,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
@@ -85,6 +94,7 @@ class _PopUpsAddState extends State<PopUpsAdd> {
                 width: width * 0.7,
                 //height: 40,
                 child: TextField(
+                  controller: titleController,
                   style: const TextStyle(
                       color: Color.fromRGBO(38, 64, 78, 1), fontSize: 25),
                   textAlignVertical: TextAlignVertical.center,
@@ -123,6 +133,7 @@ class _PopUpsAddState extends State<PopUpsAdd> {
                 width: width * 0.7,
                 //height: 40,
                 child: TextField(
+                  controller: dateController,
                   maxLines: 3,
                   minLines: 1,
                   keyboardType: TextInputType.multiline,
@@ -173,7 +184,9 @@ class _PopUpsAddState extends State<PopUpsAdd> {
                       )),
                   onPressed: () {
                     Get.to(
-                      const PopUpsConfidenceMeter(),
+                      PopUpsConfidenceMeter(
+                        course: widget.course,
+                      ),
                       transition: Transition.circularReveal,
                       duration: const Duration(milliseconds: 800),
                     );
@@ -205,6 +218,11 @@ class _PopUpsAddState extends State<PopUpsAdd> {
                         borderRadius: BorderRadius.circular(10.0),
                       )),
                   onPressed: () {
+                    Firestore().addPopUp(
+                        classId: widget.course.id!,
+                        date: dateController.text,
+                        title: titleController.text,
+                        cm: gc.confidence);
                     Get.back();
                   },
 

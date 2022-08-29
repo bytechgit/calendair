@@ -4,7 +4,8 @@ import 'package:syncfusion_flutter_core/theme.dart';
 import 'package:syncfusion_flutter_sliders/sliders.dart';
 
 class rate extends StatefulWidget {
-  const rate({Key? key}) : super(key: key);
+  String name;
+  rate({Key? key, required this.name}) : super(key: key);
 
   @override
   State<rate> createState() => _rateState();
@@ -52,11 +53,11 @@ class _rateState extends State<rate> {
                   ),
                 ),
                 Expanded(child: Container()),
-                const FittedBox(
+                FittedBox(
                   fit: BoxFit.scaleDown,
                   child: Text(
-                    'Biology',
-                    style: TextStyle(
+                    widget.name,
+                    style: const TextStyle(
                       color: Colors.black,
                       fontSize: 35,
                       fontWeight: FontWeight.bold,
@@ -168,6 +169,6 @@ class DividerShape extends SfDividerShape {
           ..style = PaintingStyle.fill
           ..color = isActive
               ? themeData.activeTrackColor!
-              : Color.fromRGBO(202, 225, 239, 1));
+              : const Color.fromRGBO(202, 225, 239, 1));
   }
 }

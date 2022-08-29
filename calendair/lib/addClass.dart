@@ -2,6 +2,8 @@ import 'package:calendair/joinNotification.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
+import 'Classes/googleClassroom.dart';
+
 class addClass extends StatefulWidget {
   const addClass({Key? key}) : super(key: key);
 
@@ -10,6 +12,8 @@ class addClass extends StatefulWidget {
 }
 
 class _addClassState extends State<addClass> {
+  final gc = Get.find<GoogleClassroom>();
+  final codeController = TextEditingController();
   @override
   Widget build(BuildContext context) {
     final width = MediaQuery.of(context).size.width;
@@ -75,6 +79,7 @@ class _addClassState extends State<addClass> {
                         width: width * 0.7,
                         //height: 40,
                         child: TextField(
+                          controller: codeController,
                           style: const TextStyle(
                               color: Color.fromRGBO(38, 64, 78, 1),
                               fontSize: 25),
@@ -120,12 +125,16 @@ class _addClassState extends State<addClass> {
                           elevation: 0,
                           shape: const CircleBorder(),
                         ),
-                        onPressed: () {
-                          Get.to(
-                            const joinNotification(),
-                            transition: Transition.circularReveal,
-                            duration: const Duration(milliseconds: 800),
-                          );
+                        onPressed: () async {
+                          String name =
+                              await gc.enrolToCourse(codeController.text);
+                          if (name != "") {
+                            Get.to(
+                              joinNotification(name: name),
+                              transition: Transition.circularReveal,
+                              duration: const Duration(milliseconds: 800),
+                            );
+                          }
                         },
 
                         child: Icon(

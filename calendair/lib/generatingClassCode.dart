@@ -4,13 +4,22 @@ import 'package:flutter/material.dart';
 import 'package:flutter/src/foundation/key.dart';
 import 'package:flutter/src/widgets/framework.dart';
 import 'package:get/get.dart';
+import 'package:progress_indicators/progress_indicators.dart';
 
 import 'bottomNavBar.dart';
 import 'models/nbar.dart';
 
-class GeneratingClassCode extends StatelessWidget {
-  const GeneratingClassCode({Key? key}) : super(key: key);
+class GeneratingClassCode extends StatefulWidget {
+  final Future<String>? futureCode;
 
+  const GeneratingClassCode({Key? key, this.futureCode}) : super(key: key);
+
+  @override
+  State<GeneratingClassCode> createState() => _GeneratingClassCodeState();
+}
+
+class _GeneratingClassCodeState extends State<GeneratingClassCode> {
+  String? code;
   @override
   Widget build(BuildContext context) {
     final width = MediaQuery.of(context).size.width;
@@ -59,19 +68,44 @@ class GeneratingClassCode extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   SizedBox(
-                    width: width * 0.7,
-                    child: const FittedBox(
-                      child: Text(
-                        "Generating Class Code...",
-                        style: TextStyle(
-                            color: Colors.black,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 28),
+                    width: width * 0.8,
+                    child: FittedBox(
+                      fit: BoxFit.scaleDown,
+                      child: Row(
+                        children: [
+                          const Text(
+                            "Generating Class Code",
+                            style: TextStyle(
+                                color: Colors.black,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 20),
+                          ),
+                          FutureBuilder<String>(
+                              future: widget.futureCode,
+                              builder: (context, snapshot) {
+                                if (snapshot.hasData) {
+                                  code = snapshot.data;
+
+                                  return const Text(
+                                    "...",
+                                    style: TextStyle(
+                                        color: Colors.black,
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 18),
+                                  );
+                                } else {
+                                  return JumpingDotsProgressIndicator(
+                                    fontSize: 18.0,
+                                    dotSpacing: 0,
+                                  );
+                                }
+                              }),
+                        ],
                       ),
                     ),
                   ),
                   Padding(
-                    padding: const EdgeInsets.only(bottom: 20.0),
+                    padding: const EdgeInsets.only(bottom: 20.0, top: 7),
                     child: Container(
                       height: 6,
                       width: width * 0.6,
@@ -85,29 +119,65 @@ class GeneratingClassCode extends StatelessWidget {
                     child: SizedBox(
                       width: width * 0.7,
                       //height: 40,
-                      child: TextField(
-                        maxLines: 3,
-                        minLines: 1,
-                        keyboardType: TextInputType.multiline,
-                        style: const TextStyle(
-                            color: Color.fromRGBO(38, 64, 78, 1), fontSize: 25),
-                        textAlignVertical: TextAlignVertical.center,
-                        textAlign: TextAlign.center,
-                        decoration: InputDecoration(
-                          contentPadding:
-                              const EdgeInsets.symmetric(horizontal: 10.0),
-                          border: OutlineInputBorder(
-                            borderSide: BorderSide.none,
-                            borderRadius: BorderRadius.circular(15.0),
-                          ),
-                          filled: true,
-                          hintStyle: const TextStyle(
-                              color: Color.fromRGBO(38, 64, 78, 1),
-                              fontSize: 25),
-                          hintText: "000-000",
-                          fillColor: const Color.fromRGBO(94, 159, 197, 1),
-                        ),
-                      ),
+                      child: FutureBuilder<String>(
+                          future: widget.futureCode,
+                          builder: (context, snapshot) {
+                            if (snapshot.hasData) {
+                              return TextField(
+                                enabled: false,
+                                maxLines: 3,
+                                minLines: 1,
+                                keyboardType: TextInputType.multiline,
+                                style: const TextStyle(
+                                    color: Color.fromRGBO(38, 64, 78, 1),
+                                    fontSize: 25),
+                                textAlignVertical: TextAlignVertical.center,
+                                textAlign: TextAlign.center,
+                                decoration: InputDecoration(
+                                  contentPadding: const EdgeInsets.symmetric(
+                                      horizontal: 10.0),
+                                  border: OutlineInputBorder(
+                                    borderSide: BorderSide.none,
+                                    borderRadius: BorderRadius.circular(15.0),
+                                  ),
+                                  filled: true,
+                                  hintStyle: const TextStyle(
+                                      color: Color.fromRGBO(38, 64, 78, 1),
+                                      fontSize: 25),
+                                  hintText: snapshot.data,
+                                  fillColor:
+                                      const Color.fromRGBO(94, 159, 197, 1),
+                                ),
+                              );
+                            } else {
+                              return TextField(
+                                enabled: false,
+                                maxLines: 3,
+                                minLines: 1,
+                                keyboardType: TextInputType.multiline,
+                                style: const TextStyle(
+                                    color: Color.fromRGBO(38, 64, 78, 1),
+                                    fontSize: 25),
+                                textAlignVertical: TextAlignVertical.center,
+                                textAlign: TextAlign.center,
+                                decoration: InputDecoration(
+                                  contentPadding: const EdgeInsets.symmetric(
+                                      horizontal: 10.0),
+                                  border: OutlineInputBorder(
+                                    borderSide: BorderSide.none,
+                                    borderRadius: BorderRadius.circular(15.0),
+                                  ),
+                                  filled: true,
+                                  hintStyle: const TextStyle(
+                                      color: Color.fromRGBO(38, 64, 78, 1),
+                                      fontSize: 25),
+                                  hintText: "",
+                                  fillColor:
+                                      const Color.fromRGBO(94, 159, 197, 1),
+                                ),
+                              );
+                            }
+                          }),
                     ),
                   ),
                   Padding(

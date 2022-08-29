@@ -3,18 +3,23 @@ import 'package:flutter/material.dart';
 import 'package:flutter/src/foundation/key.dart';
 import 'package:flutter/src/widgets/framework.dart';
 import 'package:get/get.dart';
+import 'package:googleapis/classroom/v1.dart';
 
+import 'Classes/googleClassroom.dart';
 import 'bottomNavBar.dart';
 import 'models/nbar.dart';
 
 class PopUpsConfidenceMeter extends StatefulWidget {
-  const PopUpsConfidenceMeter({Key? key}) : super(key: key);
+  Course course;
+  PopUpsConfidenceMeter({Key? key, required this.course}) : super(key: key);
 
   @override
   State<PopUpsConfidenceMeter> createState() => _PopUpsConfidenceMeterState();
 }
 
 class _PopUpsConfidenceMeterState extends State<PopUpsConfidenceMeter> {
+  final gc = Get.find<GoogleClassroom>();
+  final con = TextEditingController();
   @override
   Widget build(BuildContext context) {
     final width = MediaQuery.of(context).size.width;
@@ -47,12 +52,13 @@ class _PopUpsConfidenceMeterState extends State<PopUpsConfidenceMeter> {
               padding: const EdgeInsets.only(top: 10.0),
               child: SizedBox(
                 width: width * 0.5,
-                child: const FittedBox(
+                child: FittedBox(
+                  fit: BoxFit.scaleDown,
                   child: Text(
-                    'Period 1',
-                    style: TextStyle(
+                    widget.course.name ?? 'Period 1',
+                    style: const TextStyle(
                       color: Colors.black,
-                      fontSize: 22,
+                      fontSize: 40,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
@@ -72,8 +78,8 @@ class _PopUpsConfidenceMeterState extends State<PopUpsConfidenceMeter> {
             ),
             SizedBox(
               width: width * 0.8,
-              child: FittedBox(
-                child: const Text(
+              child: const FittedBox(
+                child: Text(
                   'Confidence Meter Question',
                   style: TextStyle(
                     color: Colors.black,
@@ -90,6 +96,7 @@ class _PopUpsConfidenceMeterState extends State<PopUpsConfidenceMeter> {
                 //height: 40,
                 child: TextField(
                   maxLines: 3,
+                  controller: con,
                   minLines: 1,
                   keyboardType: TextInputType.multiline,
                   style: const TextStyle(
@@ -127,6 +134,7 @@ class _PopUpsConfidenceMeterState extends State<PopUpsConfidenceMeter> {
                         borderRadius: BorderRadius.circular(10.0),
                       )),
                   onPressed: () {
+                    gc.confidence = con.text;
                     Get.back();
                   },
 
