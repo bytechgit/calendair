@@ -35,7 +35,7 @@ class _BottomNavBarState extends State<BottomNavBar> {
 
     navbar.index.value = widget.selected;
     return Container(
-      color: Color.fromRGBO(93, 159, 196, 1),
+      color: const Color.fromRGBO(93, 159, 196, 1),
       height: 60,
       child: Row(
         children: [
@@ -43,28 +43,15 @@ class _BottomNavBarState extends State<BottomNavBar> {
             Expanded(
                 child: SizedBox(
               child: Padding(
-                padding: const EdgeInsets.all(3.0),
+                padding: EdgeInsets.all(3.0),
                 child: InkWell(
-                  onTap: () {
-                    Get.to(
-                      widget.items[i].widget,
-                      transition: Transition.circularReveal,
-                      duration: const Duration(milliseconds: 800),
-                    )?.then((value) {
-                      setState(() {
-                        index1 = widget.selected;
-                      });
-                    });
-                    setState(() {
-                      index1 = i;
-                    });
-                  },
+                  onTap: widget.items[i].onclick,
                   child: Container(
-                    padding: EdgeInsets.all(8),
+                    padding: const EdgeInsets.all(8),
                     decoration: BoxDecoration(
                         color: index1 == i
                             ? Colors.white
-                            : Color.fromRGBO(93, 159, 196, 1),
+                            : const Color.fromRGBO(93, 159, 196, 1),
                         shape: BoxShape.circle),
                     child: Image.asset(
                         'assets/images/${widget.items[i].slika}.png'),

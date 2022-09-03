@@ -26,7 +26,7 @@ class _rateState extends State<rate> {
               color: Colors.black,
             ),
             onPressed: () {
-              Get.close(3);
+              Get.back();
             },
           ),
         ),
@@ -117,7 +117,7 @@ class _rateState extends State<rate> {
                             borderRadius: BorderRadius.circular(18.0),
                           )),
                       onPressed: () {
-                        Get.close(3);
+                        Get.back();
                       },
 
                       child: const Text(

@@ -1,10 +1,7 @@
-import 'dart:developer';
-
+import 'package:calendair/classes.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:get/get.dart';
-
-import '../models/popup.dart';
 import 'Authentication.dart';
 import 'googleClassroom.dart';
 
@@ -18,7 +15,11 @@ class Firestore {
 
   final firestore = FirebaseFirestore.instance;
   CollectionReference users = FirebaseFirestore.instance.collection('Users');
+  CollectionReference courses =
+      FirebaseFirestore.instance.collection('Courses');
   CollectionReference popups = FirebaseFirestore.instance.collection('Popups');
+  CollectionReference reminder =
+      FirebaseFirestore.instance.collection('Reminders');
 
   Firestore._internal() {
     _initializeFirebase();
@@ -29,42 +30,89 @@ class Firestore {
     return firebaseApp;
   }
 
-  void addUserIfNotExist(String UID) {
+  void addUserIfNotExist(String UID, String type) {
     users.doc(UID).get().then((DocumentSnapshot ds) {
       if (!ds.exists) {
-        users.doc(UID).set({"classes": []}, SetOptions(merge: true));
+        users
+            .doc(UID)
+            .set({"classes": [], "type": type}, SetOptions(merge: true));
       }
     });
   }
 
+  Future<String> getUserIfExist(String UID) async {
+    final ds = await users.doc(UID).get();
+    if (ds.exists) {
+      return ds["type"];
+    }
+    return "";
+  }
+
   void addPopUp(
       {required String classId,
-      required String date,
+      required DateTime date,
       required String title,
       required String cm}) {
     popups.add({
-      "ClassId": classId,
-      "Date": date,
-      "Title": title,
+      "class": classId,
+      "dueDate": date,
+      "title": title,
       "numRate": 0,
       "sumRate": 0,
-      "ConfidenceQuestion": cm,
+      "question": cm,
       "order": DateTime.now(),
       "students": []
     });
   }
 
-  void addcourse({
+  void addReminder(
+      {required String classId,
+      required DateTime date,
+      required String title}) {
+    reminder.add({
+      "class": classId,
+      "date": date,
+      "title": title,
+    });
+  }
+
+  void addCourse({
     required String classId,
     required String code,
     required String name,
   }) {
-    FirebaseFirestore.instance
-        .collection('Courses')
-        .add({"id": classId, "code": code, "name": name});
+    FirebaseFirestore.instance.collection('Courses').add({
+      "id": classId,
+      "code": code,
+      "name": name,
+      "owner": ua.currentUser!.uid,
+      "students": []
+    });
   }
 
-  Future<QuerySnapshot<Map<String, dynamic>>> getcourse({
+  Stream<QuerySnapshot<Map<String, dynamic>>> getTeacherCourses() {
+    return FirebaseFirestore.instance
+        .collection('Courses')
+        .where("owner", isEqualTo: ua.currentUser!.uid)
+        .snapshots();
+  }
+
+  Stream<QuerySnapshot<Map<String, dynamic>>> getStudentCourses() {
+    return FirebaseFirestore.instance
+        .collection('Courses')
+        .where("students", arrayContains: ua.currentUser!.uid)
+        .snapshots();
+  }
+
+  Stream<QuerySnapshot<Map<String, dynamic>>> getTeacherRemider(String id) {
+    print(id);
+    return FirebaseFirestore.instance
+        .collection('Reminders')
+        .where("class", isEqualTo: id)
+        .snapshots();
+  }
+
+  Future<QuerySnapshot<Map<String, dynamic>>> getCourse({
     required String code,
   }) async {
     return await FirebaseFirestore.instance
@@ -73,41 +121,27 @@ class Firestore {
         .get();
   }
 
-  Future<List<PopUp>> readPopUps() async {
-    var pu = await popups
-        .where("ClassId", whereIn: gc.courses.value.map((e) => e.id).toList())
-        .get();
-
-    return pu.docs.map((e) {
-      var en = e.data() as Map<String, dynamic>;
-
-      return PopUp(e.id, en["classId"] ?? "", en["date"] ?? "",
-          en["title"] ?? "", en["numRate"] ?? 0, en["sumRate"] ?? 0);
-    }).toList();
-  }
-
-  Future<List<PopUp>> readPopUpsTeacher(String classId) async {
-    var pu = await popups.where("ClassId", isEqualTo: classId).get();
-
-    return pu.docs.map((e) {
-      var en = e.data() as Map<String, dynamic>;
-
-      return PopUp(e.id, en["classId"] ?? "", en["date"] ?? "",
-          en["title"] ?? "", en["numRate"] ?? 0, en["sumRate"] ?? 0);
-    }).toList();
+  Stream<QuerySnapshot<Object?>> getTeacherPopUps(String id) {
+    return popups.where("class", isEqualTo: id).snapshots();
   }
 
   void addPopUpRate(String id, int rate) {
     popups.doc(id).update({
       "numRate": FieldValue.increment(1),
       "sumRate": FieldValue.increment(rate),
-      "students": FieldValue.arrayUnion([ua.currentUser!.uid])
+      "students": FieldValue.arrayRemove([ua.currentUser!.uid])
     });
   }
 
-  void addClassToUser(String classid) {
+  void addCourseToUser(String classid) {
     users.doc(ua.currentUser!.uid).update({
-      "classes": FieldValue.arrayUnion([classid])
+      "courses": FieldValue.arrayUnion([classid])
+    });
+  }
+
+  void addUserToCourse(String id) {
+    courses.doc(id).update({
+      "students": FieldValue.arrayUnion([ua.currentUser!.uid])
     });
   }
 

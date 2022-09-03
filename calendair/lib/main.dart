@@ -16,6 +16,7 @@ import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 
 import 'Classes/googleClassroom.dart';
+import 'loginRegister.dart';
 import 'notifications.dart';
 
 Future<void> main() async {
@@ -42,7 +43,7 @@ class MyApp extends StatelessWidget {
         fontFamily: 'LeagueSpartan',
         primarySwatch: Colors.blue,
       ),
-      home: const SplashScreen(),
+      home: const LoginRegister(),
     );
   }
 }

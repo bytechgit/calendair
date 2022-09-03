@@ -2,6 +2,7 @@ import 'dart:developer';
 
 import 'package:calendair/extracurricularsAdd.dart';
 import 'package:calendair/rate.dart';
+import 'package:calendair/studentDashboard.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/src/foundation/key.dart';
 import 'package:flutter/src/widgets/framework.dart';
@@ -45,16 +46,29 @@ class _ExtracurricularsState extends State<Extracurriculars> {
       bottomNavigationBar: BottomNavBar(
         items: [
           NBar(
-            slika: 'calendar',
-            widget: const dashboard(),
-          ),
+              slika: 'calendar',
+              onclick: () {
+                Get.off(
+                  dashboard(),
+                  transition: Transition.circularReveal,
+                  duration: const Duration(milliseconds: 800),
+                );
+              }),
           NBar(
-            slika: 'home',
-          ),
+              slika: 'home',
+              onclick: () {
+                Get.until((route) =>
+                    (route as GetPageRoute).routeName == '/studentDashboard');
+              }),
           NBar(
-            slika: 'settings',
-            widget: const Settings(),
-          )
+              slika: 'settings',
+              onclick: () {
+                Get.off(
+                  Settings(),
+                  transition: Transition.circularReveal,
+                  duration: const Duration(milliseconds: 800),
+                );
+              })
         ],
         selected: 1,
       ),

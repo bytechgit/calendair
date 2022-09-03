@@ -5,6 +5,7 @@ import 'package:calendair/teacherDashboard.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
+import 'Classes/firestore.dart';
 import 'Classes/googleClassroom.dart';
 import 'loginRegister.dart';
 
@@ -72,7 +73,9 @@ class _RegisterWhatUserState extends State<RegisterWhatUser> {
                   ),
                   InkWell(
                     onTap: (() {
-                      gc.getCourseListStudent();
+                      Firestore()
+                          .addUserIfNotExist(gc.ua.currentUser!.uid, "student");
+                      // gc.getCourseListStudent();
                       Get.to(
                         const studentDashboard(),
                         transition: Transition.circularReveal,
@@ -106,7 +109,9 @@ class _RegisterWhatUserState extends State<RegisterWhatUser> {
                   ),
                   InkWell(
                     onTap: () {
-                      gc.getCourseListTeacher();
+                      Firestore()
+                          .addUserIfNotExist(gc.ua.currentUser!.uid, "teacher");
+                      //gc.getCourseListTeacher();
                       Get.to(
                         const TeacherDashboard(),
                         transition: Transition.circularReveal,

@@ -29,8 +29,11 @@ class _AddClassReminderState extends State<AddClassReminder> {
         bottomNavigationBar: BottomNavBar(
           items: [
             NBar(
-              slika: 'home',
-            ),
+                slika: 'home',
+                onclick: () {
+                  Get.until((route) =>
+                      (route as GetPageRoute).routeName == '/TeacherDashboard');
+                }),
           ],
           selected: 0,
         ),
@@ -163,7 +166,7 @@ class _AddClassReminderState extends State<AddClassReminder> {
                 child: FittedBox(
                   fit: BoxFit.scaleDown,
                   child: const Text(
-                    'Send',
+                    'Update',
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       color: Colors.black,

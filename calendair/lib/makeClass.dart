@@ -40,8 +40,11 @@ class _MakeClassState extends State<MakeClass> {
       bottomNavigationBar: BottomNavBar(
         items: [
           NBar(
-            slika: 'home',
-          ),
+              slika: 'home',
+              onclick: () {
+                Get.until((route) =>
+                    (route as GetPageRoute).routeName == '/TeacherDashboard');
+              }),
         ],
         selected: 0,
       ),
@@ -186,6 +189,7 @@ class _MakeClassState extends State<MakeClass> {
                                       child: SingleChildScrollView(
                                         child: Column(
                                           children: [
+                                            ////printskrin bluetooth
                                             const SizedBox(
                                               width: double.infinity,
                                             ),
@@ -233,7 +237,7 @@ class _MakeClassState extends State<MakeClass> {
                                                               iconSize: 30,
                                                               onPressed: () {
                                                                 gc.addClass(e);
-                                                                Get.to(
+                                                                Get.off(
                                                                   GeneratingClassCode(
                                                                       futureCode: Future.delayed(
                                                                           Duration(

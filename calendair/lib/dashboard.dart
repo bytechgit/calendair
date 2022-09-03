@@ -1,4 +1,5 @@
 import 'package:calendair/settings.dart';
+import 'package:calendair/studentDashboard.dart';
 import 'package:calendair/toDo.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -40,16 +41,30 @@ class _dashboardState extends State<dashboard> {
             bottomNavigationBar: BottomNavBar(
               items: [
                 NBar(
-                  slika: 'calendar',
-                  widget: const dashboard(),
-                ),
+                    slika: 'calendar',
+                    onclick: () {
+                      Get.off(
+                        dashboard(),
+                        transition: Transition.circularReveal,
+                        duration: const Duration(milliseconds: 800),
+                      );
+                    }),
                 NBar(
-                  slika: 'home',
-                ),
+                    slika: 'home',
+                    onclick: () {
+                      Get.until((route) =>
+                          (route as GetPageRoute).routeName ==
+                          '/studentDashboard');
+                    }),
                 NBar(
-                  slika: 'settings',
-                  widget: const Settings(),
-                )
+                    slika: 'settings',
+                    onclick: () {
+                      Get.off(
+                        Settings(),
+                        transition: Transition.circularReveal,
+                        duration: const Duration(milliseconds: 800),
+                      );
+                    })
               ],
               selected: 0,
             ),

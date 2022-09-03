@@ -1,19 +1,18 @@
+import 'dart:developer';
 import 'package:calendair/Classes/firestore.dart';
 import 'package:calendair/bottomNavBar.dart';
 import 'package:calendair/breakDay.dart';
-import 'package:calendair/calendar.dart';
 import 'package:calendair/classes.dart';
 import 'package:calendair/confidenceMeter.dart';
 import 'package:calendair/extracurriculars.dart';
+import 'package:calendair/models/PopUpModel.dart';
 import 'package:calendair/settings.dart' as c;
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:googleapis/classroom/v1.dart';
-
+import 'package:intl/intl.dart';
 import 'Classes/googleClassroom.dart';
 import 'dashboard.dart';
-import 'loginRegister.dart';
 import 'models/nbar.dart';
 
 class studentDashboard extends StatefulWidget {
@@ -26,8 +25,10 @@ class studentDashboard extends StatefulWidget {
 class _studentDashboardState extends State<studentDashboard> {
   bool selected = false;
   final gc = Get.find<GoogleClassroom>();
+
   @override
   Widget build(BuildContext context) {
+    int i = 0;
     final width = MediaQuery.of(context).size.width;
     final height = MediaQuery.of(context).size.height;
 
@@ -40,16 +41,27 @@ class _studentDashboardState extends State<studentDashboard> {
       bottomNavigationBar: BottomNavBar(
         items: [
           NBar(
-            slika: 'calendar',
-            widget: const dashboard(),
-          ),
+              slika: 'calendar',
+              onclick: () {
+                Get.to(
+                  dashboard(),
+                  transition: Transition.circularReveal,
+                  duration: const Duration(milliseconds: 800),
+                );
+              }),
           NBar(
-            slika: 'home',
-          ),
+              slika: 'home',
+              // widget: const studentDashboard(),
+              onclick: () {}),
           NBar(
-            slika: 'settings',
-            widget: const c.Settings(),
-          )
+              slika: 'settings',
+              onclick: () {
+                Get.to(
+                  c.Settings(),
+                  transition: Transition.circularReveal,
+                  duration: const Duration(milliseconds: 800),
+                );
+              })
         ],
         selected: 1,
       ),
@@ -229,116 +241,84 @@ class _studentDashboardState extends State<studentDashboard> {
                         ),
                       ),
                       Expanded(
-                        child: Obx(
-                          () => StreamBuilder(
-                              stream: FirebaseFirestore.instance
-                                  .collection('Popups')
-                                  .where("ClassId",
-                                      whereIn: gc.courses.value.isEmpty
-                                          ? ["aa"]
-                                          : gc.courses.value
-                                              .map((e) => e.id)
-                                              .toList())
-                                  .where("students")
-                                  .orderBy("order")
-                                  .snapshots(),
-                              builder: (context,
-                                  AsyncSnapshot<QuerySnapshot> snapshot) {
-                                if (snapshot.hasData) {
-                                  return SingleChildScrollView(
-                                    child: Column(
-                                      children: [
-                                        ...snapshot.data!.docs.reversed
-                                            .where((element) =>
-                                                !(element["students"]
-                                                        as List<dynamic>)
-                                                    .map((e) => e.toString())
-                                                    .toList()
-                                                    .contains(Firestore()
-                                                        .ua
-                                                        .currentUser!
-                                                        .uid))
-                                            .map(
-                                              (d) => InkWell(
-                                                onTap: () {
-                                                  Get.to(
-                                                    ConfidenceMeter(
-                                                      id: d.id,
-                                                      question: d["Date"] +
-                                                          " " +
-                                                          d["Title"],
-                                                      message: d[
-                                                          "ConfidenceQuestion"],
-                                                    ),
-                                                    transition: Transition
-                                                        .circularReveal,
-                                                    duration: const Duration(
-                                                        milliseconds: 800),
-                                                  );
-                                                },
-                                                child: Padding(
-                                                  padding:
-                                                      const EdgeInsets.only(
-                                                          top: 10),
-                                                  child: SizedBox(
-                                                    height: 40,
-                                                    child: Row(
-                                                      mainAxisSize:
-                                                          MainAxisSize.min,
-                                                      crossAxisAlignment:
-                                                          CrossAxisAlignment
-                                                              .center,
-                                                      children: [
-                                                        Padding(
-                                                          padding:
-                                                              const EdgeInsets
-                                                                  .all(8.0),
-                                                          child: Image.asset(
-                                                            'assets/images/triangle.png',
-                                                            width: 20,
-                                                            height: 20,
-                                                          ),
-                                                        ),
-                                                        SizedBox(
-                                                          width: width * 0.55,
-                                                          child: FittedBox(
-                                                            alignment: Alignment
-                                                                .centerLeft,
-                                                            fit: BoxFit
-                                                                .scaleDown,
-                                                            child: Text(
-                                                              d["Date"] +
-                                                                  " " +
-                                                                  d["Title"],
-                                                              style:
-                                                                  const TextStyle(
-                                                                color: Colors
-                                                                    .white,
-                                                                fontSize: 25,
-                                                                fontWeight:
-                                                                    FontWeight
-                                                                        .bold,
-                                                              ),
-                                                            ),
-                                                          ),
-                                                        ),
-                                                      ],
+                        child: StreamBuilder(
+                            stream: FirebaseFirestore.instance
+                                .collection('Popups')
+                                .where("students",
+                                    arrayContains:
+                                        Firestore().ua.currentUser!.uid)
+                                .snapshots(),
+                            builder: (context,
+                                AsyncSnapshot<QuerySnapshot> snapshot) {
+                              if (snapshot.hasData) {
+                                inspect(snapshot.data);
+                                return SingleChildScrollView(
+                                  child: Column(
+                                    children: [
+                                      ...snapshot.data!.docs.map((e) {
+                                        final pu = PopUpModel.fromMap(
+                                          e.data() as Map<String, dynamic>,
+                                        );
+                                        return InkWell(
+                                          onTap: () {
+                                            Get.to(
+                                              ConfidenceMeter(
+                                                  id: e.id,
+                                                  question:
+                                                      "${DateFormat("MM/dd/yy").format(pu.dueDate.toDate())} ${pu.title}",
+                                                  message: pu.question),
+                                              transition:
+                                                  Transition.circularReveal,
+                                              duration: const Duration(
+                                                  milliseconds: 800),
+                                            );
+                                          },
+                                          child: Padding(
+                                            padding:
+                                                const EdgeInsets.only(top: 15),
+                                            child: SizedBox(
+                                              child: Row(
+                                                mainAxisSize: MainAxisSize.min,
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.center,
+                                                children: [
+                                                  Padding(
+                                                    padding:
+                                                        const EdgeInsets.all(
+                                                            8.0),
+                                                    child: Image.asset(
+                                                      'assets/images/triangle.png',
+                                                      width: 15,
+                                                      height: 15,
                                                     ),
                                                   ),
-                                                ),
+                                                  SizedBox(
+                                                    width: width * 0.65,
+                                                    child: Text(
+                                                      "${DateFormat("MM/dd/yy").format(pu.dueDate.toDate())} ${pu.title}",
+                                                      style: const TextStyle(
+                                                        color: Colors.white,
+                                                        fontSize: 18,
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ],
                                               ),
-                                            )
-                                            .toList()
-                                      ],
-                                    ),
-                                  );
-                                } else {
-                                  return Center(
-                                    child: CircularProgressIndicator(),
-                                  );
-                                }
-                              }),
-                        ),
+                                            ),
+                                          ),
+                                        );
+                                      }).toList()
+                                    ],
+                                  ),
+                                );
+                              } else {
+                                return const Center(
+                                  child: CircularProgressIndicator(),
+                                );
+                              }
+                            }),
                       ),
                     ],
                   ),

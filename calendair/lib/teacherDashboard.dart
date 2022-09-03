@@ -1,13 +1,13 @@
+import 'package:calendair/Classes/firestore.dart';
 import 'package:calendair/dashboardPeriod.dart';
 import 'package:calendair/makeClass.dart';
+import 'package:calendair/models/CustomCourse.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/src/foundation/key.dart';
-import 'package:flutter/src/widgets/framework.dart';
 import 'package:get/get.dart';
 
 import 'Classes/googleClassroom.dart';
 import 'bottomNavBar.dart';
-import 'dashboard.dart';
 import 'models/nbar.dart';
 
 class TeacherDashboard extends StatefulWidget {
@@ -34,12 +34,11 @@ class _TeacherDashboardState extends State<TeacherDashboard> {
       bottomNavigationBar: BottomNavBar(
         items: [
           NBar(
-            slika: 'calendar',
-            widget: const dashboard(),
-          ),
-          NBar(
-            slika: 'home',
-          ),
+              slika: 'home',
+              onclick: () {
+                Get.until((route) =>
+                    (route as GetPageRoute).routeName == '/TeacherDashboard');
+              }),
         ],
         selected: 0,
       ),
@@ -76,18 +75,25 @@ class _TeacherDashboardState extends State<TeacherDashboard> {
                     ),
                     child: Stack(
                       children: [
-                        SingleChildScrollView(
-                          child: Obx(
-                            () => Column(children: [
-                              ...gc.courses.value
-                                  .map((e) => Padding(
+                        StreamBuilder(
+                            stream: Firestore().getTeacherCourses(),
+                            builder: (context,
+                                AsyncSnapshot<QuerySnapshot> snapshot) {
+                              if (snapshot.hasData) {
+                                return SingleChildScrollView(
+                                  child: Column(children: [
+                                    ...snapshot.data!.docs.map((e) {
+                                      final cc = CustomCourse.fromMap(
+                                          e.data() as Map<String, dynamic>,
+                                          e.id);
+                                      return Padding(
                                         padding: const EdgeInsets.symmetric(
                                             horizontal: 20, vertical: 10),
                                         child: InkWell(
                                           onTap: (() {
                                             Get.to(
                                               DashboardPeriod(
-                                                course: e,
+                                                course: cc,
                                               ),
                                               transition:
                                                   Transition.circularReveal,
@@ -106,7 +112,7 @@ class _TeacherDashboardState extends State<TeacherDashboard> {
                                             child: Center(
                                               child: FittedBox(
                                                 child: Text(
-                                                  e.name ?? "",
+                                                  cc.name,
                                                   textAlign: TextAlign.center,
                                                   style: const TextStyle(
                                                     color: Color.fromRGBO(
@@ -118,17 +124,22 @@ class _TeacherDashboardState extends State<TeacherDashboard> {
                                             ),
                                           ),
                                         ),
-                                      ))
-                                  .toList(),
-                              Padding(
-                                padding: const EdgeInsets.all(8.0),
-                                child: Container(
-                                  height: 100,
-                                ),
-                              ),
-                            ]),
-                          ),
-                        ),
+                                      );
+                                    }).toList(),
+                                    Padding(
+                                      padding: const EdgeInsets.all(8.0),
+                                      child: Container(
+                                        height: 100,
+                                      ),
+                                    ),
+                                  ]),
+                                );
+                              } else {
+                                return Center(
+                                  child: CircularProgressIndicator(),
+                                );
+                              }
+                            }),
                         Align(
                           alignment: Alignment.bottomRight,
                           child: Padding(

@@ -27,7 +27,6 @@ class UserAuthentication extends GetxController {
   late Future<void> _hive;
   UserData? user;
   User? currentUser;
-  String _verificationCode = '000000';
 
   final auth = FirebaseAuth.instance;
   final firestore = FirebaseFirestore.instance;
@@ -71,14 +70,11 @@ class UserAuthentication extends GetxController {
     //  saveUserToLocalDb(null);
   }
 
-  Future<bool> signInwithGoogle() async {
+  Future<String> signInwithGoogle() async {
     signout();
     try {
-      print("object");
       final GoogleSignInAccount? googleSignInAccount =
           await googleSignIn.signIn();
-      print("object");
-      inspect(googleSignInAccount);
       if (googleSignInAccount != null) {
         final GoogleSignInAuthentication googleSignInAuthentication =
             await googleSignInAccount.authentication;
@@ -89,18 +85,18 @@ class UserAuthentication extends GetxController {
         final googleAuth = await googleSignInAccount.authentication;
         googleAuth.accessToken;
         UserCredential uc = await auth.signInWithCredential(credential);
-        currentUser = await auth.currentUser;
-        Firestore().addUserIfNotExist(currentUser!.uid);
-        Get.snackbar("Welcome ", currentUser?.displayName ?? "",
-            duration: Duration(seconds: 3));
-        return true;
+        currentUser = auth.currentUser;
+        // Get.snackbar("Welcome ", currentUser?.displayName ?? "",
+        //     duration: const Duration(seconds: 3));
+        print(currentUser!.uid);
+        return await Firestore().getUserIfExist(currentUser!.uid);
       }
 
-      return false;
+      return "error";
     } on FirebaseAuthException catch (e) {
-      return false;
+      return "error";
     } on Exception catch (e) {
-      return false;
+      return "error";
     }
   }
 

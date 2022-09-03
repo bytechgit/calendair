@@ -43,8 +43,11 @@ class _GeneratingClassCodeState extends State<GeneratingClassCode> {
       bottomNavigationBar: BottomNavBar(
         items: [
           NBar(
-            slika: 'home',
-          ),
+              slika: 'home',
+              onclick: () {
+                Get.until((route) =>
+                    (route as GetPageRoute).routeName == '/TeacherDashboard');
+              }),
         ],
         selected: 0,
       ),
@@ -196,11 +199,9 @@ class _GeneratingClassCodeState extends State<GeneratingClassCode> {
                   ),
                   InkWell(
                     onTap: (() {
-                      Get.to(
-                        const TeacherDashboard(),
-                        transition: Transition.circularReveal,
-                        duration: const Duration(milliseconds: 800),
-                      );
+                      Get.until((route) =>
+                          (route as GetPageRoute).routeName ==
+                          '/TeacherDashboard');
                     }),
                     child: Container(
                       width: 60,

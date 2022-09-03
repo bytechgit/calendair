@@ -1,3 +1,4 @@
+import 'package:calendair/models/CustomCourse.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/src/foundation/key.dart';
@@ -10,7 +11,7 @@ import 'bottomNavBar.dart';
 import 'models/nbar.dart';
 
 class PopUpsConfidenceMeter extends StatefulWidget {
-  Course course;
+  CustomCourse course;
   PopUpsConfidenceMeter({Key? key, required this.course}) : super(key: key);
 
   @override
@@ -40,8 +41,11 @@ class _PopUpsConfidenceMeterState extends State<PopUpsConfidenceMeter> {
       bottomNavigationBar: BottomNavBar(
         items: [
           NBar(
-            slika: 'home',
-          ),
+              slika: 'home',
+              onclick: () {
+                Get.until((route) =>
+                    (route as GetPageRoute).routeName == '/TeacherDashboard');
+              }),
         ],
         selected: 0,
       ),
@@ -55,7 +59,7 @@ class _PopUpsConfidenceMeterState extends State<PopUpsConfidenceMeter> {
                 child: FittedBox(
                   fit: BoxFit.scaleDown,
                   child: Text(
-                    widget.course.name ?? 'Period 1',
+                    widget.course.name,
                     style: const TextStyle(
                       color: Colors.black,
                       fontSize: 40,

@@ -1,18 +1,19 @@
-import 'dart:developer';
-
+import 'package:calendair/Classes/firestore.dart';
+import 'package:calendair/models/CustomCourse.dart';
+import 'package:calendair/models/PopUpModel.dart';
 import 'package:calendair/popUpsAdd.dart';
 import 'package:calendair/popUpsResults.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:googleapis/classroom/v1.dart';
+import 'package:intl/intl.dart';
 
 import 'Classes/googleClassroom.dart';
 import 'bottomNavBar.dart';
 import 'models/nbar.dart';
 
 class PopUps extends StatefulWidget {
-  Course course;
+  CustomCourse course;
   PopUps({Key? key, required this.course}) : super(key: key);
 
   @override
@@ -21,6 +22,7 @@ class PopUps extends StatefulWidget {
 
 class _PopUpsState extends State<PopUps> {
   final gc = Get.find<GoogleClassroom>();
+  List<QueryDocumentSnapshot<Object?>> popupsLis = [];
   @override
   Widget build(BuildContext context) {
     final width = MediaQuery.of(context).size.width;
@@ -41,8 +43,11 @@ class _PopUpsState extends State<PopUps> {
       bottomNavigationBar: BottomNavBar(
         items: [
           NBar(
-            slika: 'home',
-          ),
+              slika: 'home',
+              onclick: () {
+                Get.until((route) =>
+                    (route as GetPageRoute).routeName == '/TeacherDashboard');
+              }),
         ],
         selected: 0,
       ),
@@ -52,11 +57,11 @@ class _PopUpsState extends State<PopUps> {
             Padding(
               padding: const EdgeInsets.only(top: 10.0),
               child: SizedBox(
-                width: width * 0.5,
+                width: width * 0.7,
                 child: FittedBox(
                   fit: BoxFit.scaleDown,
                   child: Text(
-                    widget.course.name ?? "",
+                    widget.course.name,
                     style: const TextStyle(
                       color: Colors.black,
                       fontSize: 40,
@@ -89,71 +94,54 @@ class _PopUpsState extends State<PopUps> {
             ),
             Expanded(
               child: StreamBuilder(
-                  stream: FirebaseFirestore.instance
-                      .collection('Popups')
-                      .where("ClassId", isEqualTo: widget.course.id)
-                      .orderBy("order")
-                      .snapshots(),
+                  stream: Firestore().getTeacherPopUps(widget.course.docid),
                   builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
                     if (snapshot.hasData) {
-                      // snapshot.data!.docs.sort((a, b) {
-                      //   if ((a["order"] as Timestamp).microsecondsSinceEpoch >
-                      //       (b["order"] as Timestamp).millisecondsSinceEpoch) {
-                      //     return 2;
-                      //   }
-                      //   return -1;
-                      // });
-
+                      popupsLis = snapshot.data!.docs;
                       return SingleChildScrollView(
                         child: Column(
                           children: [
-                            ...snapshot.data!.docs.reversed
-                                .map((d) => Padding(
-                                      padding: const EdgeInsets.all(8.0),
-                                      child: SizedBox(
-                                        height: 40,
-                                        child: Row(
-                                          mainAxisSize: MainAxisSize.min,
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.center,
-                                          children: [
-                                            Padding(
-                                              padding:
-                                                  const EdgeInsets.all(8.0),
-                                              child: Image.asset(
-                                                'assets/images/triangle.png',
-                                                width: 20,
-                                                height: 20,
-                                              ),
-                                            ),
-                                            SizedBox(
-                                              width: width * 0.55,
-                                              child: FittedBox(
-                                                alignment: Alignment.centerLeft,
-                                                fit: BoxFit.scaleDown,
-                                                child: Text(
-                                                  (d['Date'] ?? "") +
-                                                          " " +
-                                                          d['Title'] ??
-                                                      '',
-                                                  style: TextStyle(
-                                                    color: Colors.black,
-                                                    fontSize: 25,
-                                                    fontWeight: FontWeight.bold,
-                                                  ),
-                                                ),
-                                              ),
-                                            ),
-                                          ],
+                            ...snapshot.data!.docs.map((d) {
+                              final pu = PopUpModel.fromMap(
+                                d.data() as Map<String, dynamic>,
+                              );
+                              return Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: SizedBox(
+                                  child: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.center,
+                                    children: [
+                                      Padding(
+                                        padding: const EdgeInsets.all(8.0),
+                                        child: Image.asset(
+                                          'assets/images/triangle.png',
+                                          width: 20,
+                                          height: 20,
                                         ),
                                       ),
-                                    ))
-                                .toList()
+                                      SizedBox(
+                                        width: width * 0.55,
+                                        child: Text(
+                                          "${DateFormat("MM/dd/yy").format(pu.dueDate.toDate())} ${pu.title}",
+                                          style: const TextStyle(
+                                            color: Colors.black,
+                                            fontSize: 18,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              );
+                            }).toList()
                           ],
                         ),
                       );
                     } else {
-                      return Center(
+                      return const Center(
                         child: CircularProgressIndicator(),
                       );
                     }
@@ -178,9 +166,7 @@ class _PopUpsState extends State<PopUps> {
                           )),
                       onPressed: () {
                         Get.to(
-                          PopUpsResults(
-                            course: widget.course,
-                          ),
+                          PopUpsResults(course: widget.course, list: popupsLis),
                           transition: Transition.circularReveal,
                           duration: const Duration(milliseconds: 800),
                         );

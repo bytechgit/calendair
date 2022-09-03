@@ -45,16 +45,29 @@ class _ExtracurricularsAddState extends State<ExtracurricularsAdd> {
       bottomNavigationBar: BottomNavBar(
         items: [
           NBar(
-            slika: 'calendar',
-            widget: const dashboard(),
-          ),
+              slika: 'calendar',
+              onclick: () {
+                Get.off(
+                  dashboard(),
+                  transition: Transition.circularReveal,
+                  duration: const Duration(milliseconds: 800),
+                );
+              }),
           NBar(
-            slika: 'home',
-          ),
+              slika: 'home',
+              onclick: () {
+                Get.until((route) =>
+                    (route as GetPageRoute).routeName == '/studentDashboard');
+              }),
           NBar(
-            slika: 'settings',
-            widget: const Settings(),
-          )
+              slika: 'settings',
+              onclick: () {
+                Get.off(
+                  Settings(),
+                  transition: Transition.circularReveal,
+                  duration: const Duration(milliseconds: 800),
+                );
+              })
         ],
         selected: 2,
       ),

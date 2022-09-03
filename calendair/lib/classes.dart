@@ -1,14 +1,13 @@
-import 'dart:developer';
-
 import 'package:calendair/Classes/googleClassroom.dart';
 import 'package:calendair/addClass.dart';
+import 'package:calendair/models/CustomCourse.dart';
 import 'package:calendair/rate.dart';
-import 'package:calendair/settings.dart';
+import 'package:calendair/settings.dart' as s;
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-
+import 'Classes/firestore.dart';
 import 'bottomNavBar.dart';
-import 'calendar.dart';
 import 'dashboard.dart';
 import 'models/nbar.dart';
 
@@ -40,16 +39,29 @@ class _classesState extends State<classes> {
       bottomNavigationBar: BottomNavBar(
         items: [
           NBar(
-            slika: 'calendar',
-            widget: const dashboard(),
-          ),
+              slika: 'calendar',
+              onclick: () {
+                Get.off(
+                  dashboard(),
+                  transition: Transition.circularReveal,
+                  duration: const Duration(milliseconds: 800),
+                );
+              }),
           NBar(
-            slika: 'home',
-          ),
+              slika: 'home',
+              onclick: () {
+                Get.until((route) =>
+                    (route as GetPageRoute).routeName == '/studentDashboard');
+              }),
           NBar(
-            slika: 'settings',
-            widget: const Settings(),
-          )
+              slika: 'settings',
+              onclick: () {
+                Get.off(
+                  s.Settings(),
+                  transition: Transition.circularReveal,
+                  duration: const Duration(milliseconds: 800),
+                );
+              })
         ],
         selected: 1,
       ),
@@ -86,103 +98,101 @@ class _classesState extends State<classes> {
                     ),
                     child: Stack(
                       children: [
-                        SingleChildScrollView(
-                          child: Column(
-                            children: [
-                              Obx(
-                                () => Column(
-                                    children: gc.courses.value
-                                        .map(
-                                          (e) => Padding(
-                                            padding: const EdgeInsets.symmetric(
-                                                horizontal: 20, vertical: 10),
-                                            child: InkWell(
-                                              onTap: (() {}),
-                                              child: Container(
-                                                padding:
-                                                    const EdgeInsets.all(10),
-                                                decoration: const BoxDecoration(
-                                                    color: Color.fromRGBO(
-                                                        94, 159, 197, 1),
-                                                    borderRadius:
-                                                        BorderRadius.all(
-                                                            Radius.circular(
-                                                                10))),
-                                                height: 65,
-                                                child: Row(
-                                                  mainAxisAlignment:
-                                                      MainAxisAlignment
-                                                          .spaceBetween,
-                                                  children: [
-                                                    SizedBox(
-                                                      width: width * 0.5,
-                                                      child: Padding(
-                                                        padding:
-                                                            const EdgeInsets
-                                                                .only(left: 10),
-                                                        child: FittedBox(
-                                                          alignment: Alignment
-                                                              .centerLeft,
-                                                          child: Text(
-                                                            e.name ??
-                                                                "the course has no name",
-                                                            textAlign:
-                                                                TextAlign.left,
-                                                            style:
-                                                                const TextStyle(
-                                                              color: Color
-                                                                  .fromRGBO(
-                                                                      38,
-                                                                      65,
-                                                                      78,
-                                                                      1),
-                                                              fontSize: 36,
-                                                            ),
-                                                          ),
+                        StreamBuilder(
+                            stream: Firestore().getStudentCourses(),
+                            builder: (context,
+                                AsyncSnapshot<QuerySnapshot> snapshot) {
+                              if (snapshot.hasData) {
+                                return SingleChildScrollView(
+                                  child: Column(children: [
+                                    ...snapshot.data!.docs.map((e) {
+                                      final cc = CustomCourse.fromMap(
+                                          e.data() as Map<String, dynamic>,
+                                          e.id);
+                                      return Padding(
+                                        padding: const EdgeInsets.symmetric(
+                                            horizontal: 20, vertical: 10),
+                                        child: InkWell(
+                                          onTap: (() {}),
+                                          child: Container(
+                                            padding: const EdgeInsets.all(10),
+                                            decoration: const BoxDecoration(
+                                                color: Color.fromRGBO(
+                                                    94, 159, 197, 1),
+                                                borderRadius: BorderRadius.all(
+                                                    Radius.circular(10))),
+                                            height: 65,
+                                            child: Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment
+                                                      .spaceBetween,
+                                              children: [
+                                                SizedBox(
+                                                  width: width * 0.5,
+                                                  child: Padding(
+                                                    padding:
+                                                        const EdgeInsets.only(
+                                                            left: 10),
+                                                    child: FittedBox(
+                                                      fit: BoxFit.scaleDown,
+                                                      alignment:
+                                                          Alignment.centerLeft,
+                                                      child: Text(
+                                                        cc.name,
+                                                        textAlign:
+                                                            TextAlign.left,
+                                                        style: const TextStyle(
+                                                          color: Color.fromRGBO(
+                                                              38, 65, 78, 1),
+                                                          fontSize: 30,
                                                         ),
                                                       ),
                                                     ),
-                                                    Expanded(
-                                                        child: Container()),
-                                                    GestureDetector(
-                                                      child: Padding(
-                                                        padding:
-                                                            const EdgeInsets
-                                                                .only(right: 5),
-                                                        child: Image.asset(
-                                                            'assets/images/settings.png'),
-                                                      ),
-                                                      onTap: () {
-                                                        Get.to(
-                                                          rate(
-                                                            name: e.name!,
-                                                          ),
-                                                          transition: Transition
-                                                              .circularReveal,
-                                                          duration:
-                                                              const Duration(
-                                                                  milliseconds:
-                                                                      800),
-                                                        );
-                                                      },
-                                                    )
-                                                  ],
+                                                  ),
                                                 ),
-                                              ),
+                                                Expanded(child: Container()),
+                                                GestureDetector(
+                                                  child: Padding(
+                                                    padding:
+                                                        const EdgeInsets.only(
+                                                            right: 5),
+                                                    child: Image.asset(
+                                                      'assets/images/settings.png',
+                                                      width: 30,
+                                                    ),
+                                                  ),
+                                                  onTap: () {
+                                                    Get.to(
+                                                      rate(
+                                                        name: cc.name,
+                                                      ),
+                                                      transition: Transition
+                                                          .circularReveal,
+                                                      duration: const Duration(
+                                                          milliseconds: 800),
+                                                    );
+                                                  },
+                                                )
+                                              ],
                                             ),
                                           ),
-                                        )
-                                        .toList()),
-                              ),
-                              Padding(
-                                padding: const EdgeInsets.all(8.0),
-                                child: Container(
-                                  height: 100,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
+                                        ),
+                                      );
+                                    }).toList(),
+                                    Padding(
+                                      padding: const EdgeInsets.all(8.0),
+                                      child: Container(
+                                        height: 100,
+                                      ),
+                                    ),
+                                  ]),
+                                );
+                              } else {
+                                return Center(
+                                  child: CircularProgressIndicator(),
+                                );
+                              }
+                            }),
                         Align(
                           alignment: Alignment.bottomRight,
                           child: Padding(
@@ -209,7 +219,7 @@ class _classesState extends State<classes> {
                                 },
 
                                 child: const Text(
-                                  'Add a Class',
+                                  'Make a class',
                                   textAlign: TextAlign.center,
                                   style: TextStyle(
                                     color: Colors.white,
@@ -222,7 +232,7 @@ class _classesState extends State<classes> {
                           ),
                         ),
                         Transform.translate(
-                          offset: const Offset(-15, 20),
+                          offset: Offset(-15, 20),
                           child: Align(
                             alignment: Alignment.bottomLeft,
                             child: SizedBox(
@@ -243,3 +253,10 @@ class _classesState extends State<classes> {
     );
   }
 }
+
+
+
+
+
+/////
+///

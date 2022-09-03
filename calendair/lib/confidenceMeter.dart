@@ -119,7 +119,7 @@ class _ConfidenceMeterState extends State<ConfidenceMeter> {
                         child: FittedBox(
                           fit: BoxFit.scaleDown,
                           child: Text(
-                            widget.message,
+                            " ${widget.message} ",
                             style: const TextStyle(
                               color: Colors.black,
                               fontSize: 35,

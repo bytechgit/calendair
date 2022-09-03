@@ -1,4 +1,5 @@
 import 'package:calendair/assignmentsUpdate.dart';
+import 'package:calendair/models/CustomCourse.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:googleapis/classroom/v1.dart';
@@ -8,7 +9,7 @@ import 'bottomNavBar.dart';
 import 'models/nbar.dart';
 
 class Assignments extends StatefulWidget {
-  Course course;
+  CustomCourse course;
   Assignments({Key? key, required this.course}) : super(key: key);
 
   @override
@@ -37,8 +38,11 @@ class _AssignmentsState extends State<Assignments> {
       bottomNavigationBar: BottomNavBar(
         items: [
           NBar(
-            slika: 'home',
-          ),
+              slika: 'home',
+              onclick: () {
+                Get.until((route) =>
+                    (route as GetPageRoute).routeName == '/TeacherDashboard');
+              }),
         ],
         selected: 0,
       ),
@@ -84,7 +88,7 @@ class _AssignmentsState extends State<Assignments> {
               height: 30,
             ),
             FutureBuilder<List<CourseWork>>(
-                future: gc.getAssigmentsList(widget.course.id!),
+                future: gc.getAssigmentsList(widget.course.id),
                 builder: (context, snapshot) {
                   if (snapshot.hasData) {
                     return Expanded(

@@ -1,5 +1,8 @@
 import 'package:calendair/Classes/Authentication.dart';
 import 'package:calendair/Classes/googleClassroom.dart';
+import 'package:calendair/registerEnterSchoolCode.dart';
+import 'package:calendair/studentDashboard.dart';
+import 'package:calendair/teacherDashboard.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/src/foundation/key.dart';
 import 'package:flutter/src/widgets/framework.dart';
@@ -73,7 +76,26 @@ class Login extends StatelessWidget {
                             )),
                         onPressed: () async {
                           final result = await u.signInwithGoogle();
-                          if (result) {}
+                          if (result == "student") {
+                            Get.to(
+                              const studentDashboard(),
+                              transition: Transition.circularReveal,
+                              duration: const Duration(milliseconds: 800),
+                            );
+                          } else if (result == "teacher") {
+                            Get.to(
+                              const TeacherDashboard(),
+                              transition: Transition.circularReveal,
+                              duration: const Duration(milliseconds: 800),
+                            );
+                          } else if (result == "") {
+                            Get.snackbar('Register', 'Please register');
+                            Get.to(
+                              const RegisterEnterSchoolCode(),
+                              transition: Transition.circularReveal,
+                              duration: const Duration(milliseconds: 800),
+                            );
+                          }
                         },
 
                         icon: Image.asset(

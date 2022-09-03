@@ -1,4 +1,5 @@
 import 'package:calendair/assignments.dart';
+import 'package:calendair/models/CustomCourse.dart';
 import 'package:calendair/popUps.dart';
 import 'package:calendair/reminders.dart';
 import 'package:calendair/students.dart';
@@ -13,7 +14,7 @@ import 'bottomNavBar.dart';
 import 'models/nbar.dart';
 
 class DashboardPeriod extends StatefulWidget {
-  Course course;
+  CustomCourse course;
   DashboardPeriod({Key? key, required this.course}) : super(key: key);
 
   @override
@@ -42,8 +43,11 @@ class _DashboardPeriodState extends State<DashboardPeriod> {
       bottomNavigationBar: BottomNavBar(
         items: [
           NBar(
-            slika: 'home',
-          ),
+              slika: 'home',
+              onclick: () {
+                Get.until((route) =>
+                    (route as GetPageRoute).routeName == '/TeacherDashboard');
+              }),
         ],
         selected: 0,
       ),
@@ -58,7 +62,7 @@ class _DashboardPeriodState extends State<DashboardPeriod> {
                   child: FittedBox(
                     fit: BoxFit.scaleDown,
                     child: Text(
-                      widget.course.name ?? "No name",
+                      widget.course.name,
                       style: const TextStyle(
                         color: Colors.black,
                         fontSize: 35,
@@ -76,9 +80,9 @@ class _DashboardPeriodState extends State<DashboardPeriod> {
                   color: Color.fromRGBO(223, 223, 223, 1),
                 ),
               ),
-              const Text(
-                'JOIN CODE: 000-000',
-                style: TextStyle(
+              Text(
+                'JOIN CODE: ${widget.course.code}',
+                style: const TextStyle(
                   color: Colors.black,
                   fontSize: 22,
                   fontWeight: FontWeight.w400,
@@ -183,7 +187,7 @@ class _DashboardPeriodState extends State<DashboardPeriod> {
                     child: InkWell(
                       onTap: (() {
                         Get.to(
-                          const Reminders(),
+                          Reminders(course: widget.course),
                           transition: Transition.circularReveal,
                           duration: const Duration(milliseconds: 800),
                         );

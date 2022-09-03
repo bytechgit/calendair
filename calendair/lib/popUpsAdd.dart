@@ -1,18 +1,20 @@
 import 'package:calendair/Classes/firestore.dart';
+import 'package:calendair/models/CustomCourse.dart';
 import 'package:calendair/popUpsConfidenceMeter.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/src/foundation/key.dart';
 import 'package:flutter/src/widgets/framework.dart';
+import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';
 import 'package:get/get.dart';
-import 'package:googleapis/classroom/v1.dart';
+import 'package:intl/intl.dart';
 
 import 'Classes/googleClassroom.dart';
 import 'bottomNavBar.dart';
 import 'models/nbar.dart';
 
 class PopUpsAdd extends StatefulWidget {
-  Course course;
+  CustomCourse course;
   PopUpsAdd({Key? key, required this.course}) : super(key: key);
 
   @override
@@ -23,6 +25,7 @@ class _PopUpsAddState extends State<PopUpsAdd> {
   final titleController = TextEditingController();
   final dateController = TextEditingController();
   final gc = Get.find<GoogleClassroom>();
+  DateTime date = DateTime.now();
   //final titleController=TextEditingController();
   @override
   Widget build(BuildContext context) {
@@ -44,8 +47,11 @@ class _PopUpsAddState extends State<PopUpsAdd> {
       bottomNavigationBar: BottomNavBar(
         items: [
           NBar(
-            slika: 'home',
-          ),
+              slika: 'home',
+              onclick: () {
+                Get.until((route) =>
+                    (route as GetPageRoute).routeName == '/TeacherDashboard');
+              }),
         ],
         selected: 0,
       ),
@@ -59,7 +65,7 @@ class _PopUpsAddState extends State<PopUpsAdd> {
                 child: FittedBox(
                   fit: BoxFit.scaleDown,
                   child: Text(
-                    widget.course.name ?? 'Period 1',
+                    widget.course.name,
                     style: const TextStyle(
                       color: Colors.black,
                       fontSize: 40,
@@ -129,30 +135,40 @@ class _PopUpsAddState extends State<PopUpsAdd> {
             ),
             Padding(
               padding: const EdgeInsets.only(top: 5.0, bottom: 20),
-              child: SizedBox(
-                width: width * 0.7,
-                //height: 40,
-                child: TextField(
-                  controller: dateController,
-                  maxLines: 3,
-                  minLines: 1,
-                  keyboardType: TextInputType.multiline,
-                  style: const TextStyle(
-                      color: Color.fromRGBO(38, 64, 78, 1), fontSize: 25),
-                  textAlignVertical: TextAlignVertical.center,
-                  textAlign: TextAlign.center,
-                  decoration: InputDecoration(
-                    contentPadding:
-                        const EdgeInsets.symmetric(horizontal: 10.0),
-                    border: OutlineInputBorder(
-                      borderSide: BorderSide.none,
-                      borderRadius: BorderRadius.circular(15.0),
+              child: InkWell(
+                onTap: () {
+                  DatePicker.showDatePicker(context,
+                      showTitleActions: true,
+                      minTime: DateTime.now(),
+                      maxTime: DateTime.now().add(Duration(days: 600)),
+                      theme: const DatePickerTheme(
+                          headerColor: Color.fromARGB(255, 176, 176, 176),
+                          backgroundColor: Color.fromRGBO(94, 159, 197, 1),
+                          itemStyle: TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 18),
+                          doneStyle:
+                              TextStyle(color: Colors.white, fontSize: 16)),
+                      onChanged: (date) {}, onConfirm: (d) {
+                    setState(() {
+                      date = d;
+                    });
+                  }, currentTime: DateTime.now(), locale: LocaleType.en);
+                },
+                child: Container(
+                  width: width * 0.7,
+                  height: 50,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(15),
+                    color: const Color.fromRGBO(94, 159, 197, 1),
+                  ),
+                  child: Center(
+                    child: Text(
+                      DateFormat("MM/dd/yy").format(date),
+                      style: const TextStyle(
+                          color: Color.fromRGBO(38, 64, 78, 1), fontSize: 25),
                     ),
-                    filled: true,
-                    hintStyle: const TextStyle(
-                        color: Color.fromRGBO(38, 64, 78, 1), fontSize: 25),
-                    hintText: "Please Enter",
-                    fillColor: const Color.fromRGBO(94, 159, 197, 1),
                   ),
                 ),
               ),
@@ -195,7 +211,7 @@ class _PopUpsAddState extends State<PopUpsAdd> {
                   child: const Text(
                     'Confidence Meter',
                     textAlign: TextAlign.center,
-                    style: const TextStyle(
+                    style: TextStyle(
                         color: Color.fromRGBO(38, 64, 78, 1),
                         fontSize: 25,
                         fontWeight: FontWeight.w400),
@@ -219,8 +235,8 @@ class _PopUpsAddState extends State<PopUpsAdd> {
                       )),
                   onPressed: () {
                     Firestore().addPopUp(
-                        classId: widget.course.id!,
-                        date: dateController.text,
+                        classId: widget.course.docid,
+                        date: date,
                         title: titleController.text,
                         cm: gc.confidence);
                     Get.back();

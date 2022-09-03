@@ -53,12 +53,20 @@ class _ReminderState extends State<Reminder> {
         bottomNavigationBar: BottomNavBar(
           items: [
             NBar(
-              slika: 'home',
-            ),
+                slika: 'home',
+                onclick: () {
+                  Get.until((route) =>
+                      (route as GetPageRoute).routeName == '/studentDashboard');
+                }),
             NBar(
-              slika: 'settings',
-              widget: const Settings(),
-            )
+                slika: 'settings',
+                onclick: () {
+                  Get.off(
+                    Settings(),
+                    transition: Transition.circularReveal,
+                    duration: const Duration(milliseconds: 800),
+                  );
+                })
           ],
           selected: 0,
         ),

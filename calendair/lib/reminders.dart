@@ -1,11 +1,21 @@
+import 'dart:developer';
+
+import 'package:calendair/Classes/firestore.dart';
+import 'package:calendair/addClassReminder.dart';
+import 'package:calendair/addClassReminderSend.dart';
+import 'package:calendair/models/CustomCourse.dart';
+import 'package:calendair/models/Reminder.dart';
+import 'package:calendair/models/reminderModel.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-
+import 'package:intl/intl.dart';
 import 'bottomNavBar.dart';
 import 'models/nbar.dart';
 
 class Reminders extends StatefulWidget {
-  const Reminders({Key? key}) : super(key: key);
+  CustomCourse course;
+  Reminders({Key? key, required this.course}) : super(key: key);
 
   @override
   State<Reminders> createState() => _RemindersState();
@@ -31,8 +41,11 @@ class _RemindersState extends State<Reminders> {
       bottomNavigationBar: BottomNavBar(
         items: [
           NBar(
-            slika: 'home',
-          ),
+              slika: 'home',
+              onclick: () {
+                Get.until((route) =>
+                    (route as GetPageRoute).routeName == '/TeacherDashboard');
+              }),
         ],
         selected: 0,
       ),
@@ -43,12 +56,13 @@ class _RemindersState extends State<Reminders> {
               padding: const EdgeInsets.only(top: 10.0),
               child: SizedBox(
                 width: width * 0.5,
-                child: const FittedBox(
+                child: FittedBox(
+                  fit: BoxFit.scaleDown,
                   child: Text(
-                    'Period 1',
+                    widget.course.name,
                     style: TextStyle(
                       color: Colors.black,
-                      fontSize: 22,
+                      fontSize: 40,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
@@ -74,71 +88,89 @@ class _RemindersState extends State<Reminders> {
               ),
             ),
             const SizedBox(
-              height: 30,
+              height: 10,
             ),
             Expanded(
-              child: SingleChildScrollView(
-                child: Column(
-                  children: [
-                    for (int i = 0; i < 10; i++)
-                      Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: SizedBox(
-                          height: 80,
-                          child: Row(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Padding(
+              child: StreamBuilder(
+                  stream: Firestore().getTeacherRemider(widget.course.docid),
+                  builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
+                    if (snapshot.hasData) {
+                      inspect(snapshot.data);
+                      return SingleChildScrollView(
+                        child: Column(
+                          children: [
+                            ...snapshot.data!.docs.map((e) {
+                              final r = ReminderModel.fromMap(
+                                  e.data() as Map<String, dynamic>);
+                              return Padding(
                                 padding: const EdgeInsets.all(8.0),
-                                child: Container(
-                                  width: 20,
-                                  height: 20,
-                                  decoration: const BoxDecoration(
-                                    color: Color.fromRGBO(243, 162, 162, 1),
+                                child: SizedBox(
+                                  child: Row(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.center,
+                                    children: [
+                                      Padding(
+                                        padding: const EdgeInsets.all(8.0),
+                                        child: Container(
+                                          width: 20,
+                                          height: 20,
+                                          decoration: const BoxDecoration(
+                                            color: Color.fromRGBO(
+                                                243, 162, 162, 1),
+                                          ),
+                                        ),
+                                      ),
+                                      SizedBox(
+                                        width: width * 0.55,
+                                        child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            FittedBox(
+                                              fit: BoxFit.scaleDown,
+                                              child: Text(
+                                                r.title,
+                                                style: const TextStyle(
+                                                  color: Colors.black,
+                                                  fontSize: 20,
+                                                  fontWeight: FontWeight.bold,
+                                                ),
+                                              ),
+                                            ),
+                                            FittedBox(
+                                              fit: BoxFit.scaleDown,
+                                              child: Text(
+                                                "Date: ${DateFormat("MM/dd/yy").format(r.date.toDate())}",
+                                                style: const TextStyle(
+                                                  color: Color.fromRGBO(
+                                                      143, 146, 145, 1),
+                                                  fontSize: 20,
+                                                  fontWeight: FontWeight.w400,
+                                                ),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                      const Expanded(child: SizedBox()),
+                                      IconButton(
+                                          iconSize: 40,
+                                          onPressed: () {},
+                                          icon: const Icon(Icons.settings))
+                                    ],
                                   ),
                                 ),
-                              ),
-                              SizedBox(
-                                width: width * 0.55,
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: const [
-                                    FittedBox(
-                                      child: Text(
-                                        "Unit 1 Quiz",
-                                        style: TextStyle(
-                                          color: Colors.black,
-                                          fontSize: 30,
-                                          fontWeight: FontWeight.bold,
-                                        ),
-                                      ),
-                                    ),
-                                    FittedBox(
-                                      child: Text(
-                                        "Date: 00/00/00",
-                                        style: TextStyle(
-                                          color:
-                                              Color.fromRGBO(143, 146, 145, 1),
-                                          fontSize: 30,
-                                          fontWeight: FontWeight.w400,
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                              const Expanded(child: SizedBox()),
-                              IconButton(
-                                  iconSize: 55,
-                                  onPressed: () {},
-                                  icon: const Icon(Icons.settings))
-                            ],
-                          ),
+                              );
+                            }).toList()
+                          ],
                         ),
-                      )
-                  ],
-                ),
-              ),
+                      );
+                    } else {
+                      return const Center(
+                        child: CircularProgressIndicator(),
+                      );
+                    }
+                  }),
             ),
             Row(
               children: [
@@ -157,7 +189,15 @@ class _RemindersState extends State<Reminders> {
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(10.0),
                           )),
-                      onPressed: () {},
+                      onPressed: () {
+                        Get.to(
+                          AddClassReminderSend(
+                            course: widget.course,
+                          ),
+                          transition: Transition.circularReveal,
+                          duration: const Duration(milliseconds: 800),
+                        );
+                      },
                       child: const Text(
                         'Add Class Reminder',
                         textAlign: TextAlign.center,

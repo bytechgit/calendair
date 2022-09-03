@@ -96,10 +96,10 @@ class _ResultsState extends State<Results> {
                   children: [
                     SizedBox(
                       width: width * 0.4,
-                      child: const FittedBox(
+                      child: FittedBox(
                         child: Text(
-                          'Average Class Answer: 21',
-                          style: TextStyle(
+                          'Average Class Answer: ${widget.rez.toPrecision(2)}',
+                          style: const TextStyle(
                             color: Colors.black,
                             fontSize: 35,
                             fontWeight: FontWeight.bold,
