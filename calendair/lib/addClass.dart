@@ -128,7 +128,7 @@ class _addClassState extends State<addClass> {
                         onPressed: () async {
                           String name =
                               await gc.enrolToCourse(codeController.text);
-                          if (name != "") {
+                          if (name != "" && name != "Error") {
                             Get.to(
                               joinNotification(name: name),
                               transition: Transition.circularReveal,

@@ -43,7 +43,7 @@ class _ConfidenceMeterState extends State<ConfidenceMeter> {
     super.dispose();
   }
 
-  double _value = 21.0;
+  double _value = 0.0;
   @override
   Widget build(BuildContext context) {
     final width = MediaQuery.of(context).size.width;

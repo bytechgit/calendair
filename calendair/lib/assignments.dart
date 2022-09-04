@@ -9,8 +9,8 @@ import 'bottomNavBar.dart';
 import 'models/nbar.dart';
 
 class Assignments extends StatefulWidget {
-  CustomCourse course;
-  Assignments({Key? key, required this.course}) : super(key: key);
+  final CustomCourse course;
+  const Assignments({Key? key, required this.course}) : super(key: key);
 
   @override
   State<Assignments> createState() => _AssignmentsState();
@@ -53,13 +53,14 @@ class _AssignmentsState extends State<Assignments> {
             Padding(
               padding: const EdgeInsets.only(top: 10.0),
               child: SizedBox(
-                width: width * 0.5,
-                child: const FittedBox(
+                width: width * 0.8,
+                child: FittedBox(
+                  fit: BoxFit.scaleDown,
                   child: Text(
-                    'Period 1',
-                    style: TextStyle(
+                    widget.course.name,
+                    style: const TextStyle(
                       color: Colors.black,
-                      fontSize: 22,
+                      fontSize: 40,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
@@ -87,12 +88,12 @@ class _AssignmentsState extends State<Assignments> {
             const SizedBox(
               height: 30,
             ),
-            FutureBuilder<List<CourseWork>>(
-                future: gc.getAssigmentsList(widget.course.id),
-                builder: (context, snapshot) {
-                  if (snapshot.hasData) {
-                    return Expanded(
-                      child: SingleChildScrollView(
+            Expanded(
+              child: FutureBuilder<List<CourseWork>>(
+                  future: gc.getAssigmentsList(widget.course.id),
+                  builder: (context, snapshot) {
+                    if (snapshot.hasData) {
+                      return SingleChildScrollView(
                         child: Obx(
                           () => Column(
                             children: [
@@ -188,14 +189,14 @@ class _AssignmentsState extends State<Assignments> {
                             ],
                           ),
                         ),
-                      ),
-                    );
-                  } else {
-                    return Center(
-                      child: CircularProgressIndicator(),
-                    );
-                  }
-                })
+                      );
+                    } else {
+                      return const Center(
+                        child: CircularProgressIndicator(),
+                      );
+                    }
+                  }),
+            )
           ],
         ),
       )),

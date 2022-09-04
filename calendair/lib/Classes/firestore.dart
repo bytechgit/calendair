@@ -1,5 +1,9 @@
+import 'dart:developer';
+
 import 'package:calendair/classes.dart';
+import 'package:calendair/models/ExtracurricularsModel.dart';
 import 'package:calendair/models/UserModel.dart';
+import 'package:calendair/models/reminderModel.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:get/get.dart';
@@ -38,7 +42,7 @@ class Firestore {
           "courses": [],
           "type": user.type,
           "name": user.name,
-          "picture": user.picture
+          "picture": user.picture,
         }, SetOptions(merge: true));
       }
     });
@@ -82,6 +86,13 @@ class Firestore {
     });
   }
 
+  void updateReminder({required ReminderModel r}) {
+    reminder.doc(r.id).update({
+      "title": r.title,
+      "date": r.date,
+    });
+  }
+
   void addCourse({
     required String classId,
     required String code,
@@ -102,6 +113,55 @@ class Firestore {
         .collection('Courses')
         .where("owner", isEqualTo: ua.currentUser!.uid)
         .snapshots();
+  }
+
+  Stream<QuerySnapshot<Map<String, dynamic>>> getExtracurriculars() {
+    return FirebaseFirestore.instance
+        .collection('Extracurriculars')
+        .where("studentId", isEqualTo: ua.currentUser!.uid)
+        .where("date",
+            isGreaterThanOrEqualTo: Timestamp.fromDate(DateTime.now()))
+        .orderBy("date", descending: true)
+        .snapshots();
+  }
+
+  void updateExtracurriculars(ExtracurricularsModel ex) {
+    FirebaseFirestore.instance
+        .collection('Extracurriculars')
+        .doc(ex.id)
+        .update(ex.toMap());
+  }
+
+  void addBreakDay(String day) {
+    FirebaseFirestore.instance
+        .collection('Users')
+        .doc(ua.currentUser!.uid)
+        .update({"breakday": day});
+  }
+
+  Future<String> getBreakday() async {
+    return (await FirebaseFirestore.instance
+            .collection('Users')
+            .doc(ua.currentUser!.uid)
+            .get())
+        .data()!["breakday"];
+  }
+
+  void addExtracurriculars(int time, String title, String day, DateTime date) {
+    FirebaseFirestore.instance.collection('Extracurriculars').add({
+      "title": title,
+      "day": day,
+      "time": time,
+      "date": Timestamp.fromDate(date),
+      "studentId": ua.currentUser!.uid
+    });
+  }
+
+  void deleteExtracurriculars(ExtracurricularsModel ex) {
+    FirebaseFirestore.instance
+        .collection('Extracurriculars')
+        .doc(ex.id)
+        .delete();
   }
 
   Stream<QuerySnapshot<Map<String, dynamic>>> getStudentCourses() {

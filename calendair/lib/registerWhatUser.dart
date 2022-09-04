@@ -1,14 +1,10 @@
 import 'package:calendair/models/UserModel.dart';
-import 'package:calendair/pom/inputClassCode.dart';
-import 'package:calendair/pom/makeClass.dart';
 import 'package:calendair/studentDashboard.dart';
 import 'package:calendair/teacherDashboard.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-
 import 'Classes/firestore.dart';
 import 'Classes/googleClassroom.dart';
-import 'loginRegister.dart';
 
 class RegisterWhatUser extends StatefulWidget {
   const RegisterWhatUser({Key? key}) : super(key: key);

@@ -165,6 +165,7 @@ class _classesState extends State<classes> {
                                                     Get.to(
                                                       rate(
                                                         name: cc.name,
+                                                        back3: false,
                                                       ),
                                                       transition: Transition
                                                           .circularReveal,

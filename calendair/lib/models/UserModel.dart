@@ -1,11 +1,9 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:googleapis/cloudsearch/v1.dart';
-
 class UserModel {
   String id;
   String name;
   String picture;
   String type;
+  String? breakday;
   List<String>? courses = [];
 
   UserModel(
@@ -28,6 +26,7 @@ class UserModel {
         name = map["name"] ?? " ",
         picture = map["picture"] ?? " ",
         type = map["type"] ?? " ",
+        breakday = map["brekaday"],
         courses = ((map["courses"] ?? []) as List<dynamic>)
             .map((e) => e.toString())
             .toList();

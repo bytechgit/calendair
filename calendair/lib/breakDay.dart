@@ -1,19 +1,12 @@
-import 'dart:developer';
-
+import 'package:calendair/Classes/firestore.dart';
+import 'package:calendair/classes/ExtButton.dart';
 import 'package:calendair/extracurricularButton.dart';
-import 'package:calendair/rate.dart';
 import 'package:calendair/settings.dart';
-import 'package:calendair/studentDashboard.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/src/foundation/key.dart';
-import 'package:flutter/src/widgets/framework.dart';
 import 'package:get/get.dart';
-import 'package:get/get_navigation/src/routes/transitions_type.dart';
 
 import 'Classes/googleClassroom.dart';
-import 'addClass.dart';
 import 'bottomNavBar.dart';
-import 'calendar.dart';
 import 'dashboard.dart';
 import 'models/nbar.dart';
 
@@ -26,7 +19,14 @@ class BreakDay extends StatefulWidget {
 
 class _BreakDayState extends State<BreakDay> {
   final gc = Get.find<GoogleClassroom>();
+  final extb = Get.find<ExtButton>();
   final days = ['Mon', 'Tues', 'Wed', 'Thurs', 'Fri', 'Sat', 'Sun'];
+  @override
+  void initState() {
+    extb.day.value = extb.breakday.value;
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     final width = MediaQuery.of(context).size.width;
@@ -121,41 +121,41 @@ class _BreakDayState extends State<BreakDay> {
                       children: [
                         Row(
                           mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
+                          children: const [
                             Expanded(
                                 child: ExtracurricularButton(
-                                    text: "Mon", f: () {})),
+                                    text: "Mon", index: 0, ext: false)),
                             Expanded(
                                 child: ExtracurricularButton(
-                                    text: "Tue", f: () {})),
+                                    text: "Tue", index: 1, ext: false)),
                           ],
                         ),
                         Row(
                           mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
+                          children: const [
                             Expanded(
                                 child: ExtracurricularButton(
-                                    text: "Wed", f: () {})),
+                                    text: "Wed", index: 2, ext: false)),
                             Expanded(
                                 child: ExtracurricularButton(
-                                    text: "Thu", f: () {})),
+                                    text: "Thu", index: 3, ext: false)),
                           ],
                         ),
                         Row(
                           mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
+                          children: const [
                             Expanded(
                                 child: ExtracurricularButton(
-                                    text: "Fri", f: () {})),
+                                    text: "Fri", index: 4, ext: false)),
                             Expanded(
                                 child: ExtracurricularButton(
-                                    text: "Sat", f: () {})),
+                                    text: "Sat", index: 5, ext: false)),
                           ],
                         ),
                         SizedBox(
                             width: width * 0.3,
-                            child:
-                                ExtracurricularButton(text: "Sun", f: () {})),
+                            child: const ExtracurricularButton(
+                                text: "Sun", index: 6, ext: false)),
                       ],
                     ),
                   ),
@@ -174,6 +174,8 @@ class _BreakDayState extends State<BreakDay> {
                             borderRadius: BorderRadius.circular(20.0),
                           )),
                       onPressed: () {
+                        Firestore().addBreakDay(extb.day.value);
+                        extb.breakday.value = extb.day.value;
                         Get.back();
                       },
 

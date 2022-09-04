@@ -8,8 +8,9 @@ import 'bottomNavBar.dart';
 import 'models/nbar.dart';
 
 class AddClassReminderSend extends StatefulWidget {
-  CustomCourse course;
-  AddClassReminderSend({Key? key, required this.course}) : super(key: key);
+  final CustomCourse course;
+  const AddClassReminderSend({Key? key, required this.course})
+      : super(key: key);
 
   @override
   State<AddClassReminderSend> createState() => _AddClassReminderSendState();

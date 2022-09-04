@@ -167,24 +167,29 @@ class GoogleClassroom extends GetxController {
 
   Future<String> enrolToCourse(String code) async {
     if (ua.googleSignIn.currentUser != null) {
-      final c = await Firestore().getCourse(code: code);
-      if (c.docs.isNotEmpty) {
-        String docId = c.docs[0].id;
-        String id = c.docs[0]["id"];
-        String name = c.docs[0]["name"];
-        final baseClient = Client();
-        final authenticateClient = AuthenticateClient(
-            await ua.googleSignIn.currentUser!.authHeaders, baseClient);
-        final cra = ClassroomApi(authenticateClient);
+      try {
+        final c = await Firestore().getCourse(code: code);
+        if (c.docs.isNotEmpty) {
+          String docId = c.docs[0].id;
+          String id = c.docs[0]["id"];
+          String name = c.docs[0]["name"];
+          final baseClient = Client();
+          final authenticateClient = AuthenticateClient(
+              await ua.googleSignIn.currentUser!.authHeaders, baseClient);
+          final cra = ClassroomApi(authenticateClient);
 
-        final cur = await cra.courses.students
-            .create(Student(userId: 'me'), id, enrollmentCode: code);
-        Firestore().addCourseToUser(docId);
-        Firestore().addUserToCourse(docId);
-        return name;
-      } else {
-        Get.snackbar("", "The course does not exist");
-        return "";
+          final cur = await cra.courses.students
+              .create(Student(userId: 'me'), id, enrollmentCode: code);
+          Firestore().addCourseToUser(docId);
+          Firestore().addUserToCourse(docId);
+          return name;
+        } else {
+          Get.snackbar("", "The course does not exist");
+          return "";
+        }
+      } on DetailedApiRequestError catch (e) {
+        print(e);
+        Get.snackbar("Error", e.message ?? "");
       }
     }
     return "Error";

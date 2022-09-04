@@ -1,21 +1,19 @@
 import 'dart:developer';
-
 import 'package:calendair/Classes/firestore.dart';
-import 'package:calendair/addClassReminder.dart';
 import 'package:calendair/addClassReminderSend.dart';
 import 'package:calendair/models/CustomCourse.dart';
-import 'package:calendair/models/Reminder.dart';
 import 'package:calendair/models/reminderModel.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
+import 'addClassReminder.dart';
 import 'bottomNavBar.dart';
 import 'models/nbar.dart';
 
 class Reminders extends StatefulWidget {
-  CustomCourse course;
-  Reminders({Key? key, required this.course}) : super(key: key);
+  final CustomCourse course;
+  const Reminders({Key? key, required this.course}) : super(key: key);
 
   @override
   State<Reminders> createState() => _RemindersState();
@@ -55,12 +53,12 @@ class _RemindersState extends State<Reminders> {
             Padding(
               padding: const EdgeInsets.only(top: 10.0),
               child: SizedBox(
-                width: width * 0.5,
+                width: width * 0.8,
                 child: FittedBox(
                   fit: BoxFit.scaleDown,
                   child: Text(
                     widget.course.name,
-                    style: TextStyle(
+                    style: const TextStyle(
                       color: Colors.black,
                       fontSize: 40,
                       fontWeight: FontWeight.bold,
@@ -101,7 +99,7 @@ class _RemindersState extends State<Reminders> {
                           children: [
                             ...snapshot.data!.docs.map((e) {
                               final r = ReminderModel.fromMap(
-                                  e.data() as Map<String, dynamic>);
+                                  e.data() as Map<String, dynamic>, e.id);
                               return Padding(
                                 padding: const EdgeInsets.all(8.0),
                                 child: SizedBox(
@@ -155,7 +153,17 @@ class _RemindersState extends State<Reminders> {
                                       const Expanded(child: SizedBox()),
                                       IconButton(
                                           iconSize: 40,
-                                          onPressed: () {},
+                                          onPressed: () {
+                                            Get.to(
+                                              AddClassReminder(
+                                                  course: widget.course,
+                                                  reminder: r),
+                                              transition:
+                                                  Transition.circularReveal,
+                                              duration: const Duration(
+                                                  milliseconds: 800),
+                                            );
+                                          },
                                           icon: const Icon(Icons.settings))
                                     ],
                                   ),

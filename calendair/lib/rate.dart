@@ -4,8 +4,9 @@ import 'package:syncfusion_flutter_core/theme.dart';
 import 'package:syncfusion_flutter_sliders/sliders.dart';
 
 class rate extends StatefulWidget {
+  final bool back3;
   String name;
-  rate({Key? key, required this.name}) : super(key: key);
+  rate({Key? key, required this.name, this.back3 = true}) : super(key: key);
 
   @override
   State<rate> createState() => _rateState();
@@ -26,7 +27,11 @@ class _rateState extends State<rate> {
               color: Colors.black,
             ),
             onPressed: () {
-              Get.back();
+              if (widget.back3) {
+                Get.close(3);
+              } else {
+                Get.back();
+              }
             },
           ),
         ),
@@ -117,7 +122,11 @@ class _rateState extends State<rate> {
                             borderRadius: BorderRadius.circular(18.0),
                           )),
                       onPressed: () {
-                        Get.back();
+                        if (widget.back3) {
+                          Get.close(3);
+                        } else {
+                          Get.back();
+                        }
                       },
 
                       child: const Text(

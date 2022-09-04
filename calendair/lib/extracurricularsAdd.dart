@@ -1,31 +1,40 @@
-import 'dart:developer';
-
+import 'package:calendair/Classes/firestore.dart';
 import 'package:calendair/extracurricularButton.dart';
-import 'package:calendair/rate.dart';
+import 'package:calendair/models/ExtracurricularsModel.dart';
 import 'package:calendair/settings.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/src/foundation/key.dart';
-import 'package:flutter/src/widgets/framework.dart';
 import 'package:get/get.dart';
-import 'package:get/get_navigation/src/routes/transitions_type.dart';
-
 import 'Classes/googleClassroom.dart';
-import 'addClass.dart';
 import 'bottomNavBar.dart';
-import 'calendar.dart';
+import 'classes/ExtButton.dart';
 import 'dashboard.dart';
 import 'models/nbar.dart';
 
 class ExtracurricularsAdd extends StatefulWidget {
-  const ExtracurricularsAdd({Key? key}) : super(key: key);
+  final ExtracurricularsModel? ext;
+  const ExtracurricularsAdd({Key? key, this.ext}) : super(key: key);
 
   @override
   State<ExtracurricularsAdd> createState() => _ExtracurricularsAddState();
 }
 
 class _ExtracurricularsAddState extends State<ExtracurricularsAdd> {
+  final titleController = TextEditingController();
+  final minutesController = TextEditingController();
+  final extb = Get.find<ExtButton>();
+  @override
+  void initState() {
+    if (widget.ext != null) {
+      extb.day.value = widget.ext!.day;
+      titleController.text = widget.ext!.title;
+      minutesController.text = widget.ext!.time.toString();
+    }
+    super.initState();
+  }
+
   final gc = Get.find<GoogleClassroom>();
   final days = ['Mon', 'Tues', 'Wed', 'Thurs', 'Fri', 'Sat', 'Sun'];
+
   @override
   Widget build(BuildContext context) {
     final width = MediaQuery.of(context).size.width;
@@ -48,7 +57,7 @@ class _ExtracurricularsAddState extends State<ExtracurricularsAdd> {
               slika: 'calendar',
               onclick: () {
                 Get.off(
-                  dashboard(),
+                  const dashboard(),
                   transition: Transition.circularReveal,
                   duration: const Duration(milliseconds: 800),
                 );
@@ -63,7 +72,7 @@ class _ExtracurricularsAddState extends State<ExtracurricularsAdd> {
               slika: 'settings',
               onclick: () {
                 Get.off(
-                  Settings(),
+                  const Settings(),
                   transition: Transition.circularReveal,
                   duration: const Duration(milliseconds: 800),
                 );
@@ -98,6 +107,7 @@ class _ExtracurricularsAddState extends State<ExtracurricularsAdd> {
                 SizedBox(
                   width: width * 0.85,
                   child: TextField(
+                    controller: titleController,
                     maxLines: 4,
                     minLines: 3,
                     keyboardType: TextInputType.multiline,
@@ -116,7 +126,7 @@ class _ExtracurricularsAddState extends State<ExtracurricularsAdd> {
                       hintStyle: const TextStyle(
                           color: Color.fromRGBO(38, 64, 78, 1), fontSize: 25),
                       hintText: "Extracurricular Title",
-                      fillColor: Color.fromRGBO(217, 217, 217, 1),
+                      fillColor: const Color.fromRGBO(217, 217, 217, 1),
                     ),
                   ),
                 ),
@@ -128,41 +138,41 @@ class _ExtracurricularsAddState extends State<ExtracurricularsAdd> {
                       children: [
                         Row(
                           mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
+                          children: const [
                             Expanded(
                                 child: ExtracurricularButton(
-                                    text: "Mon", f: () {})),
+                                    text: "Mon", index: 0)),
                             Expanded(
                                 child: ExtracurricularButton(
-                                    text: "Tue", f: () {})),
+                                    text: "Tue", index: 1)),
                           ],
                         ),
                         Row(
                           mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
+                          children: const [
                             Expanded(
                                 child: ExtracurricularButton(
-                                    text: "Wed", f: () {})),
+                                    text: "Wed", index: 2)),
                             Expanded(
                                 child: ExtracurricularButton(
-                                    text: "Thu", f: () {})),
+                                    text: "Thu", index: 3)),
                           ],
                         ),
                         Row(
                           mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
+                          children: const [
                             Expanded(
                                 child: ExtracurricularButton(
-                                    text: "Fri", f: () {})),
+                                    text: "Fri", index: 4)),
                             Expanded(
                                 child: ExtracurricularButton(
-                                    text: "Sat", f: () {})),
+                                    text: "Sat", index: 5)),
                           ],
                         ),
                         SizedBox(
                             width: width * 0.3,
-                            child:
-                                ExtracurricularButton(text: "Sun", f: () {})),
+                            child: const ExtracurricularButton(
+                                text: "Sun", index: 6)),
                       ],
                     ),
                   ),
@@ -182,9 +192,8 @@ class _ExtracurricularsAddState extends State<ExtracurricularsAdd> {
                 SizedBox(
                   width: width * 0.7,
                   child: TextField(
-                    maxLines: 4,
-                    minLines: 1,
-                    keyboardType: TextInputType.multiline,
+                    controller: minutesController,
+                    keyboardType: TextInputType.number,
                     style: const TextStyle(
                         color: Color.fromRGBO(38, 64, 78, 1), fontSize: 25),
                     textAlignVertical: TextAlignVertical.center,
@@ -200,7 +209,7 @@ class _ExtracurricularsAddState extends State<ExtracurricularsAdd> {
                       hintStyle: const TextStyle(
                           color: Color.fromRGBO(38, 64, 78, 1), fontSize: 25),
                       hintText: "00 minutes",
-                      fillColor: Color.fromRGBO(217, 217, 217, 1),
+                      fillColor: const Color.fromRGBO(217, 217, 217, 1),
                     ),
                   ),
                 ),
@@ -218,6 +227,21 @@ class _ExtracurricularsAddState extends State<ExtracurricularsAdd> {
                             borderRadius: BorderRadius.circular(20.0),
                           )),
                       onPressed: () {
+                        if (widget.ext != null) {
+                          widget.ext!.day = extb.day.value;
+                          widget.ext!.time = int.parse(minutesController.text);
+                          widget.ext!.title = titleController.text;
+                          // print(extb.getDay());
+                          widget.ext!.date = extb.getDay();
+
+                          Firestore().updateExtracurriculars(widget.ext!);
+                        } else {
+                          Firestore().addExtracurriculars(
+                              int.parse(minutesController.text),
+                              titleController.text,
+                              extb.day.value,
+                              extb.getDay());
+                        }
                         Get.back();
                       },
 

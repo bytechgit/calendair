@@ -59,7 +59,7 @@ class _StudentsState extends State<Students> {
                     top: 10.0,
                   ),
                   child: SizedBox(
-                    width: width * 0.7,
+                    width: width * 0.8,
                     child: const FittedBox(
                       fit: BoxFit.scaleDown,
                       child: Text(

@@ -62,7 +62,7 @@ class _DashboardPeriodState extends State<DashboardPeriod> {
                       style: const TextStyle(
                         color: Colors.black,
                         fontSize: 35,
-                        fontWeight: FontWeight.w900,
+                        fontWeight: FontWeight.bold,
                       ),
                     ),
                   ),

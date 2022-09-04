@@ -13,8 +13,8 @@ import 'bottomNavBar.dart';
 import 'models/nbar.dart';
 
 class PopUps extends StatefulWidget {
-  CustomCourse course;
-  PopUps({Key? key, required this.course}) : super(key: key);
+  final CustomCourse course;
+  const PopUps({Key? key, required this.course}) : super(key: key);
 
   @override
   State<PopUps> createState() => _PopUpsState();
@@ -57,7 +57,7 @@ class _PopUpsState extends State<PopUps> {
             Padding(
               padding: const EdgeInsets.only(top: 10.0),
               child: SizedBox(
-                width: width * 0.7,
+                width: width * 0.8,
                 child: FittedBox(
                   fit: BoxFit.scaleDown,
                   child: Text(
