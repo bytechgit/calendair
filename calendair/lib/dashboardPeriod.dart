@@ -4,11 +4,7 @@ import 'package:calendair/popUps.dart';
 import 'package:calendair/reminders.dart';
 import 'package:calendair/students.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/src/foundation/key.dart';
-import 'package:flutter/src/widgets/framework.dart';
 import 'package:get/get.dart';
-import 'package:googleapis/classroom/v1.dart';
-
 import 'Classes/googleClassroom.dart';
 import 'bottomNavBar.dart';
 import 'models/nbar.dart';
@@ -99,7 +95,7 @@ class _DashboardPeriodState extends State<DashboardPeriod> {
                     child: InkWell(
                       onTap: (() {
                         Get.to(
-                          const Students(),
+                          Students(courseId: widget.course.docid),
                           transition: Transition.circularReveal,
                           duration: const Duration(milliseconds: 800),
                         );

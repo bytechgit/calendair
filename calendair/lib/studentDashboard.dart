@@ -242,12 +242,7 @@ class _studentDashboardState extends State<studentDashboard> {
                       ),
                       Expanded(
                         child: StreamBuilder(
-                            stream: FirebaseFirestore.instance
-                                .collection('Popups')
-                                .where("students",
-                                    arrayContains:
-                                        Firestore().ua.currentUser!.uid)
-                                .snapshots(),
+                            stream: Firestore().getStudentPopUps(),
                             builder: (context,
                                 AsyncSnapshot<QuerySnapshot> snapshot) {
                               if (snapshot.hasData) {

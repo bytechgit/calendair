@@ -41,14 +41,14 @@ class GoogleClassroom extends GetxController {
       final authenticateClient = AuthenticateClient(
           await ua.googleSignIn.currentUser!.authHeaders, baseClient);
       final cra = ClassroomApi(authenticateClient);
-
+      print("aaaa");
       Map<String, dynamic>? data =
           await Firestore().readUser(ua.auth.currentUser!.uid);
       if (data != null) {
         final lcr = await cra.courses.list(teacherId: "me");
         return lcr.courses != null
             ? lcr.courses!
-                .where((Course course) => !(data["classes"] as List<dynamic>)
+                .where((Course course) => !(data["courses"] as List<dynamic>)
                     .map((e) => e.toString())
                     .toList()
                     .contains(course.id))

@@ -1,3 +1,4 @@
+import 'package:calendair/models/UserModel.dart';
 import 'package:calendair/pom/inputClassCode.dart';
 import 'package:calendair/pom/makeClass.dart';
 import 'package:calendair/studentDashboard.dart';
@@ -73,8 +74,13 @@ class _RegisterWhatUserState extends State<RegisterWhatUser> {
                   ),
                   InkWell(
                     onTap: (() {
-                      Firestore()
-                          .addUserIfNotExist(gc.ua.currentUser!.uid, "student");
+                      Firestore().addUserIfNotExist(
+                          user: UserModel(
+                              id: gc.ua.currentUser!.uid,
+                              name: gc.ua.currentUser!.displayName ?? "no name",
+                              picture: gc.ua.currentUser!.photoURL ?? "",
+                              type: "student",
+                              courses: []));
                       // gc.getCourseListStudent();
                       Get.to(
                         const studentDashboard(),
@@ -109,8 +115,13 @@ class _RegisterWhatUserState extends State<RegisterWhatUser> {
                   ),
                   InkWell(
                     onTap: () {
-                      Firestore()
-                          .addUserIfNotExist(gc.ua.currentUser!.uid, "teacher");
+                      Firestore().addUserIfNotExist(
+                          user: UserModel(
+                              id: gc.ua.currentUser!.uid,
+                              name: gc.ua.currentUser!.displayName ?? "no name",
+                              picture: gc.ua.currentUser!.photoURL ?? "",
+                              type: "teacher",
+                              courses: []));
                       //gc.getCourseListTeacher();
                       Get.to(
                         const TeacherDashboard(),
