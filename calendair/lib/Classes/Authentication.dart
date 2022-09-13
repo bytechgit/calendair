@@ -73,9 +73,12 @@ class UserAuthentication extends GetxController {
   Future<String> signInwithGoogle() async {
     signout();
     try {
+      print("1");
       final GoogleSignInAccount? googleSignInAccount =
           await googleSignIn.signIn();
+      print("2");
       if (googleSignInAccount != null) {
+        print("3");
         final GoogleSignInAuthentication googleSignInAuthentication =
             await googleSignInAccount.authentication;
         final OAuthCredential credential = GoogleAuthProvider.credential(

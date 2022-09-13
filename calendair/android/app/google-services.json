@@ -14,6 +14,14 @@
       },
       "oauth_client": [
         {
+          "client_id": "64934311180-48rvcrj59po74c0s4kp928m23jfqnlia.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.calendair",
+            "certificate_hash": "7ded9e48eb30fb5b1f18e4ed8d258c09fdeb81a0"
+          }
+        },
+        {
           "client_id": "64934311180-b7sqkhi609re8g9a7hd7jenmuui2kkjc.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
@@ -35,7 +43,7 @@
         "appinvite_service": {
           "other_platform_oauth_client": [
             {
-              "client_id": "64934311180-ur80ord9qo262td8suibipg3u975onmv.apps.googleusercontent.com",
+              "client_id": "64934311180-0h43fe1c77cllqkqltbapcbo6nmoeff6.apps.googleusercontent.com",
               "client_type": 3
             }
           ]

@@ -1,4 +1,5 @@
 import 'package:calendair/assignmentsUpdate.dart';
+import 'package:calendair/models/AssignmentModel.dart';
 import 'package:calendair/models/CustomCourse.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -10,6 +11,7 @@ import 'models/nbar.dart';
 
 class Assignments extends StatefulWidget {
   final CustomCourse course;
+
   const Assignments({Key? key, required this.course}) : super(key: key);
 
   @override
@@ -17,10 +19,18 @@ class Assignments extends StatefulWidget {
 }
 
 class _AssignmentsState extends State<Assignments> {
+  final gc = Get.find<GoogleClassroom>();
+  Future<List<MyAssignment>>? mylist = null;
+
+  Future<List<MyAssignment>> getMyList() {
+    mylist ??= gc.getAssigmentsList(widget.course.id);
+    return mylist!;
+  }
+
   @override
   Widget build(BuildContext context) {
     final width = MediaQuery.of(context).size.width;
-    final gc = Get.find<GoogleClassroom>();
+
     return Scaffold(
       resizeToAvoidBottomInset: false,
       appBar: AppBar(
@@ -89,8 +99,8 @@ class _AssignmentsState extends State<Assignments> {
               height: 30,
             ),
             Expanded(
-              child: FutureBuilder<List<CourseWork>>(
-                  future: gc.getAssigmentsList(widget.course.id),
+              child: FutureBuilder<List<MyAssignment>>(
+                  future: getMyList(),
                   builder: (context, snapshot) {
                     if (snapshot.hasData) {
                       return SingleChildScrollView(
@@ -125,20 +135,21 @@ class _AssignmentsState extends State<Assignments> {
                                         SizedBox(
                                           width: width * 0.55,
                                           child: Column(
-                                            mainAxisAlignment: gc
-                                                        .assignments
-                                                        .value[i]
-                                                        .scheduledTime ==
-                                                    null
-                                                ? MainAxisAlignment.center
-                                                : MainAxisAlignment.start,
+                                            mainAxisAlignment: //gc
+                                                //             .assignments
+                                                //             .value[i]
+                                                //             .scheduledTime ==
+                                                //         null
+                                                //     ? MainAxisAlignment.center
+                                                //:
+                                                MainAxisAlignment.start,
                                             crossAxisAlignment:
                                                 CrossAxisAlignment.start,
                                             children: [
                                               FittedBox(
                                                 child: Text(
                                                   gc.assignments.value[i]
-                                                          .title ??
+                                                          .coursework?.title ??
                                                       "no title",
                                                   style: const TextStyle(
                                                     color: Colors.black,
@@ -147,22 +158,21 @@ class _AssignmentsState extends State<Assignments> {
                                                   ),
                                                 ),
                                               ),
-                                              if (gc.assignments.value[i]
-                                                      .scheduledTime !=
-                                                  null)
-                                                FittedBox(
-                                                  fit: BoxFit.scaleDown,
-                                                  child: Text(
-                                                    "${gc.assignments.value[i].scheduledTime ?? ''} Minutes",
-                                                    style: const TextStyle(
-                                                      color: Color.fromRGBO(
-                                                          143, 146, 145, 1),
-                                                      fontSize: 30,
-                                                      fontWeight:
-                                                          FontWeight.w400,
-                                                    ),
+                                              //if (gc.assignments.value[i]
+                                              //         .scheduledTime !=
+                                              //    null)
+                                              FittedBox(
+                                                fit: BoxFit.scaleDown,
+                                                child: Text(
+                                                  "${gc.assignments.value[i].duration} Minutes",
+                                                  style: const TextStyle(
+                                                    color: Color.fromRGBO(
+                                                        143, 146, 145, 1),
+                                                    fontSize: 30,
+                                                    fontWeight: FontWeight.w400,
                                                   ),
                                                 ),
+                                              ),
                                             ],
                                           ),
                                         ),
@@ -172,8 +182,9 @@ class _AssignmentsState extends State<Assignments> {
                                             onPressed: () {
                                               Get.to(
                                                 AssignmentsUpdate(
-                                                  assignmentIndex: i,
-                                                ),
+                                                    assignmentIndex: i,
+                                                    courseId:
+                                                        widget.course.docid),
                                                 transition:
                                                     Transition.circularReveal,
                                                 duration: const Duration(

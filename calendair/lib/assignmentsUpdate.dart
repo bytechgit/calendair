@@ -1,5 +1,6 @@
 import 'dart:developer';
 
+import 'package:calendair/Classes/firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/src/foundation/key.dart';
@@ -13,7 +14,9 @@ import 'models/nbar.dart';
 
 class AssignmentsUpdate extends StatefulWidget {
   int assignmentIndex;
-  AssignmentsUpdate({Key? key, required this.assignmentIndex})
+  String courseId;
+  AssignmentsUpdate(
+      {Key? key, required this.assignmentIndex, required this.courseId})
       : super(key: key);
 
   @override
@@ -24,9 +27,18 @@ class _AssignmentsUpdateState extends State<AssignmentsUpdate> {
   final gc = Get.find<GoogleClassroom>();
   final minscontroller = TextEditingController();
   final noteController = TextEditingController();
+
   @override
   Widget build(BuildContext context) {
     final width = MediaQuery.of(context).size.width;
+
+    if (minscontroller.text.isEmpty) {
+      minscontroller.text =
+          gc.assignments.value[widget.assignmentIndex].duration.toString();
+      noteController.text =
+          gc.assignments.value[widget.assignmentIndex].note ?? "";
+    }
+
     return Scaffold(
       resizeToAvoidBottomInset: false,
       appBar: AppBar(
@@ -82,7 +94,9 @@ class _AssignmentsUpdateState extends State<AssignmentsUpdate> {
             ),
             FittedBox(
               child: Text(
-                gc.assignments.value[widget.assignmentIndex].title ?? "no name",
+                gc.assignments.value[widget.assignmentIndex].coursework
+                        ?.title ??
+                    "no name",
                 style: const TextStyle(
                   color: Color.fromRGBO(93, 159, 196, 1),
                   fontSize: 50,
@@ -201,15 +215,19 @@ class _AssignmentsUpdateState extends State<AssignmentsUpdate> {
                         borderRadius: BorderRadius.circular(10.0),
                       )),
                   onPressed: () {
-                    gc.assignments.value[widget.assignmentIndex].description =
+                    gc.assignments.value[widget.assignmentIndex].note =
                         noteController.text;
-                    gc.assignments.value[widget.assignmentIndex].maxPoints =
-                        double.tryParse(minscontroller.text);
+                    gc.assignments.value[widget.assignmentIndex].duration =
+                        int.tryParse(minscontroller.text) ?? 0;
 
                     gc.assignments.refresh();
                     inspect(gc.assignments.value);
-                    gc.updateAssignment(
-                        gc.assignments.value[widget.assignmentIndex]);
+                    // gc.updateAssignment(
+                    //   gc.assignments.value[widget.assignmentIndex]);
+                    Firestore().insertOrUpdateAssignment(
+                        gc.assignments.value[widget.assignmentIndex],
+                        widget.courseId);
+
                     Get.back();
                   },
 

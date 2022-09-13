@@ -1,16 +1,10 @@
 import 'package:calendair/calendarAssignment.dart';
 import 'package:calendair/models/Assigments.dart';
-import 'package:calendair/popUpsConfidenceMeter.dart';
 import 'package:calendair/reminder.dart';
-import 'package:drag_and_drop_lists/drag_and_drop_item.dart';
-import 'package:drag_and_drop_lists/drag_and_drop_list.dart';
 import 'package:drag_and_drop_lists/drag_and_drop_lists.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
-import 'package:syncfusion_flutter_core/theme.dart';
-import 'package:syncfusion_flutter_sliders/sliders.dart';
-
 import 'Classes/googleClassroom.dart';
 
 class Calendar extends StatefulWidget {
@@ -22,80 +16,34 @@ class Calendar extends StatefulWidget {
 
 class _CalendarState extends State<Calendar> {
   final gc = Get.find<GoogleClassroom>();
-  late final List<DragAndDropList> _contents = [
-    DragAndDropList(verticalAlignment: CrossAxisAlignment.stretch, children: [
-      DragAndDropItem(
-          child:
-              CalendarAssignment(as: Assigments("Finish Bio Lab", 30, false))),
-    ]),
-    DragAndDropList(
-      contentsWhenEmpty: SizedBox(),
-      children: [
-        DragAndDropItem(
-            child:
-                CalendarAssignment(as: Assigments("Finish Bio Lab", 30, true))),
-        DragAndDropItem(
-            child: CalendarAssignment(
-                as: Assigments("Finish Bio Lab", 30, false))),
-      ],
-    ),
-    DragAndDropList(
-      canDrag: false,
-      children: [
-        DragAndDropItem(
-            child: CalendarAssignment(
-                as: Assigments("Finish Bio Lab", 30, false))),
-        DragAndDropItem(
-            child: CalendarAssignment(
-                as: Assigments("Finish Bio Lab", 30, false))),
-      ],
-    ),
-    DragAndDropList(
-      children: [
-        DragAndDropItem(
-            child: CalendarAssignment(
-                as: Assigments("Finish Bio Lab", 30, false))),
-        DragAndDropItem(
-            child: CalendarAssignment(
-                as: Assigments("Finish Bio Lab", 30, false))),
-      ],
-    ),
-    DragAndDropList(
-      children: [
-        DragAndDropItem(
-            child: CalendarAssignment(
-                as: Assigments("Finish Bio Lab", 30, false))),
-        DragAndDropItem(
-            child: CalendarAssignment(
-                as: Assigments("Finish Bio Lab", 30, false))),
-      ],
-    ),
-    DragAndDropList(
-      children: [
-        DragAndDropItem(
-            child: CalendarAssignment(
-                as: Assigments("Finish Bio Lab", 30, false))),
-        DragAndDropItem(
-            child: CalendarAssignment(
-                as: Assigments("Finish Bio Lab", 30, false))),
-      ],
-    ),
-    DragAndDropList(
-      children: [
-        DragAndDropItem(
-            child: CalendarAssignment(
-                as: Assigments("Finish Bio Lab", 30, false))),
-        DragAndDropItem(
-            child: CalendarAssignment(
-                as: Assigments("Finish Bio Lab", 30, false))),
-      ],
-    ),
-  ];
+  late final List<DragAndDropList> _contents = [];
+  //     gc.scheduleElements.value.map((list) {
+  //   return DragAndDropList(
+  //       verticalAlignment: CrossAxisAlignment.stretch,
+  //       children: list
+  //           .map(
+  //             (e) => DragAndDropItem(
+  //               child: CalendarAssignment(
+  //                 as: Assigments(e.title, e.time, false),
+  //               ),
+  //               canDrag: true,
+  //             ),
+  //           )
+  //           .toList(),
+  //       canDrag: true);
+  // }).toList();
+
   _onItemReorder(
       int oldItemIndex, int oldListIndex, int newItemIndex, int newListIndex) {
     setState(() {
-      var movedItem = _contents[oldListIndex].children.removeAt(oldItemIndex);
-      _contents[newListIndex].children.insert(newItemIndex, movedItem);
+      var movedI =
+          gc.removeFromScheduleElements(day: oldListIndex, index: oldItemIndex);
+      gc.addInScheduleElements(
+          day: newListIndex, index: newItemIndex, se: movedI, updateDate: true);
+      // gc.scheduleElements.value[oldListIndex].removeAt(oldItemIndex);
+      //gc.scheduleElements.value[newListIndex].insert(newItemIndex, movedI);
+      // var movedItem = _contents[oldListIndex].children.removeAt(oldItemIndex);
+      // _contents[newListIndex].children.insert(newItemIndex, movedItem);
     });
   }
 
@@ -210,7 +158,22 @@ class _CalendarState extends State<Calendar> {
                         lastListTargetSize: 0,
                         lastItemTargetHeight: 100,
                         //disableScrolling: true,
-                        children: _contents,
+                        children: gc.scheduleElements.value.map((list) {
+                          return DragAndDropList(
+                              verticalAlignment: CrossAxisAlignment.stretch,
+                              children: list
+                                  .map(
+                                    (e) => DragAndDropItem(
+                                      child: CalendarAssignment(
+                                        scheduleElement: e,
+                                      ),
+                                      canDrag:
+                                          e.type == "reminder" ? false : true,
+                                    ),
+                                  )
+                                  .toList(),
+                              canDrag: false);
+                        }).toList(),
                         onItemReorder: _onItemReorder,
                         onListReorder: _onListReorder,
                         axis: Axis.horizontal,
@@ -274,41 +237,42 @@ class _CalendarState extends State<Calendar> {
             Expanded(
               flex: 1,
               child: Row(
-                children: days
-                    .map((e) => Expanded(
+                children: [
+                  for (int d = 0; d < 7; d++)
+                    Expanded(
+                        child: Container(
+                      decoration: const BoxDecoration(
+                        border: Border(
+                            left: BorderSide(
+                                color: Color.fromRGBO(94, 158, 197, 1),
+                                width: 2),
+                            right: BorderSide(
+                                color: Color.fromRGBO(94, 158, 197, 1),
+                                width: 2),
+                            top: BorderSide(
+                                color: Color.fromRGBO(94, 158, 197, 1),
+                                width: 2)),
+                      ),
+                      child: Column(
+                        children: [
+                          Expanded(
                             child: Container(
-                          decoration: const BoxDecoration(
-                            border: Border(
-                                left: BorderSide(
-                                    color: Color.fromRGBO(94, 158, 197, 1),
-                                    width: 2),
-                                right: BorderSide(
-                                    color: Color.fromRGBO(94, 158, 197, 1),
-                                    width: 2),
-                                top: BorderSide(
-                                    color: Color.fromRGBO(94, 158, 197, 1),
-                                    width: 2)),
-                          ),
-                          child: Column(
-                            children: [
-                              Expanded(
-                                child: Container(
-                                  child: Center(
-                                    child: FittedBox(
-                                      child: Text(
-                                        "65 Minutes",
-                                        style: TextStyle(
-                                            color: Color.fromRGBO(
-                                                144, 144, 144, 1)),
-                                      ),
-                                    ),
+                              child: Center(
+                                child: FittedBox(
+                                  child: Text(
+                                    "${gc.totalTimes.value[d]} Minutes",
+                                    style: const TextStyle(
+                                        color:
+                                            Color.fromRGBO(144, 144, 144, 1)),
                                   ),
                                 ),
-                              )
-                            ],
-                          ),
-                        )))
-                    .toList(),
+                              ),
+                            ),
+                          )
+                        ],
+                      ),
+                    ))
+                ],
               ),
             )
           ],
