@@ -3,6 +3,7 @@ import 'package:calendair/models/UserModel.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:sizer/sizer.dart';
 
 import 'Classes/firestore.dart';
 import 'bottomNavBar.dart';
@@ -20,7 +21,6 @@ class _StudentsState extends State<Students> {
   bool selected = false;
   @override
   Widget build(BuildContext context) {
-    final width = MediaQuery.of(context).size.width;
     return Scaffold(
       appBar: AppBar(
         backgroundColor: const Color.fromRGBO(93, 159, 196, 1),
@@ -59,7 +59,7 @@ class _StudentsState extends State<Students> {
                     top: 10.0,
                   ),
                   child: SizedBox(
-                    width: width * 0.8,
+                    width: 80.w,
                     child: const FittedBox(
                       fit: BoxFit.scaleDown,
                       child: Text(
@@ -78,7 +78,7 @@ class _StudentsState extends State<Students> {
                 padding: const EdgeInsets.only(bottom: 30),
                 child: Center(
                   child: SizedBox(
-                    width: width * 0.8,
+                    width: 80.w,
                     child: const Divider(
                       thickness: 10,
                       height: 15,
@@ -108,7 +108,7 @@ class _StudentsState extends State<Students> {
                                     },
                                     child: Container(
                                       height: 55,
-                                      width: width * 0.75,
+                                      width: 75.w,
                                       decoration: BoxDecoration(
                                           color: selected == false
                                               ? const Color.fromRGBO(

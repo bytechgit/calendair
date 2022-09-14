@@ -3,6 +3,7 @@ import 'package:calendair/models/ExtracurricularsModel.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:sizer/sizer.dart';
 import 'Classes/firestore.dart';
 import 'Classes/googleClassroom.dart';
 import 'bottomNavBar.dart';
@@ -21,7 +22,6 @@ class _ExtracurricularsState extends State<Extracurriculars> {
   final gc = Get.find<GoogleClassroom>();
   @override
   Widget build(BuildContext context) {
-    final width = MediaQuery.of(context).size.width;
     return Scaffold(
       appBar: AppBar(
         backgroundColor: const Color.fromRGBO(93, 159, 196, 1),
@@ -72,7 +72,7 @@ class _ExtracurricularsState extends State<Extracurriculars> {
               Padding(
                 padding: const EdgeInsets.only(top: 10.0, bottom: 30),
                 child: SizedBox(
-                  width: width * 0.7,
+                  width: 70.w,
                   child: const FittedBox(
                     child: Text(
                       'Extracurriculars',
@@ -108,7 +108,7 @@ class _ExtracurricularsState extends State<Extracurriculars> {
                                   height: 65,
                                   child: Row(children: [
                                     SizedBox(
-                                      width: width * 0.5,
+                                      width: 50.w,
                                       child: FittedBox(
                                         alignment: Alignment.centerLeft,
                                         fit: BoxFit.scaleDown,
@@ -130,7 +130,7 @@ class _ExtracurricularsState extends State<Extracurriculars> {
                                       child: SizedBox(),
                                     ),
                                     SizedBox(
-                                      width: width * 0.30,
+                                      width: 30.w,
                                       height: 45,
                                       child: ElevatedButton(
                                         style: ElevatedButton.styleFrom(
@@ -196,7 +196,7 @@ class _ExtracurricularsState extends State<Extracurriculars> {
               Padding(
                 padding: const EdgeInsets.only(top: 15.0),
                 child: SizedBox(
-                  width: width * 0.70,
+                  width: 70.w,
                   height: 75,
                   child: ElevatedButton(
                     style: ElevatedButton.styleFrom(

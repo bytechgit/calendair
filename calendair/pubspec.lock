@@ -366,6 +366,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "0.6.4"
+  linked_scroll_controller:
+    dependency: "direct main"
+    description:
+      name: linked_scroll_controller
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.2.0"
   lint:
     dependency: transitive
     description:
@@ -520,6 +527,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "0.27.5"
+  sizer:
+    dependency: "direct main"
+    description:
+      name: sizer
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "2.0.15"
   sky_engine:
     dependency: transitive
     description: flutter

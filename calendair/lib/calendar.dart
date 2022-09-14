@@ -1,10 +1,12 @@
 import 'package:calendair/calendarAssignment.dart';
+import 'package:calendair/classes/scheduleController.dart';
 import 'package:calendair/models/Assigments.dart';
 import 'package:calendair/reminder.dart';
 import 'package:drag_and_drop_lists/drag_and_drop_lists.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
+import 'package:linked_scroll_controller/linked_scroll_controller.dart';
 import 'Classes/googleClassroom.dart';
 
 class Calendar extends StatefulWidget {
@@ -16,30 +18,18 @@ class Calendar extends StatefulWidget {
 
 class _CalendarState extends State<Calendar> {
   final gc = Get.find<GoogleClassroom>();
+  final sc = Get.find<ScheduleCintroller>();
   late final List<DragAndDropList> _contents = [];
-  //     gc.scheduleElements.value.map((list) {
-  //   return DragAndDropList(
-  //       verticalAlignment: CrossAxisAlignment.stretch,
-  //       children: list
-  //           .map(
-  //             (e) => DragAndDropItem(
-  //               child: CalendarAssignment(
-  //                 as: Assigments(e.title, e.time, false),
-  //               ),
-  //               canDrag: true,
-  //             ),
-  //           )
-  //           .toList(),
-  //       canDrag: true);
-  // }).toList();
-
   _onItemReorder(
       int oldItemIndex, int oldListIndex, int newItemIndex, int newListIndex) {
     setState(() {
       var movedI =
-          gc.removeFromScheduleElements(day: oldListIndex, index: oldItemIndex);
-      gc.addInScheduleElements(
-          day: newListIndex, index: newItemIndex, se: movedI, updateDate: true);
+          sc.removeFromScheduleElements(day: oldListIndex, index: oldItemIndex);
+      sc.addInScheduleElements(
+          newListIndex: newListIndex,
+          index: newItemIndex,
+          se: movedI,
+          oldListIndex: oldListIndex);
       // gc.scheduleElements.value[oldListIndex].removeAt(oldItemIndex);
       //gc.scheduleElements.value[newListIndex].insert(newItemIndex, movedI);
       // var movedItem = _contents[oldListIndex].children.removeAt(oldItemIndex);
@@ -54,6 +44,12 @@ class _CalendarState extends State<Calendar> {
     });
   }
 
+  late LinkedScrollControllerGroup _controllers;
+  late ScrollController calendarController;
+  late ScrollController avgController;
+  late ScrollController gridController;
+  late ScrollController appBarController;
+
   @override
   void initState() {
     super.initState();
@@ -61,6 +57,11 @@ class _CalendarState extends State<Calendar> {
       DeviceOrientation.landscapeRight,
       DeviceOrientation.landscapeLeft,
     ]);
+    _controllers = LinkedScrollControllerGroup();
+    calendarController = _controllers.addAndGet();
+    avgController = _controllers.addAndGet();
+    gridController = _controllers.addAndGet();
+    appBarController = _controllers.addAndGet();
   }
 
   @override
@@ -71,11 +72,28 @@ class _CalendarState extends State<Calendar> {
       DeviceOrientation.portraitUp,
       DeviceOrientation.portraitDown,
     ]);
+    calendarController.dispose();
+    avgController.dispose();
     super.dispose();
   }
 
   double _value = 21.0;
-  final days = ['Mon', 'Tues', 'Wed', 'Thurs', 'Fri', 'Sat', 'Sun'];
+  final days = [
+    'Mon',
+    'Tues',
+    'Wed',
+    'Thurs',
+    'Fri',
+    'Sat',
+    'Sun',
+    'Mon',
+    'Tues',
+    'Wed',
+    'Thurs',
+    'Fri',
+    'Sat',
+    'Sun'
+  ];
   @override
   Widget build(BuildContext context) {
     final width = MediaQuery.of(context).size.width;
@@ -98,13 +116,17 @@ class _CalendarState extends State<Calendar> {
                     ),
                   ),
                 ),
-                Row(
-                    children: days
-                        .map((e) => Expanded(
-                              child: Container(
-                                constraints:
-                                    BoxConstraints(maxWidth: width * 0.13),
+                SingleChildScrollView(
+                  controller: appBarController,
+                  scrollDirection: Axis.horizontal,
+                  child: Row(
+                      children: days
+                          .map((e) => SizedBox(
+                                width: width / 7,
+                                // constraints:
+                                //  BoxConstraints(maxWidth: width / 7),
                                 child: FittedBox(
+                                  alignment: Alignment.center,
                                   fit: BoxFit.scaleDown,
                                   child: Text(
                                     e,
@@ -114,9 +136,9 @@ class _CalendarState extends State<Calendar> {
                                         fontWeight: FontWeight.bold),
                                   ),
                                 ),
-                              ),
-                            ))
-                        .toList()),
+                              ))
+                          .toList()),
+                ),
               ],
             ),
           ),
@@ -134,32 +156,38 @@ class _CalendarState extends State<Calendar> {
               child: Obx(
                 () => Stack(
                   children: [
-                    Row(
-                      children: days
-                          .map((e) => Expanded(
-                                  child: Container(
-                                decoration: BoxDecoration(
-                                    border: Border.all(
-                                        color: const Color.fromRGBO(
-                                            94, 158, 197, 1),
-                                        width: 2)),
-                              )))
-                          .toList(),
+                    SingleChildScrollView(
+                      scrollDirection: Axis.horizontal,
+                      controller: gridController,
+                      child: Row(
+                        children: days
+                            .map((e) => Container(
+                                  width: width / 7,
+                                  decoration: BoxDecoration(
+                                      border: Border.all(
+                                          color: const Color.fromRGBO(
+                                              94, 158, 197, 1),
+                                          width: 2)),
+                                ))
+                            .toList(),
+                      ),
                     ),
                     Obx(
                       () => DragAndDropLists(
+                        scrollController: calendarController,
                         itemDragHandle: !gc.edit.value
-                            ? DragHandle(child: SizedBox())
+                            ? const DragHandle(child: SizedBox())
                             : null,
                         listDragHandle: !gc.edit.value
-                            ? DragHandle(child: SizedBox())
+                            ? const DragHandle(child: SizedBox())
                             : null,
-                        contentsWhenEmpty: Text('aaa'),
+
                         lastListTargetSize: 0,
                         lastItemTargetHeight: 100,
                         //disableScrolling: true,
-                        children: gc.scheduleElements.value.map((list) {
+                        children: sc.scheduleElements.value.map((list) {
                           return DragAndDropList(
+                              contentsWhenEmpty: const SizedBox(),
                               verticalAlignment: CrossAxisAlignment.stretch,
                               children: list
                                   .map(
@@ -178,7 +206,7 @@ class _CalendarState extends State<Calendar> {
                         onListReorder: _onListReorder,
                         axis: Axis.horizontal,
                         listWidth: width / 7,
-                        listPadding: EdgeInsets.symmetric(horizontal: 0),
+                        listPadding: const EdgeInsets.symmetric(horizontal: 0),
                       ),
                     ),
                     if (!gc.edit.value)
@@ -236,43 +264,45 @@ class _CalendarState extends State<Calendar> {
             ),
             Expanded(
               flex: 1,
-              child: Row(
-                children: [
-                  for (int d = 0; d < 7; d++)
-                    Expanded(
-                        child: Container(
-                      decoration: const BoxDecoration(
-                        border: Border(
-                            left: BorderSide(
-                                color: Color.fromRGBO(94, 158, 197, 1),
-                                width: 2),
-                            right: BorderSide(
-                                color: Color.fromRGBO(94, 158, 197, 1),
-                                width: 2),
-                            top: BorderSide(
-                                color: Color.fromRGBO(94, 158, 197, 1),
-                                width: 2)),
-                      ),
-                      child: Column(
-                        children: [
-                          Expanded(
-                            child: Container(
+              child: SingleChildScrollView(
+                controller: avgController,
+                scrollDirection: Axis.horizontal,
+                child: Row(
+                  children: [
+                    for (int d = 0; d < 14; d++)
+                      Container(
+                        width: width / 7,
+                        decoration: const BoxDecoration(
+                          border: Border(
+                              left: BorderSide(
+                                  color: Color.fromRGBO(94, 158, 197, 1),
+                                  width: 2),
+                              right: BorderSide(
+                                  color: Color.fromRGBO(94, 158, 197, 1),
+                                  width: 2),
+                              top: BorderSide(
+                                  color: Color.fromRGBO(94, 158, 197, 1),
+                                  width: 2)),
+                        ),
+                        child: Column(
+                          children: [
+                            Expanded(
                               child: Center(
                                 child: FittedBox(
                                   child: Text(
-                                    "${gc.totalTimes.value[d]} Minutes",
+                                    "${sc.totalTimes.value[d]} Minutes",
                                     style: const TextStyle(
                                         color:
                                             Color.fromRGBO(144, 144, 144, 1)),
                                   ),
                                 ),
                               ),
-                            ),
-                          )
-                        ],
-                      ),
-                    ))
-                ],
+                            )
+                          ],
+                        ),
+                      )
+                  ],
+                ),
               ),
             )
           ],

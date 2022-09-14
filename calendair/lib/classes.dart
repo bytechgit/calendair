@@ -6,6 +6,7 @@ import 'package:calendair/settings.dart' as s;
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:sizer/sizer.dart';
 import 'Classes/firestore.dart';
 import 'bottomNavBar.dart';
 import 'dashboard.dart';
@@ -22,7 +23,6 @@ class _classesState extends State<classes> {
   final gc = Get.find<GoogleClassroom>();
   @override
   Widget build(BuildContext context) {
-    final width = MediaQuery.of(context).size.width;
     return Scaffold(
       appBar: AppBar(
         backgroundColor: const Color.fromRGBO(93, 159, 196, 1),
@@ -72,7 +72,7 @@ class _classesState extends State<classes> {
               Padding(
                 padding: const EdgeInsets.only(top: 10.0),
                 child: SizedBox(
-                  width: width * 0.5,
+                  width: 50.w,
                   child: const FittedBox(
                     child: Text(
                       'Classes',
@@ -128,7 +128,7 @@ class _classesState extends State<classes> {
                                                       .spaceBetween,
                                               children: [
                                                 SizedBox(
-                                                  width: width * 0.5,
+                                                  width: 50.w,
                                                   child: Padding(
                                                     padding:
                                                         const EdgeInsets.only(
@@ -199,7 +199,7 @@ class _classesState extends State<classes> {
                           child: Padding(
                             padding: const EdgeInsets.all(20.0),
                             child: SizedBox(
-                              width: width * 0.40,
+                              width: 40.w,
                               height: 100,
                               child: ElevatedButton(
                                 style: ElevatedButton.styleFrom(
@@ -237,7 +237,7 @@ class _classesState extends State<classes> {
                           child: Align(
                             alignment: Alignment.bottomLeft,
                             child: SizedBox(
-                                width: width * 0.4,
+                                width: 40.w,
                                 child: Image.asset(
                                     'assets/images/teacherDashboard.png')),
                           ),

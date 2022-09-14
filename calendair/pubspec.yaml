@@ -55,6 +55,8 @@ dependencies:
   quiver: ^3.1.0
   flutter_datetime_picker: ^1.5.1
   cached_network_image: ^3.2.1
+  linked_scroll_controller: ^0.2.0
+  sizer: ^2.0.15
 
 dev_dependencies:
   flutter_test:

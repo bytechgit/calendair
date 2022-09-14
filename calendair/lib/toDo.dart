@@ -19,7 +19,6 @@ class _ToDoState extends State<ToDo> {
   @override
   Widget build(BuildContext context) {
     final width = MediaQuery.of(context).size.width;
-    final height = MediaQuery.of(context).size.height;
     return Scaffold(
         appBar: AppBar(
           backgroundColor: const Color.fromRGBO(93, 159, 196, 1),

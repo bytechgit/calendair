@@ -14,7 +14,6 @@ Da li je bitan redosled u toku dana?
  */
 ///////////////////////////////////
 import 'dart:developer';
-
 import 'package:calendair/classes.dart';
 import 'package:calendair/models/AssignmentModel.dart';
 import 'package:calendair/models/ExtracurricularsModel.dart';
@@ -52,195 +51,10 @@ class Firestore {
     _initializeFirebase();
   }
 
-  bool isInRange(DateTime start, DateTime date, DateTime end) {
-    start.subtract(Duration(
-        minutes: start.minute,
-        seconds: start.second,
-        milliseconds: start.millisecond,
-        microseconds: start.microsecond));
-    end.subtract(Duration(
-        minutes: end.minute,
-        seconds: end.second,
-        milliseconds: end.millisecond,
-        microseconds: end.microsecond));
-    return date.isAfter(start) && date.isBefore(end);
-  }
-
-  int getDayIndex(DateTime dt) {
-    DateTime dtn = DateTime.now();
-    final nd = dtn.weekday;
-    final startDate = dtn.subtract(Duration(days: nd - 1));
-    final endDate = startDate.add(const Duration(days: 7));
-    if (isInRange(startDate, dt, endDate)) {
-      return dt.day - startDate.day;
-    } else {
-      return -1;
-    }
-  }
-
-  FindingResult? findScheduleElement(ScheduleElement sc) {
-    for (int i = 0; i < gc.scheduleElements.value.length; i++) {
-      var list = gc.scheduleElements.value[i];
-      for (int j = 0; j < list.length; j++) {
-        if (list[j].docId == sc.docId) {
-          return FindingResult(i, j, list[j]);
-        }
-      }
-    }
-    return null;
-  }
-
-  bool addInSchedule(ScheduleElement se) {
-    if (se.type == "assignment" && se.date == null) {
-      se.date = DateTime.now();
-
-      updateScheduleElementDate(se);
-      print("OVDEEEEE");
-    }
-    int index = getDayIndex(se.date!);
-    if (index != -1) {
-      se.setRandomColor(gc.scheduleElements.value[index].length > 0
-          ? gc.scheduleElements.value[index].last.colorIndex
-          : null);
-      gc.addInScheduleElements(day: index, se: se);
-      //gc.scheduleElements.value[index].add(se);
-      gc.scheduleElements.refresh();
-      return true;
-    }
-    return false;
-  }
-
   Future<FirebaseApp> _initializeFirebase() async {
     FirebaseApp firebaseApp = await Firebase.initializeApp();
 
-    listenReminders().listen((e) {
-      for (var doc in e.docChanges) {
-        final ScheduleElement se = ScheduleElement.fromMap(
-          doc.doc.data()!,
-          doc.doc.id,
-          "reminder",
-        );
-        if (doc.type == DocumentChangeType.modified) {
-          var fse = findScheduleElement(se);
-          if (fse != null) {
-            if (fse.element.date!.isAtSameMomentAs(se.date!)) {
-              fse.element.title = se.title;
-            } else {
-              gc.removeFromScheduleElements(day: fse.dayId, index: fse.classId);
-              //gc.scheduleElements.value[fse.dayId].removeAt(fse.classId);
-              addInSchedule(se);
-            }
-            gc.scheduleElements.refresh();
-          } else {
-            addInSchedule(se);
-          }
-        }
-        if (doc.type == DocumentChangeType.added) {
-          addInSchedule(se);
-          // gc.scheduleElements.refresh();
-        }
-        if (doc.type == DocumentChangeType.removed) {
-          var fse = findScheduleElement(se);
-          if (fse != null) {
-            gc.removeFromScheduleElements(day: fse.dayId, index: fse.classId);
-            // gc.scheduleElements.value[fse.dayId].removeAt(fse.classId);
-            gc.scheduleElements.refresh();
-          }
-        }
-      }
-    });
-
-    listenExtracurriculars().listen((e) {
-      for (var doc in e.docChanges) {
-        final ScheduleElement se = ScheduleElement.fromMap(
-            doc.doc.data()!, doc.doc.id, "extracurriculars");
-
-        if (doc.type == DocumentChangeType.added) {
-          addInSchedule(se);
-        }
-        if (doc.type == DocumentChangeType.modified) {
-          var fse = findScheduleElement(se);
-          if (fse != null) {
-            if (fse.element.date!.isAtSameMomentAs(se.date!)) {
-              fse.element.title = se.title;
-              fse.element.time = se.time;
-              print("UPDATEEEEE");
-            } else {
-              gc.removeFromScheduleElements(day: fse.dayId, index: fse.classId);
-              // gc.scheduleElements.value[fse.dayId].removeAt(fse.classId);
-              addInSchedule(se);
-              print("REMOVEEEEE");
-            }
-            gc.scheduleElements.refresh();
-          } else {
-            addInSchedule(se);
-          }
-        }
-        if (doc.type == DocumentChangeType.removed) {
-          var fse = findScheduleElement(se);
-          if (fse != null) {
-            gc.removeFromScheduleElements(day: fse.dayId, index: fse.classId);
-            // gc.scheduleElements.value[fse.dayId].removeAt(fse.classId);
-            gc.scheduleElements.refresh();
-          }
-        }
-      }
-    });
-
-    listenStudentAssigments().listen((e) async {
-      for (var doc in e.docChanges) {
-        ScheduleElement se =
-            ScheduleElement.fromMap(doc.doc.data()!, doc.doc.id, "assignment");
-        MyAssignment mya = await readMyAssignmentById(se.parentDocRef!);
-        se.time = mya.duration;
-        se.note = mya.note!;
-        se.dueDate = mya.dueDate;
-        se.title = mya.title;
-
-        if (doc.type == DocumentChangeType.added) {
-          addInSchedule(se);
-        }
-        if (doc.type == DocumentChangeType.modified) {
-          var fse = findScheduleElement(se);
-          if (fse != null) {
-            if (fse.element.date!.isAtSameMomentAs(se.date!)) {
-              fse.element.time = se.time;
-              fse.element.note = se.note;
-            } else {
-              gc.removeFromScheduleElements(day: fse.dayId, index: fse.classId);
-              //gc.scheduleElements.value[fse.dayId].removeAt(fse.classId);
-              addInSchedule(se);
-            }
-            gc.scheduleElements.refresh();
-          } else {
-            addInSchedule(se);
-          }
-        }
-      }
-    });
-
     return firebaseApp;
-  }
-
-  void updateScheduleElementDate(ScheduleElement se) {
-    print(se.type);
-    if (se.type == "assignment") {
-      print("ASSSIGNMENT");
-
-      FirebaseFirestore.instance
-          .collection('ScheduleAssignments')
-          .doc(se.docId)
-          .update({
-        "date": se.date,
-      });
-    } else if (se.type == "extracurriculars") {
-      FirebaseFirestore.instance
-          .collection('Extracurriculars')
-          .doc(se.docId)
-          .update({
-        "date": se.date,
-      });
-    }
   }
 
   void addUserIfNotExist({required UserModel user}) {
@@ -283,17 +97,39 @@ class Firestore {
     });
   }
 
+  Future<List<String>> addRemindersCopyForStudents(
+      {required String classId,
+      required DateTime date,
+      required String title}) async {
+    List<String> ids = [];
+    for (var student in ((await courses.doc(classId).get()).data()!
+            as Map<String, dynamic>)["students"] ??
+        []) {
+      final doc =
+          await FirebaseFirestore.instance.collection('ScheduleReminders').add({
+        "studentId": student,
+        //"class": classId,
+        "date": date,
+        "title": title,
+      });
+      ids.add(doc.id);
+    }
+    return ids;
+  }
+
   Future<void> addReminder(
       {required String classId,
       required DateTime date,
       required String title}) async {
+    final ids = await addRemindersCopyForStudents(
+        classId: classId, date: date, title: title);
     reminder.add({
       "class": classId,
       "date": date,
       "title": title,
-      "students": ((await courses.doc(classId).get()).data()!
-              as Map<String, dynamic>)["students"] ??
-          []
+      "studentsCopy": ids
+          .map((e) => FirebaseFirestore.instance.doc("ScheduleReminders/$e"))
+          .toList()
     });
   }
 
@@ -302,6 +138,12 @@ class Firestore {
       "title": r.title,
       "date": r.date,
     });
+    for (var s in r.studentsCopy) {
+      s.update({
+        "title": r.title,
+        "date": r.date,
+      });
+    }
   }
 
   void addCourse({
@@ -369,21 +211,25 @@ class Firestore {
     });
   }
 
-  Future<void> insertAssignmentCopyForStudents(
+  Future<List<String>> insertAssignmentCopyForStudents(
       MyAssignment mya, String courseId) async {
-    print("EVOOOOOOOOOOOO");
-    //await gc.getStudentsList(mya.coursework!.courseId!);
-    QuerySnapshot<Map<String, dynamic>> students =
-        await getStudentsFromCourse(courseId);
+    List<String> ids = [];
+    QuerySnapshot<Map<String, dynamic>> students = await getStudentsFromCourse(
+        courseId); //?vec imas studenti koji su na odredjeni predmen ne mora se ponovo citaju
     for (var student in students.docs) {
-      print(student.id);
-      FirebaseFirestore.instance.collection('ScheduleAssignments').add({
+      final doc = await FirebaseFirestore.instance
+          .collection('ScheduleAssignments')
+          .add({
         "studentId": student.id,
-        //   "note": mya.note,
-        //    "duration": mya.duration,
-        "parentDocRef": "${mya.coursework!.courseId!}${mya.coursework!.id!}"
+        "note": mya.note,
+        "time": mya.duration,
+        "title": mya.coursework!.title,
+        "date": mya.coursework!.dueDate ??
+            DateTime.now().add(const Duration(days: 7)),
       });
+      ids.add(doc.id);
     }
+    return ids;
   }
 
   Future<void> insertOrUpdateAssignment(
@@ -392,9 +238,10 @@ class Firestore {
         .collection('Assignments')
         .doc(mya.coursework!.courseId! + mya.coursework!.id!)
         .get()
-        .then((DocumentSnapshot ds) {
+        .then((DocumentSnapshot ds) async {
       if (!ds.exists) {
         //insert
+        final ids = await insertAssignmentCopyForStudents(mya, courseId);
         FirebaseFirestore.instance
             .collection('Assignments')
             .doc(mya.coursework!.courseId! + mya.coursework!.id!)
@@ -403,9 +250,12 @@ class Firestore {
           "duration": mya.duration,
           "dueDate": mya.coursework!.dueDate ??
               DateTime.now().add(const Duration(days: 7)),
-          "title": mya.coursework!.title
+          "title": mya.coursework!.title,
+          "studentsCopy": ids
+              .map((e) =>
+                  FirebaseFirestore.instance.doc("ScheduleAssignments/$e"))
+              .toList()
         }, SetOptions(merge: true));
-        insertAssignmentCopyForStudents(mya, courseId);
       } else //update
       {
         FirebaseFirestore.instance
@@ -417,6 +267,15 @@ class Firestore {
           "dueDate": mya.coursework!.dueDate ??
               DateTime.now().add(const Duration(days: 7))
         });
+        for (DocumentReference<Map<String, dynamic>> ref
+            in (ds.data() as Map<String, dynamic>)["studentsCopy"] ?? []) {
+          ref.update({
+            "note": mya.note,
+            "time": mya.duration,
+            "dueDate": mya.coursework!.dueDate ??
+                DateTime.now().add(const Duration(days: 7))
+          });
+        }
       }
     });
   }
@@ -447,30 +306,10 @@ class Firestore {
   }
 
 ///////////////////////////kalendar
-  Stream<QuerySnapshot<Map<String, dynamic>>> listenReminders() {
-    print("=---------------------------------------------");
-    return FirebaseFirestore.instance
-        .collection('Reminders')
-        .where("students", arrayContains: ua.currentUser!.uid)
-        .snapshots();
-  }
-
-  Stream<QuerySnapshot<Map<String, dynamic>>> listenExtracurriculars() {
-    print("AAAAAAAAAAAAAAAAAA" + ua.currentUser!.uid);
-    return FirebaseFirestore.instance
-        .collection('Extracurriculars')
-        .where("studentId", isEqualTo: ua.currentUser!.uid)
-        .snapshots();
-  }
-
-  Stream<QuerySnapshot<Map<String, dynamic>>> listenStudentAssigments() {
-    return FirebaseFirestore.instance
-        .collection('ScheduleAssignments')
-        .where("studentId", isEqualTo: ua.currentUser!.uid)
-        .snapshots();
-  }
 
 ///////////////////////////////////////////////////////////////////////////////////
+  ///
+
   Stream<QuerySnapshot<Map<String, dynamic>>> getStudentCourses() {
     return FirebaseFirestore.instance
         .collection('Courses')
@@ -486,6 +325,7 @@ class Firestore {
         .snapshots();
   }
 
+//! studenti mogu direktno iz kurs da se uzmu
   Future<QuerySnapshot<Map<String, dynamic>>> getStudentsFromCourse(
       String courseId) async {
     return await FirebaseFirestore.instance

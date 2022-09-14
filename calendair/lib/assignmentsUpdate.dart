@@ -1,21 +1,15 @@
 import 'dart:developer';
-
 import 'package:calendair/Classes/firestore.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/src/foundation/key.dart';
-import 'package:flutter/src/widgets/framework.dart';
 import 'package:get/get.dart';
-import 'package:googleapis/classroom/v1.dart' as classroom;
-
 import 'Classes/googleClassroom.dart';
 import 'bottomNavBar.dart';
 import 'models/nbar.dart';
 
 class AssignmentsUpdate extends StatefulWidget {
-  int assignmentIndex;
-  String courseId;
-  AssignmentsUpdate(
+  final int assignmentIndex;
+  final String courseId;
+  const AssignmentsUpdate(
       {Key? key, required this.assignmentIndex, required this.courseId})
       : super(key: key);
 

@@ -1,6 +1,6 @@
 import 'dart:developer';
 import 'package:calendair/Classes/firestore.dart';
-import 'package:calendair/addClassReminderSend.dart';
+import 'package:calendair/updateReminder.dart';
 import 'package:calendair/models/CustomCourse.dart';
 import 'package:calendair/models/reminderModel.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -10,6 +10,7 @@ import 'package:intl/intl.dart';
 import 'addClassReminder.dart';
 import 'bottomNavBar.dart';
 import 'models/nbar.dart';
+import 'package:sizer/sizer.dart';
 
 class Reminders extends StatefulWidget {
   final CustomCourse course;
@@ -22,7 +23,6 @@ class Reminders extends StatefulWidget {
 class _RemindersState extends State<Reminders> {
   @override
   Widget build(BuildContext context) {
-    final width = MediaQuery.of(context).size.width;
     return Scaffold(
       appBar: AppBar(
         backgroundColor: const Color.fromRGBO(93, 159, 196, 1),
@@ -53,7 +53,7 @@ class _RemindersState extends State<Reminders> {
             Padding(
               padding: const EdgeInsets.only(top: 10.0),
               child: SizedBox(
-                width: width * 0.8,
+                width: 80.w,
                 child: FittedBox(
                   fit: BoxFit.scaleDown,
                   child: Text(
@@ -68,7 +68,7 @@ class _RemindersState extends State<Reminders> {
               ),
             ),
             SizedBox(
-              width: width * 0.8,
+              width: 80.w,
               child: const Divider(
                 thickness: 10,
                 height: 15,
@@ -93,7 +93,8 @@ class _RemindersState extends State<Reminders> {
                   stream: Firestore().getTeacherRemider(widget.course.docid),
                   builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
                     if (snapshot.hasData) {
-                      inspect(snapshot.data);
+                      //inspect(snapshot.data);
+                      print("aaaaa");
                       return SingleChildScrollView(
                         child: Column(
                           children: [
@@ -119,7 +120,7 @@ class _RemindersState extends State<Reminders> {
                                         ),
                                       ),
                                       SizedBox(
-                                        width: width * 0.55,
+                                        width: 55.w,
                                         child: Column(
                                           crossAxisAlignment:
                                               CrossAxisAlignment.start,
@@ -187,7 +188,7 @@ class _RemindersState extends State<Reminders> {
                   padding:
                       const EdgeInsets.only(top: 20.0, bottom: 20, right: 10),
                   child: SizedBox(
-                    width: width * 0.5,
+                    width: 50.w,
                     height: 100,
                     child: ElevatedButton(
                       style: ElevatedButton.styleFrom(
@@ -199,7 +200,7 @@ class _RemindersState extends State<Reminders> {
                           )),
                       onPressed: () {
                         Get.to(
-                          AddClassReminderSend(
+                          UpdateReminder(
                             course: widget.course,
                           ),
                           transition: Transition.circularReveal,

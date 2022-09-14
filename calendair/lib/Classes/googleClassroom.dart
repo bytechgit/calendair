@@ -1,10 +1,8 @@
 import 'dart:developer';
-
 import 'package:calendair/Classes/Authentication.dart';
 import 'package:calendair/models/AssignmentModel.dart';
 import 'package:calendair/models/ScheduleElementModel.dart';
 import 'package:calendair/popUps.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:get/get.dart';
 import 'package:googleapis/classroom/v1.dart';
 import 'package:http/http.dart';
@@ -21,9 +19,6 @@ class GoogleClassroom extends GetxController {
   final assignments = Rx<List<MyAssignment>>([]);
   final popups = Rx<List<PopUps>>([]);
   final ua = UserAuthentication();
-  final scheduleElements =
-      Rx<List<List<ScheduleElement>>>([[], [], [], [], [], [], []]);
-  final totalTimes = Rx<List<int>>([0, 0, 0, 0, 0, 0, 0]);
 
   // Future<void> getCourseList() async {
   //   if (ua.googleSignIn.currentUser != null) {
@@ -38,35 +33,6 @@ class GoogleClassroom extends GetxController {
   // }
   Iterable<MapEntry<int, List<Course>>> getPartiotion() {
     return partition(courses.value, 10).toList().asMap().entries;
-  }
-
-  void addInScheduleElements(
-      {required int day,
-      required ScheduleElement se,
-      int? index,
-      bool updateDate = false}) {
-    if (updateDate) {
-      if (se.date!.weekday - 1 != day) {
-        final div = day - (se.date!.weekday - 1);
-        se.date = se.date!.add(Duration(days: div));
-        Firestore().updateScheduleElementDate(se);
-      }
-    }
-
-    if (index != null) {
-      scheduleElements.value[day].insert(index, se);
-    } else {
-      scheduleElements.value[day].add(se);
-    }
-    totalTimes.value[day] += se.time;
-    totalTimes.refresh();
-  }
-
-  ScheduleElement removeFromScheduleElements(
-      {required int day, required int index}) {
-    totalTimes.value[day] -= scheduleElements.value[day][index].time;
-    totalTimes.refresh();
-    return scheduleElements.value[day].removeAt(index);
   }
 
   Future<List<Course>> getCourseList() async {
@@ -137,8 +103,8 @@ class GoogleClassroom extends GetxController {
           await ua.googleSignIn.currentUser!.authHeaders, baseClient);
       final cra = ClassroomApi(authenticateClient);
       print("LOAD ASSIGNMENTS");
-      for (var c in ((await cra.courses.courseWork.list(courseId)).courseWork ??
-          []) as List<CourseWork>) {
+      for (var c
+          in ((await cra.courses.courseWork.list(courseId)).courseWork ?? [])) {
         print(c.title);
         MyAssignment mya = await Firestore().readMyAssignment(c);
 

@@ -7,16 +7,15 @@ import 'package:intl/intl.dart';
 import 'bottomNavBar.dart';
 import 'models/nbar.dart';
 
-class AddClassReminderSend extends StatefulWidget {
+class UpdateReminder extends StatefulWidget {
   final CustomCourse course;
-  const AddClassReminderSend({Key? key, required this.course})
-      : super(key: key);
+  const UpdateReminder({Key? key, required this.course}) : super(key: key);
 
   @override
-  State<AddClassReminderSend> createState() => _AddClassReminderSendState();
+  State<UpdateReminder> createState() => _UpdateReminderState();
 }
 
-class _AddClassReminderSendState extends State<AddClassReminderSend> {
+class _UpdateReminderState extends State<UpdateReminder> {
   DateTime date = DateTime.now();
   final titleController = TextEditingController();
   @override

@@ -5,6 +5,7 @@ import 'package:calendair/models/CustomCourse.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:sizer/sizer.dart';
 
 import 'Classes/googleClassroom.dart';
 import 'bottomNavBar.dart';
@@ -23,7 +24,6 @@ class _TeacherDashboardState extends State<TeacherDashboard> {
   int tabIndex = 0;
   @override
   Widget build(BuildContext context) {
-    final width = MediaQuery.of(context).size.width;
     return Scaffold(
       resizeToAvoidBottomInset: false,
       appBar: AppBar(
@@ -49,7 +49,7 @@ class _TeacherDashboardState extends State<TeacherDashboard> {
               Padding(
                 padding: const EdgeInsets.only(top: 10.0),
                 child: SizedBox(
-                  width: width * 0.5,
+                  width: 50.w,
                   child: const FittedBox(
                     child: Text(
                       'Classes',
@@ -135,7 +135,7 @@ class _TeacherDashboardState extends State<TeacherDashboard> {
                                   ]),
                                 );
                               } else {
-                                return Center(
+                                return const Center(
                                   child: CircularProgressIndicator(),
                                 );
                               }
@@ -145,7 +145,7 @@ class _TeacherDashboardState extends State<TeacherDashboard> {
                           child: Padding(
                             padding: const EdgeInsets.all(20.0),
                             child: SizedBox(
-                              width: width * 0.40,
+                              width: 40.w,
                               height: 100,
                               child: ElevatedButton(
                                 style: ElevatedButton.styleFrom(
@@ -179,11 +179,11 @@ class _TeacherDashboardState extends State<TeacherDashboard> {
                           ),
                         ),
                         Transform.translate(
-                          offset: Offset(-15, 20),
+                          offset: const Offset(-15, 20),
                           child: Align(
                             alignment: Alignment.bottomLeft,
                             child: SizedBox(
-                                width: width * 0.4,
+                                width: 40.w,
                                 child: Image.asset(
                                     'assets/images/teacherDashboard.png')),
                           ),

@@ -5,6 +5,7 @@ import 'package:flutter/src/foundation/key.dart';
 import 'package:flutter/src/widgets/framework.dart';
 import 'package:get/get.dart';
 import 'package:progress_indicators/progress_indicators.dart';
+import 'package:sizer/sizer.dart';
 
 import 'bottomNavBar.dart';
 import 'models/nbar.dart';
@@ -22,7 +23,6 @@ class _GeneratingClassCodeState extends State<GeneratingClassCode> {
   String? code;
   @override
   Widget build(BuildContext context) {
-    final width = MediaQuery.of(context).size.width;
     return Scaffold(
       resizeToAvoidBottomInset: false,
       appBar: AppBar(
@@ -71,7 +71,7 @@ class _GeneratingClassCodeState extends State<GeneratingClassCode> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   SizedBox(
-                    width: width * 0.8,
+                    width: 80.w,
                     child: FittedBox(
                       fit: BoxFit.scaleDown,
                       child: Row(
@@ -111,7 +111,7 @@ class _GeneratingClassCodeState extends State<GeneratingClassCode> {
                     padding: const EdgeInsets.only(bottom: 20.0, top: 7),
                     child: Container(
                       height: 6,
-                      width: width * 0.6,
+                      width: 60.w,
                       decoration: const BoxDecoration(
                           color: Color.fromRGBO(94, 159, 196, 1),
                           borderRadius: BorderRadius.all(Radius.circular(13))),
@@ -120,7 +120,7 @@ class _GeneratingClassCodeState extends State<GeneratingClassCode> {
                   Padding(
                     padding: const EdgeInsets.only(top: 5.0, bottom: 20),
                     child: SizedBox(
-                      width: width * 0.7,
+                      width: 70.w,
                       //height: 40,
                       child: FutureBuilder<String>(
                           future: widget.futureCode,
@@ -186,7 +186,7 @@ class _GeneratingClassCodeState extends State<GeneratingClassCode> {
                   Padding(
                     padding: const EdgeInsets.only(bottom: 20.0),
                     child: SizedBox(
-                      width: width * 0.5,
+                      width: 50.w,
                       child: const Text(
                         "Give this code to your students !",
                         textAlign: TextAlign.center,

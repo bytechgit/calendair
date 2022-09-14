@@ -2,6 +2,7 @@ import 'package:calendair/generatingClassCode.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:googleapis/classroom/v1.dart' as classroom;
+import 'package:sizer/sizer.dart';
 import 'Classes/googleClassroom.dart';
 import 'bottomNavBar.dart';
 import 'models/nbar.dart';
@@ -19,8 +20,6 @@ class _MakeClassState extends State<MakeClass> {
   final periodController = TextEditingController();
   final nameController = TextEditingController();
   Widget build(BuildContext context) {
-    final width = MediaQuery.of(context).size.width;
-    final height = MediaQuery.of(context).size.height;
     final gc = Get.find<GoogleClassroom>();
 
     return Scaffold(
@@ -56,7 +55,7 @@ class _MakeClassState extends State<MakeClass> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 SizedBox(
-                  width: width * 0.7,
+                  width: 70.w,
                   child: const Text(
                     'What would you like to name your class?',
                     textAlign: TextAlign.center,
@@ -70,7 +69,7 @@ class _MakeClassState extends State<MakeClass> {
                 Padding(
                   padding: const EdgeInsets.only(top: 5.0, bottom: 20),
                   child: SizedBox(
-                    width: width * 0.7,
+                    width: 70.w,
                     height: 70,
                     child: TextFormField(
                       controller: nameController,
@@ -104,7 +103,7 @@ class _MakeClassState extends State<MakeClass> {
                   ),
                 ),
                 SizedBox(
-                  width: width * 0.8,
+                  width: 80.w,
                   child: const FittedBox(
                     child: Text(
                       'What period is this class in?',
@@ -120,7 +119,7 @@ class _MakeClassState extends State<MakeClass> {
                 Padding(
                   padding: const EdgeInsets.only(top: 5.0, bottom: 20),
                   child: SizedBox(
-                    width: width * 0.7,
+                    width: 70.w,
                     height: 50,
                     child: TextFormField(
                       controller: periodController,
@@ -148,7 +147,7 @@ class _MakeClassState extends State<MakeClass> {
                   ),
                 ),
                 SizedBox(
-                  width: width * 0.7,
+                  width: 70.w,
                   child: const Text(
                     'Choose the Google Classroom to sync to.',
                     textAlign: TextAlign.center,
@@ -162,7 +161,7 @@ class _MakeClassState extends State<MakeClass> {
                 Padding(
                   padding: const EdgeInsets.only(top: 5.0, bottom: 20),
                   child: SizedBox(
-                    width: width * 0.7,
+                    width: 70.w,
                     height: 50,
                     child: ElevatedButton(
                       style: ElevatedButton.styleFrom(
@@ -185,7 +184,7 @@ class _MakeClassState extends State<MakeClass> {
                                 builder: (context, snapshot) {
                                   if (snapshot.hasData) {
                                     return SizedBox(
-                                      height: height * 0.5,
+                                      height: 50.h,
                                       child: SingleChildScrollView(
                                         child: Column(
                                           children: [

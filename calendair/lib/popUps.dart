@@ -7,6 +7,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
+import 'package:sizer/sizer.dart';
 
 import 'Classes/googleClassroom.dart';
 import 'bottomNavBar.dart';
@@ -25,7 +26,6 @@ class _PopUpsState extends State<PopUps> {
   List<QueryDocumentSnapshot<Object?>> popupsLis = [];
   @override
   Widget build(BuildContext context) {
-    final width = MediaQuery.of(context).size.width;
     return Scaffold(
       resizeToAvoidBottomInset: false,
       appBar: AppBar(
@@ -57,7 +57,7 @@ class _PopUpsState extends State<PopUps> {
             Padding(
               padding: const EdgeInsets.only(top: 10.0),
               child: SizedBox(
-                width: width * 0.8,
+                width: 80.w,
                 child: FittedBox(
                   fit: BoxFit.scaleDown,
                   child: Text(
@@ -72,7 +72,7 @@ class _PopUpsState extends State<PopUps> {
               ),
             ),
             SizedBox(
-              width: width * 0.8,
+              width: 80.w,
               child: const Divider(
                 thickness: 10,
                 height: 15,
@@ -122,7 +122,7 @@ class _PopUpsState extends State<PopUps> {
                                         ),
                                       ),
                                       SizedBox(
-                                        width: width * 0.55,
+                                        width: 55.w,
                                         child: Text(
                                           "${DateFormat("MM/dd/yy").format(pu.dueDate.toDate())} ${pu.title}",
                                           style: const TextStyle(
@@ -154,7 +154,7 @@ class _PopUpsState extends State<PopUps> {
                   padding:
                       const EdgeInsets.only(top: 20.0, bottom: 20, left: 10),
                   child: SizedBox(
-                    width: width * 0.40,
+                    width: 40.w,
                     height: 70,
                     child: ElevatedButton(
                       style: ElevatedButton.styleFrom(
@@ -187,7 +187,7 @@ class _PopUpsState extends State<PopUps> {
                   padding:
                       const EdgeInsets.only(top: 20.0, bottom: 20, right: 10),
                   child: SizedBox(
-                    width: width * 0.40,
+                    width: 40.w,
                     height: 70,
                     child: ElevatedButton(
                       style: ElevatedButton.styleFrom(

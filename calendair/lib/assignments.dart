@@ -4,6 +4,7 @@ import 'package:calendair/models/CustomCourse.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:googleapis/classroom/v1.dart';
+import 'package:sizer/sizer.dart';
 
 import 'Classes/googleClassroom.dart';
 import 'bottomNavBar.dart';
@@ -20,7 +21,7 @@ class Assignments extends StatefulWidget {
 
 class _AssignmentsState extends State<Assignments> {
   final gc = Get.find<GoogleClassroom>();
-  Future<List<MyAssignment>>? mylist = null;
+  Future<List<MyAssignment>>? mylist;
 
   Future<List<MyAssignment>> getMyList() {
     mylist ??= gc.getAssigmentsList(widget.course.id);
@@ -29,8 +30,6 @@ class _AssignmentsState extends State<Assignments> {
 
   @override
   Widget build(BuildContext context) {
-    final width = MediaQuery.of(context).size.width;
-
     return Scaffold(
       resizeToAvoidBottomInset: false,
       appBar: AppBar(
@@ -63,7 +62,7 @@ class _AssignmentsState extends State<Assignments> {
             Padding(
               padding: const EdgeInsets.only(top: 10.0),
               child: SizedBox(
-                width: width * 0.8,
+                width: 80.w,
                 child: FittedBox(
                   fit: BoxFit.scaleDown,
                   child: Text(
@@ -78,7 +77,7 @@ class _AssignmentsState extends State<Assignments> {
               ),
             ),
             SizedBox(
-              width: width * 0.8,
+              width: 80.w,
               child: const Divider(
                 thickness: 10,
                 height: 15,
@@ -133,7 +132,7 @@ class _AssignmentsState extends State<Assignments> {
                                           ),
                                         ),
                                         SizedBox(
-                                          width: width * 0.55,
+                                          width: 55.w,
                                           child: Column(
                                             mainAxisAlignment: //gc
                                                 //             .assignments

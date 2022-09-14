@@ -1,12 +1,11 @@
 import 'package:calendair/Classes/Authentication.dart';
-import 'package:calendair/Classes/googleClassroom.dart';
 import 'package:calendair/registerEnterSchoolCode.dart';
 import 'package:calendair/studentDashboard.dart';
 import 'package:calendair/teacherDashboard.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/src/foundation/key.dart';
-import 'package:flutter/src/widgets/framework.dart';
 import 'package:get/get.dart';
+
+import 'classes/scheduleController.dart';
 
 class Login extends StatelessWidget {
   const Login({Key? key}) : super(key: key);
@@ -14,6 +13,7 @@ class Login extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final u = UserAuthentication();
+    final sc = Get.find<ScheduleCintroller>();
     final width = MediaQuery.of(context).size.width;
     return Scaffold(
       resizeToAvoidBottomInset: false,
@@ -77,6 +77,8 @@ class Login extends StatelessWidget {
                         onPressed: () async {
                           final result = await u.signInwithGoogle();
                           if (result == "student") {
+                            sc.listen(u.currentUser!.uid);
+
                             Get.to(
                               const studentDashboard(),
                               transition: Transition.circularReveal,

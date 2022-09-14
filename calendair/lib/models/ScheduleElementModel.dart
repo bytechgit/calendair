@@ -16,6 +16,7 @@ class ScheduleElement {
   String note;
   bool checked;
   String? parentDocRef;
+  int index;
   Random random = Random();
   final List _colors = [
     const Color.fromRGBO(217, 237, 249, 1),
@@ -43,6 +44,7 @@ class ScheduleElement {
             ? (map["date"] as Timestamp).toDate()
             : null, //((map["date"] ?? Timestamp(0, 0)) as Timestamp).toDate(),
         title = map["title"] ?? " ",
+        index = map["index"] ?? -1,
         note = map["note"] ?? " ",
         time = map["time"] ?? 0,
         parentDocRef = map["parentDocRef"],

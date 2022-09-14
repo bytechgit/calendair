@@ -12,6 +12,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
+import 'package:sizer/sizer.dart';
 import 'Classes/googleClassroom.dart';
 import 'dashboard.dart';
 import 'models/nbar.dart';
@@ -35,9 +36,6 @@ class _studentDashboardState extends State<studentDashboard> {
 
   @override
   Widget build(BuildContext context) {
-    final width = MediaQuery.of(context).size.width;
-    final height = MediaQuery.of(context).size.height;
-
     return Scaffold(
       appBar: AppBar(
         backgroundColor: const Color.fromRGBO(93, 159, 196, 1),
@@ -86,7 +84,7 @@ class _studentDashboardState extends State<studentDashboard> {
                     Padding(
                       padding: const EdgeInsets.only(top: 30.0),
                       child: SizedBox(
-                        width: width * 0.7,
+                        width: 70.w,
                         child: const FittedBox(
                           child: Text(
                             'Dashboard',
@@ -102,7 +100,7 @@ class _studentDashboardState extends State<studentDashboard> {
                     Padding(
                       padding: const EdgeInsets.only(top: 30),
                       child: SizedBox(
-                        width: width * 0.70,
+                        width: 70.w,
                         height: 80,
                         child: ElevatedButton(
                           style: ElevatedButton.styleFrom(
@@ -139,7 +137,7 @@ class _studentDashboardState extends State<studentDashboard> {
                     Padding(
                       padding: const EdgeInsets.only(top: 20),
                       child: SizedBox(
-                        width: width * 0.70,
+                        width: 70.w,
                         height: 80,
                         child: ElevatedButton(
                           style: ElevatedButton.styleFrom(
@@ -176,7 +174,7 @@ class _studentDashboardState extends State<studentDashboard> {
                     Padding(
                       padding: const EdgeInsets.only(top: 20),
                       child: SizedBox(
-                        width: width * 0.70,
+                        width: 70.w,
                         height: 80,
                         child: ElevatedButton(
                           style: ElevatedButton.styleFrom(
@@ -217,8 +215,8 @@ class _studentDashboardState extends State<studentDashboard> {
                 Align(
                   alignment: Alignment.center,
                   child: Container(
-                    width: width * 0.9,
-                    height: height * 0.77,
+                    width: 90.w,
+                    height: 77.h,
                     decoration: const BoxDecoration(
                         color: Color.fromRGBO(26, 71, 97, 0.9),
                         borderRadius: BorderRadius.all(Radius.circular(10))),
@@ -301,7 +299,7 @@ class _studentDashboardState extends State<studentDashboard> {
                                                         ),
                                                       ),
                                                       SizedBox(
-                                                        width: width * 0.65,
+                                                        width: 65.w,
                                                         child: Text(
                                                           "${DateFormat("MM/dd/yy").format(pu.dueDate.toDate())} ${pu.title}",
                                                           style:

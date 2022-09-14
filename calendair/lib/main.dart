@@ -1,8 +1,10 @@
 import 'package:calendair/Classes/navBar.dart';
 import 'package:calendair/classes/ExtButton.dart';
+import 'package:calendair/classes/scheduleController.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:sizer/sizer.dart';
 import 'Classes/googleClassroom.dart';
 import 'loginRegister.dart';
 
@@ -14,6 +16,7 @@ Future<void> main() async {
   //   DeviceOrientation.portraitDown,
   // ]);
   Get.put(GoogleClassroom());
+  Get.put(ScheduleCintroller());
   Get.put(ExtButton());
   Get.put(NavBar()); // To turn off landscape mode
   runApp(const MyApp());
@@ -25,13 +28,15 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return GetMaterialApp(
-      title: 'Flutter Demo',
-      theme: ThemeData(
-        fontFamily: 'LeagueSpartan',
-        primarySwatch: Colors.blue,
-      ),
-      home: const LoginRegister(),
-    );
+    return Sizer(builder: (context, orientation, deviceType) {
+      return GetMaterialApp(
+        title: 'Flutter Demo',
+        theme: ThemeData(
+          fontFamily: 'LeagueSpartan',
+          primarySwatch: Colors.blue,
+        ),
+        home: const LoginRegister(),
+      );
+    });
   }
 }
