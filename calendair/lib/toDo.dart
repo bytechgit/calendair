@@ -132,7 +132,7 @@ class _ToDoState extends State<ToDo> {
                           children: [
                             ...sc.scheduleElements.value[widget.index]
                                 .map((el) {
-                              if (el is ScheduleElementAssignmentCopy) {
+                              if (el is ScheduleElementAssignment) {
                                 return ToDoCheck(el: el);
                               } else {
                                 return const SizedBox.shrink();

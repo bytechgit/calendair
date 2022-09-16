@@ -87,7 +87,7 @@ class _CalendarAssignmentState extends State<CalendarAssignment> {
                   child: Column(
                     children: [
                       Text(
-                        widget.scheduleElement.title,
+                        widget.scheduleElement.title_,
                         textAlign: TextAlign.center,
                         style: const TextStyle(
                             fontSize: 13, fontWeight: FontWeight.w600),

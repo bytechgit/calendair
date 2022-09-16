@@ -76,7 +76,7 @@ class _ToDoCheckState extends State<ToDoCheck> {
                   mainAxisAlignment: MainAxisAlignment.start,
                   children: [
                     Text(
-                      widget.el.title,
+                      widget.el.title_,
                       style: const TextStyle(
                         fontSize: 25,
                         fontWeight: FontWeight.bold,

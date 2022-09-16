@@ -233,25 +233,29 @@ class Firestore {
 //!ako je profesor stavio da traje 50 min to je podeljeno na dva dela 30,20 i sad ako je student vec zavrsio ovaj deo od 30 i ostalo mu
 //! od 20 a profesor promeni vreme sta se onda desava
 
-  Future<List<String>> insertAssignmentCopyForStudents(
-      MyAssignment mya, String courseId) async {
-    List<String> ids = [];
+  Future<List<DocumentReference<Map<String, dynamic>>>>
+      insertAssignmentCopyForStudents(MyAssignment mya, String courseId) async {
+    List<DocumentReference<Map<String, dynamic>>> ids = [];
     QuerySnapshot<Map<String, dynamic>> students = await getStudentsFromCourse(
         courseId); //?vec imas studenti koji su na odredjeni predmen ne mora se ponovo citaju
     for (var student in students.docs) {
-      final doc = await FirebaseFirestore.instance.collection('Schedule').add({
-        "studentId": student.id,
-        "note": mya.note,
-        "times": getTimes(mya.duration),
-        "finished": getTimes(mya.duration).map((e) => false).toList(),
-        "title": mya.coursework!.title,
-        "indexes": getTimes(mya.duration).map((e) => -1).toList(),
-        "dueDate": mya.coursework!.dueDate ??
-            DateTime.now().add(const Duration(days: 14)),
-        "type": "assignment",
-        "dates": []
-      });
-      ids.add(doc.id);
+      for (var t in getTimes(mya.duration)) {
+        final doc =
+            await FirebaseFirestore.instance.collection('Schedule').add({
+          "studentId": student.id,
+          "note": mya.note,
+          "time": t,
+          "finished": false,
+          "title": mya.coursework!.title,
+          "index": -1,
+          "dueDate": mya.coursework!.dueDate ??
+              DateTime.now().add(const Duration(days: 14)),
+          "type": "assignment",
+          "date": null,
+          "parentId": mya.coursework!.courseId! + mya.coursework!.id!
+        });
+        ids.add(FirebaseFirestore.instance.doc("Schedule/${doc.id}"));
+      }
     }
     return ids;
   }
@@ -275,9 +279,8 @@ class Firestore {
           "dueDate": mya.coursework!.dueDate ??
               DateTime.now().add(const Duration(days: 7)),
           "title": mya.coursework!.title,
-          "studentsCopy": ids
-              .map((e) => FirebaseFirestore.instance.doc("Schedule/$e"))
-              .toList()
+          "studentsCopy": ids,
+          "count": getTimes(mya.duration).length
         }, SetOptions(merge: true));
       } else //update
       {

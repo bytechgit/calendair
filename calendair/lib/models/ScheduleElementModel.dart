@@ -4,12 +4,16 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
 class ScheduleElement {
+  DateTime? date;
   String studentId;
   String docId;
   String type;
   String title;
   bool checked = false;
   int time = 0;
+  String get title_ {
+    return title;
+  }
 
   void setRandomColor(int? prevColorIndex) {
     if (prevColorIndex != null && colorIndex == prevColorIndex) {
@@ -23,7 +27,13 @@ class ScheduleElement {
     const Color.fromRGBO(247, 225, 237, 1),
     const Color.fromRGBO(248, 234, 213, 1),
     const Color.fromRGBO(218, 213, 249, 1),
-    const Color.fromRGBO(226, 208, 198, 1)
+    const Color.fromRGBO(226, 208, 198, 1),
+    const Color.fromRGBO(193, 246, 241, 1),
+    const Color.fromRGBO(128, 154, 207, 1),
+    const Color.fromRGBO(150, 184, 209, 1),
+    const Color.fromRGBO(183, 224, 210, 1),
+    const Color.fromRGBO(213, 233, 223, 1),
+    const Color.fromRGBO(234, 196, 212, 1),
   ];
   late Color color;
   late int colorIndex;
@@ -33,23 +43,25 @@ class ScheduleElement {
       required this.type,
       required this.title,
       this.time = 0,
-      int? colorIndeks}) {
+      int? colorIndeks,
+      this.date}) {
     if (colorIndeks != null) {
       colorIndex = colorIndeks;
     } else {
-      colorIndex = Random().nextInt(5);
+      colorIndex = Random().nextInt(10);
     }
     color = _colors[colorIndex];
   }
 }
 
 class ScheduleElementReminder extends ScheduleElement {
-  DateTime? date;
   int index;
   ScheduleElementReminder.fromMap(Map<String, dynamic> map, String docId)
-      : date = map["date"] != null ? (map["date"] as Timestamp).toDate() : null,
-        index = map["index"] ?? -1,
+      : index = map["index"] ?? -1,
         super(
+            date: map["date"] != null
+                ? (map["date"] as Timestamp).toDate()
+                : null,
             title: map["title"] ?? " ",
             studentId: map["studentId"] ?? " ",
             docId: docId,
@@ -57,28 +69,24 @@ class ScheduleElementReminder extends ScheduleElement {
 }
 
 class ScheduleElementAssignment extends ScheduleElement {
-  List<DateTime> dates;
   DateTime dueDate;
-  List<int> times = [];
-  List<bool> finished = [];
-  List<int> indexes = [];
+  String pref = "";
   String note;
+  String parentId;
+  @override
+  String get title_ {
+    return "$pref $title";
+  }
+
   ScheduleElementAssignment.fromMap(Map<String, dynamic> map, String docId)
-      : dates = ((map["dates"] ?? []) as List<dynamic>)
-            .map((e) => (e as Timestamp).toDate())
-            .toList(),
-        dueDate = ((map["dueDate"] ?? Timestamp(0, 0)) as Timestamp).toDate(),
+      : dueDate = ((map["dueDate"] ?? Timestamp(0, 0)) as Timestamp).toDate(),
         note = map["note"] ?? " ",
-        times = ((map["times"] ?? []) as List<dynamic>)
-            .map((e) => e as int)
-            .toList(),
-        finished = ((map["finished"] ?? []) as List<dynamic>)
-            .map((e) => e as bool)
-            .toList(),
-        indexes = ((map["indexes"] ?? []) as List<dynamic>)
-            .map((e) => e as int)
-            .toList(),
+        parentId = map["parentId"] ?? " ",
         super(
+            time: map["time"] ?? 0,
+            date: map["date"] != null
+                ? (map["date"] as Timestamp).toDate()
+                : null,
             title: map["title"] ?? " ",
             studentId: map["studentId"] ?? " ",
             docId: docId,
@@ -101,24 +109,4 @@ class ScheduleElementExtracurriculars extends ScheduleElement {
           type: map["type"] ?? "",
           time: map["time"] ?? 0,
         );
-}
-
-class ScheduleElementAssignmentCopy extends ScheduleElement {
-  int index;
-  ScheduleElementAssignment assignemnt;
-  late DateTime date;
-  ScheduleElementAssignmentCopy({required this.index, required this.assignemnt})
-      : super(
-            docId: assignemnt.docId,
-            studentId: assignemnt.studentId,
-            title: index == 0
-                ? "Start ${assignemnt.title}"
-                : index == assignemnt.times.length - 1
-                    ? "Finish ${assignemnt.title}"
-                    : "Continue ${assignemnt.title}",
-            type: assignemnt.type,
-            time: assignemnt.times[index],
-            colorIndeks: assignemnt.colorIndex) {
-    date = assignemnt.dates[index];
-  }
 }

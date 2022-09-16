@@ -36,7 +36,7 @@ class _DayToDoState extends State<DayToDo> {
                 width: width * 0.7,
                 child: FittedBox(
                   child: Text(
-                    widget.sc.title,
+                    widget.sc.title_,
                     style: const TextStyle(
                       color: Colors.black,
                       fontSize: 22,
@@ -128,7 +128,7 @@ class _DayToDoState extends State<DayToDo> {
                   child: SizedBox(
                     width: width * 0.6,
                     child: Text(
-                      '${widget.sc.title} PDF',
+                      '${widget.sc.title_} PDF',
                       textAlign: TextAlign.center,
                       style: const TextStyle(
                         color: Colors.black,
@@ -157,7 +157,7 @@ class _DayToDoState extends State<DayToDo> {
               child: SizedBox(
                 width: width * 0.7,
                 child: Text(
-                  (widget.sc as ScheduleElementAssignmentCopy).assignemnt.note,
+                  (widget.sc as ScheduleElementAssignment).note,
                   textAlign: TextAlign.center,
                   style: const TextStyle(
                       fontWeight: FontWeight.bold, fontSize: 16),

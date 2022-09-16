@@ -105,12 +105,11 @@ class ScheduleCintroller extends GetxController {
   void updateScheduleElementDate(
       ScheduleElement se, int oldIndex, int newIndex) {
     final doc = FirebaseFirestore.instance.collection('Schedule').doc(se.docId);
-    if (se is ScheduleElementAssignmentCopy) {
+    if (se is ScheduleElementAssignment) {
       final ind = newIndex - oldIndex;
-      se.assignemnt.dates[se.index] =
-          se.assignemnt.dates[se.index].add(Duration(days: ind));
+      se.date = se.date!.add(Duration(days: ind));
       doc.update({
-        "dates": se.assignemnt.dates,
+        "date": se.date,
         // "index": se.index,
       });
     } else if (se is ScheduleElementExtracurriculars) {
@@ -158,6 +157,9 @@ class ScheduleCintroller extends GetxController {
       scheduleElements.value[newListIndex].insert(index, se);
       totalTimes.value[newListIndex] += se.time;
     }
+    if (se is ScheduleElementAssignment) {
+      addPrefix(se);
+    }
 
     totalTimes.refresh();
   }
@@ -188,14 +190,11 @@ class ScheduleCintroller extends GetxController {
         totalTimes.refresh();
         scheduleElements.refresh();
         return se1;
-      } else if (se1 is ScheduleElementAssignmentCopy) {
+      } else if (se1 is ScheduleElementAssignment) {
         scheduleElements.value[fe.dayId].removeAt(fe.classId);
         totalTimes.value[fe.dayId] -= se1.time;
         totalTimes.refresh();
         scheduleElements.refresh();
-        return se1;
-      } else if (se1 is ScheduleElementAssignment) {
-        //!ako je izbrisan ceo assignemnt
         return se1;
       } else {
         return se1;
@@ -224,27 +223,30 @@ class ScheduleCintroller extends GetxController {
       totalTimes.refresh();
       scheduleElements.refresh();
     } else if (se is ScheduleElementAssignment) {
-      if (se.dates.isEmpty) {
+      if (se.date == null) {
         print("prazno");
-        se.dates = getDates(se);
+        se.date = getDate(se);
         FirebaseFirestore.instance
             .collection('Schedule')
             .doc(se.docId)
-            .update({"dates": se.dates});
+            .update({"date": se.date});
       }
-      for (int i = 0; i < se.times.length; i++) {
-        int index = getDayIndex(se.dates[i]);
-        if (index != -1) {
-          scheduleElements.value[index]
-              .add(ScheduleElementAssignmentCopy(index: i, assignemnt: se));
-          totalTimes.value[index] += se.times[i];
-        }
+
+      int index = getDayIndex(se.date!);
+      if (index != -1) {
+        scheduleElements.value[index].add(se);
+        totalTimes.value[index] += se.time;
+        // print(totalTimes.value[4]);
+        k++;
       }
+
       totalTimes.refresh();
+      addPrefix(se);
     }
     return false;
   }
 
+  int k = 0;
   void modifieSchdeuleElement(ScheduleElement se) {
     final fse = findScheduleElement(se);
     if (fse != null) {
@@ -278,15 +280,15 @@ class ScheduleCintroller extends GetxController {
     scheduleElements.refresh();
   }
 
-  List<DateTime> getDates(ScheduleElementAssignment sea) {
+  DateTime getDate(ScheduleElementAssignment sea) {
     final days = daysBetween(DateTime.now(), sea.dueDate);
     List<int> times = [];
-    final weekday = DateTime.now().weekday;
-    List<DateTime> lista = [];
+    final weekday = DateTime.now().weekday - 1;
     for (int i = weekday; i < days + weekday; i++) {
       if (i < 14) {
-        if (i == breakday.breakdayIndex.value + 1 ||
-            i == breakday.breakdayIndex.value + 1 + 7) {
+        if (breakday.breakdayIndex.value != -1 &&
+            (i == breakday.breakdayIndex.value + 1 ||
+                i == breakday.breakdayIndex.value + 1 + 7)) {
           times.add(100000);
         } else {
           times.add(totalTimes.value[i]);
@@ -295,15 +297,9 @@ class ScheduleCintroller extends GetxController {
         times.add(0);
       }
     }
-    for (var t in sea.times) {
-      int index = minIndex(times);
-      times[index] += t;
-      lista.add(DateTime.now().add(Duration(days: index)));
-    }
-    lista.sort(((a, b) {
-      return a.compareTo(b);
-    }));
-    return lista;
+    inspect(times);
+    int index = minIndex(times);
+    return DateTime.now().add(Duration(days: index));
   }
 
   int minIndex(List<int> l) {
@@ -326,5 +322,23 @@ class ScheduleCintroller extends GetxController {
 
   void updateIndex(ScheduleElement se, index) {
     if (se is ScheduleElementExtracurriculars) {}
+  }
+
+  void addPrefix(ScheduleElementAssignment se) {
+    final f = scheduleElements.value
+        .expand((element) => element)
+        .whereType<ScheduleElementAssignment>()
+        .toList();
+    final list = f.where((element) => (element).parentId == se.parentId);
+    for (var element in list) {
+      element.pref = "Continue";
+      element.color = list.first.color;
+    }
+    final first = f.firstWhere((element) => (element).parentId == se.parentId);
+    first.pref = "Start";
+
+    final last = f.lastWhere((element) => (element).parentId == se.parentId);
+    last.pref = "Finish";
+    scheduleElements.refresh();
   }
 }
