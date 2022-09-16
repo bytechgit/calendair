@@ -11,8 +11,9 @@ import 'bottomNavBar.dart';
 import 'models/nbar.dart';
 
 class PopUpsConfidenceMeter extends StatefulWidget {
-  CustomCourse course;
-  PopUpsConfidenceMeter({Key? key, required this.course}) : super(key: key);
+  final CustomCourse course;
+  const PopUpsConfidenceMeter({Key? key, required this.course})
+      : super(key: key);
 
   @override
   State<PopUpsConfidenceMeter> createState() => _PopUpsConfidenceMeterState();

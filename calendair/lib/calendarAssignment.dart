@@ -44,7 +44,7 @@ class _CalendarAssignmentState extends State<CalendarAssignment> {
                 // borderRadius: BorderRadius.all(Radius.circular(50)),
                 color: widget.scheduleElement.color,
               ),
-        child: widget.scheduleElement.type == "reminder"
+        child: widget.scheduleElement is ScheduleElementReminder
             ? Center(
                 child: Padding(
                   padding: const EdgeInsets.symmetric(vertical: 5.0),

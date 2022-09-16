@@ -1,7 +1,10 @@
+import 'dart:developer';
+
 import 'package:calendair/calendarAssignment.dart';
 import 'package:calendair/classes/scheduleController.dart';
 import 'package:calendair/models/Assigments.dart';
-import 'package:calendair/reminder.dart';
+import 'package:calendair/addReminderStudent.dart';
+import 'package:calendair/toDo.dart';
 import 'package:drag_and_drop_lists/drag_and_drop_lists.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -23,8 +26,8 @@ class _CalendarState extends State<Calendar> {
   _onItemReorder(
       int oldItemIndex, int oldListIndex, int newItemIndex, int newListIndex) {
     setState(() {
-      var movedI =
-          sc.removeFromScheduleElements(day: oldListIndex, index: oldItemIndex);
+      var movedI = sc.removeFromScheduleElements(
+          listIndex: oldListIndex, index: oldItemIndex);
       sc.addInScheduleElements(
           newListIndex: newListIndex,
           index: newItemIndex,
@@ -120,24 +123,48 @@ class _CalendarState extends State<Calendar> {
                   controller: appBarController,
                   scrollDirection: Axis.horizontal,
                   child: Row(
-                      children: days
-                          .map((e) => SizedBox(
-                                width: width / 7,
-                                // constraints:
-                                //  BoxConstraints(maxWidth: width / 7),
-                                child: FittedBox(
-                                  alignment: Alignment.center,
-                                  fit: BoxFit.scaleDown,
-                                  child: Text(
-                                    e,
-                                    style: const TextStyle(
-                                        color: Colors.black,
-                                        fontSize: 25,
-                                        fontWeight: FontWeight.bold),
-                                  ),
-                                ),
-                              ))
-                          .toList()),
+                    children: [
+                      for (int i = 0; i < days.length; i++)
+                        InkWell(
+                          onTap: (() {
+                            Get.to(
+                              ToDo(
+                                index: i,
+                                day: days[i],
+                                fromCalendar: true,
+                              ),
+                              transition: Transition.circularReveal,
+                              duration: const Duration(milliseconds: 800),
+                            )!
+                                .then((value) {
+                              print(Get.currentRoute);
+                              if (Get.currentRoute == "/Calendar") {
+                                SystemChrome.setPreferredOrientations([
+                                  DeviceOrientation.landscapeRight,
+                                  DeviceOrientation.landscapeLeft,
+                                ]);
+                              }
+                            });
+                          }),
+                          child: SizedBox(
+                            width: width / 7,
+                            // constraints:
+                            //  BoxConstraints(maxWidth: width / 7),
+                            child: FittedBox(
+                              alignment: Alignment.center,
+                              fit: BoxFit.scaleDown,
+                              child: Text(
+                                days[i],
+                                style: const TextStyle(
+                                    color: Colors.black,
+                                    fontSize: 25,
+                                    fontWeight: FontWeight.bold),
+                              ),
+                            ),
+                          ),
+                        )
+                    ],
+                  ),
                 ),
               ],
             ),
@@ -195,8 +222,8 @@ class _CalendarState extends State<Calendar> {
                                       child: CalendarAssignment(
                                         scheduleElement: e,
                                       ),
-                                      canDrag:
-                                          e.type == "reminder" ? false : true,
+                                      canDrag: true,
+                                      // e.type == "reminder" ? false : true,
                                     ),
                                   )
                                   .toList(),

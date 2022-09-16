@@ -13,21 +13,16 @@ velika je verovatnoca da ce da se prebaci za sledecu nedelju
 Da li je bitan redosled u toku dana?
  */
 ///////////////////////////////////
-import 'dart:developer';
-import 'package:calendair/classes.dart';
+import 'package:calendair/Classes/googleClassroom.dart';
 import 'package:calendair/models/AssignmentModel.dart';
 import 'package:calendair/models/ExtracurricularsModel.dart';
-import 'package:calendair/models/ScheduleElementModel.dart';
 import 'package:calendair/models/UserModel.dart';
 import 'package:calendair/models/reminderModel.dart';
-import 'package:calendair/models/scheduleFindingResult.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:get/get.dart';
 import 'package:googleapis/classroom/v1.dart';
-import 'package:sqflite/utils/utils.dart';
 import 'Authentication.dart';
-import 'googleClassroom.dart';
 import 'package:intl/intl.dart';
 
 class Firestore {
@@ -97,6 +92,17 @@ class Firestore {
     });
   }
 
+  Future<void> addReminderStudent(
+      {required DateTime date, required String title}) async {
+    await FirebaseFirestore.instance.collection('Schedule').add({
+      "studentId": ua.currentUser!.uid,
+      //"class": classId,
+      "date": date,
+      "title": title,
+      "type": "reminder"
+    });
+  }
+
   Future<List<String>> addRemindersCopyForStudents(
       {required String classId,
       required DateTime date,
@@ -105,12 +111,12 @@ class Firestore {
     for (var student in ((await courses.doc(classId).get()).data()!
             as Map<String, dynamic>)["students"] ??
         []) {
-      final doc =
-          await FirebaseFirestore.instance.collection('ScheduleReminders').add({
+      final doc = await FirebaseFirestore.instance.collection('Schedule').add({
         "studentId": student,
         //"class": classId,
         "date": date,
         "title": title,
+        "type": "reminder"
       });
       ids.add(doc.id);
     }
@@ -127,9 +133,8 @@ class Firestore {
       "class": classId,
       "date": date,
       "title": title,
-      "studentsCopy": ids
-          .map((e) => FirebaseFirestore.instance.doc("ScheduleReminders/$e"))
-          .toList()
+      "studentsCopy":
+          ids.map((e) => FirebaseFirestore.instance.doc("Schedule/$e")).toList()
     });
   }
 
@@ -170,30 +175,27 @@ class Firestore {
 
   Stream<QuerySnapshot<Map<String, dynamic>>> getExtracurriculars() {
     return FirebaseFirestore.instance
-        .collection('Extracurriculars')
+        .collection('Schedule')
         .where("studentId", isEqualTo: ua.currentUser!.uid)
-        .where("date",
-            isGreaterThanOrEqualTo: Timestamp.fromDate(
-                DateTime.now().subtract(const Duration(days: 8))))
-        .orderBy("date", descending: true)
+        .where("type", isEqualTo: "extracurricular")
         .snapshots();
   }
 
   void updateExtracurriculars(ExtracurricularsModel ex) {
     FirebaseFirestore.instance
-        .collection('Extracurriculars')
+        .collection('Schedule')
         .doc(ex.id)
         .update(ex.toMap());
   }
 
-  void addBreakDay(String day) {
+  void addBreakDay(int dayIndex) {
     FirebaseFirestore.instance
         .collection('Users')
         .doc(ua.currentUser!.uid)
-        .update({"breakday": day});
+        .update({"breakday": dayIndex});
   }
 
-  Future<String> getBreakday() async {
+  Future<int> getBreakday() async {
     return (await FirebaseFirestore.instance
             .collection('Users')
             .doc(ua.currentUser!.uid)
@@ -201,15 +203,35 @@ class Firestore {
         .data()!["breakday"];
   }
 
-  void addExtracurriculars(int time, String title, String day, DateTime date) {
-    FirebaseFirestore.instance.collection('Extracurriculars').add({
+  void addExtracurriculars(int time, String title, int dayIndex) {
+    FirebaseFirestore.instance.collection('Schedule').add({
       "title": title,
-      "day": day,
       "time": time,
-      "date": Timestamp.fromDate(date),
-      "studentId": ua.currentUser!.uid
+      "dayIndex": dayIndex,
+      "studentId": ua.currentUser!.uid,
+      "type": "extracurricular"
     });
   }
+
+  List<int> getTimes(int time) {
+    if (time < 45) {
+      return [time];
+    } else {
+      final List<int> list = [];
+      for (int i = 0; i < (time / 30).floor() + 1; i++) {
+        int t = time - 30 * (i + 1);
+        if (t <= 15) {
+          list.add(30 + t);
+          break;
+        } else {
+          list.add(30);
+        }
+      }
+      return list;
+    }
+  }
+//!ako je profesor stavio da traje 50 min to je podeljeno na dva dela 30,20 i sad ako je student vec zavrsio ovaj deo od 30 i ostalo mu
+//! od 20 a profesor promeni vreme sta se onda desava
 
   Future<List<String>> insertAssignmentCopyForStudents(
       MyAssignment mya, String courseId) async {
@@ -217,15 +239,17 @@ class Firestore {
     QuerySnapshot<Map<String, dynamic>> students = await getStudentsFromCourse(
         courseId); //?vec imas studenti koji su na odredjeni predmen ne mora se ponovo citaju
     for (var student in students.docs) {
-      final doc = await FirebaseFirestore.instance
-          .collection('ScheduleAssignments')
-          .add({
+      final doc = await FirebaseFirestore.instance.collection('Schedule').add({
         "studentId": student.id,
         "note": mya.note,
-        "time": mya.duration,
+        "times": getTimes(mya.duration),
+        "finished": getTimes(mya.duration).map((e) => false).toList(),
         "title": mya.coursework!.title,
-        "date": mya.coursework!.dueDate ??
-            DateTime.now().add(const Duration(days: 7)),
+        "indexes": getTimes(mya.duration).map((e) => -1).toList(),
+        "dueDate": mya.coursework!.dueDate ??
+            DateTime.now().add(const Duration(days: 14)),
+        "type": "assignment",
+        "dates": []
       });
       ids.add(doc.id);
     }
@@ -252,8 +276,7 @@ class Firestore {
               DateTime.now().add(const Duration(days: 7)),
           "title": mya.coursework!.title,
           "studentsCopy": ids
-              .map((e) =>
-                  FirebaseFirestore.instance.doc("ScheduleAssignments/$e"))
+              .map((e) => FirebaseFirestore.instance.doc("Schedule/$e"))
               .toList()
         }, SetOptions(merge: true));
       } else //update
@@ -271,7 +294,7 @@ class Firestore {
             in (ds.data() as Map<String, dynamic>)["studentsCopy"] ?? []) {
           ref.update({
             "note": mya.note,
-            "time": mya.duration,
+            "time": mya.duration, //!da se napravi da ne moze da se menja vreme
             "dueDate": mya.coursework!.dueDate ??
                 DateTime.now().add(const Duration(days: 7))
           });
@@ -299,10 +322,7 @@ class Firestore {
   }
 
   void deleteExtracurriculars(ExtracurricularsModel ex) {
-    FirebaseFirestore.instance
-        .collection('Extracurriculars')
-        .doc(ex.id)
-        .delete();
+    FirebaseFirestore.instance.collection('Schedule').doc(ex.id).delete();
   }
 
 ///////////////////////////kalendar
@@ -360,6 +380,8 @@ class Firestore {
     return FirebaseFirestore.instance
         .collection('Popups')
         .where("students", arrayContains: ua.currentUser!.uid)
+        .where("dueDate", isGreaterThanOrEqualTo: DateTime.now())
+        .orderBy("dueDate")
         .snapshots();
   }
 
@@ -389,4 +411,11 @@ class Firestore {
         ? documentSnapshot.data()! as Map<String, dynamic>
         : null;
   }
+
+  // void addTimes(List<int> times) {
+  //   users.doc(ua.currentUser!.uid).update({"times": times});
+  // }
+  // List<int> getTimes(String id) {
+  //   return popups.where("class", isEqualTo: id).snapshots();
+  // }
 }

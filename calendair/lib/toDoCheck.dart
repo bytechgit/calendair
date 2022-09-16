@@ -1,15 +1,11 @@
 import 'package:calendair/dayToDo.dart';
+import 'package:calendair/models/ScheduleElementModel.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 class ToDoCheck extends StatefulWidget {
-  Color color;
-
-  String number;
-  String name;
-  ToDoCheck(
-      {Key? key, required this.color, required this.number, required this.name})
-      : super(key: key);
+  ScheduleElement el;
+  ToDoCheck({Key? key, required this.el}) : super(key: key);
 
   @override
   State<ToDoCheck> createState() => _ToDoCheckState();
@@ -20,7 +16,6 @@ class _ToDoCheckState extends State<ToDoCheck> {
   @override
   Widget build(BuildContext context) {
     final width = MediaQuery.of(context).size.width;
-    final height = MediaQuery.of(context).size.height;
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 20),
       child: Row(
@@ -56,10 +51,10 @@ class _ToDoCheckState extends State<ToDoCheck> {
           Padding(
             padding: const EdgeInsets.only(left: 10),
             child: Container(
-              height: 20,
-              width: width * 0.04,
+              height: 30,
+              width: 15,
               decoration:
-                  BoxDecoration(shape: BoxShape.circle, color: widget.color),
+                  BoxDecoration(shape: BoxShape.circle, color: widget.el.color),
             ),
           ),
           // Expanded(child: Container()),
@@ -67,7 +62,9 @@ class _ToDoCheckState extends State<ToDoCheck> {
             child: InkWell(
               onTap: () {
                 Get.to(
-                  const DayToDo(),
+                  DayToDo(
+                    sc: widget.el,
+                  ),
                   transition: Transition.circularReveal,
                   duration: const Duration(milliseconds: 800),
                 );
@@ -78,22 +75,20 @@ class _ToDoCheckState extends State<ToDoCheck> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisAlignment: MainAxisAlignment.start,
                   children: [
-                    FittedBox(
-                      alignment: Alignment.centerLeft,
-                      child: Text(
-                        widget.name,
-                        style: const TextStyle(
-                          fontSize: 25,
-                          fontWeight: FontWeight.bold,
-                          decoration: TextDecoration.underline,
-                        ),
+                    Text(
+                      widget.el.title,
+                      style: const TextStyle(
+                        fontSize: 25,
+                        fontWeight: FontWeight.bold,
+                        decoration: TextDecoration.underline,
                       ),
                     ),
                     FittedBox(
+                      fit: BoxFit.scaleDown,
                       child: Text(
-                        "${widget.number} Minutes",
+                        "${widget.el.time} Minutes",
                         style: const TextStyle(
-                            fontSize: 14, color: Color.fromRGBO(75, 76, 77, 1)),
+                            fontSize: 17, color: Color.fromRGBO(75, 76, 77, 1)),
                       ),
                     ),
                   ],

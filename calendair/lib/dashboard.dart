@@ -2,6 +2,7 @@ import 'package:calendair/settings.dart';
 import 'package:calendair/studentDashboard.dart';
 import 'package:calendair/toDo.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 
 import 'bottomNavBar.dart';
@@ -16,6 +17,26 @@ class dashboard extends StatefulWidget {
 }
 
 class _dashboardState extends State<dashboard> {
+  @override
+  void initState() {
+    SystemChrome.setPreferredOrientations([
+      DeviceOrientation.landscapeRight,
+      DeviceOrientation.landscapeLeft,
+      DeviceOrientation.portraitUp,
+      DeviceOrientation.portraitDown,
+    ]);
+    super.initState();
+  }
+
+  final days = [
+    "Monday",
+    "Tuesday",
+    "Wednesday",
+    "Thursday",
+    "Friday",
+    "Saturday",
+    "Sunday"
+  ];
   @override
   Widget build(BuildContext context) {
     final width = MediaQuery.of(context).size.width;
@@ -44,7 +65,7 @@ class _dashboardState extends State<dashboard> {
                     slika: 'calendar',
                     onclick: () {
                       Get.off(
-                        dashboard(),
+                        const dashboard(),
                         transition: Transition.circularReveal,
                         duration: const Duration(milliseconds: 800),
                       );
@@ -60,7 +81,7 @@ class _dashboardState extends State<dashboard> {
                     slika: 'settings',
                     onclick: () {
                       Get.off(
-                        Settings(),
+                        const Settings(),
                         transition: Transition.circularReveal,
                         duration: const Duration(milliseconds: 800),
                       );
@@ -79,328 +100,54 @@ class _dashboardState extends State<dashboard> {
                           width: double.infinity,
                           height: 30,
                         ),
-                        Padding(
-                          padding: const EdgeInsets.only(bottom: 20, top: 0),
-                          child: InkWell(
-                            onTap: (() {
-                              Get.to(
-                                const ToDo(
-                                  day: "Monday",
-                                ),
-                                transition: Transition.circularReveal,
-                                duration: const Duration(milliseconds: 800),
-                              );
-                            }),
-                            child: SizedBox(
-                              height: 60,
-                              width: width * 0.8,
-                              child: Stack(
-                                children: [
-                                  const Align(
-                                    alignment: Alignment.topLeft,
-                                    child: FittedBox(
-                                      child: Text(
-                                        "Monday",
-                                        style: TextStyle(
-                                          color:
-                                              Color.fromRGBO(93, 159, 196, 1),
-                                          fontSize: 50,
-                                          fontWeight: FontWeight.w500,
+                        for (int i = 0; i < days.length; i++)
+                          Padding(
+                            padding: const EdgeInsets.only(bottom: 20, top: 0),
+                            child: InkWell(
+                              onTap: (() {
+                                Get.to(
+                                  ToDo(
+                                    index: i,
+                                    day: days[i],
+                                  ),
+                                  transition: Transition.circularReveal,
+                                  duration: const Duration(milliseconds: 800),
+                                );
+                              }),
+                              child: SizedBox(
+                                height: 60,
+                                width: width * 0.8,
+                                child: Stack(
+                                  children: [
+                                    Align(
+                                      alignment: Alignment.topLeft,
+                                      child: FittedBox(
+                                        child: Text(
+                                          days[i],
+                                          style: const TextStyle(
+                                            color:
+                                                Color.fromRGBO(93, 159, 196, 1),
+                                            fontSize: 50,
+                                            fontWeight: FontWeight.w500,
+                                          ),
                                         ),
                                       ),
                                     ),
-                                  ),
-                                  Transform.translate(
-                                    offset: const Offset(0, -3),
-                                    child: const Align(
-                                      alignment: Alignment.bottomLeft,
-                                      child: Divider(
-                                        thickness: 10,
-                                        color: Color.fromRGBO(0, 0, 0, 0.1),
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.only(bottom: 20, top: 20),
-                          child: InkWell(
-                            onTap: (() {
-                              Get.to(
-                                const ToDo(
-                                  day: "Tuesday",
-                                ),
-                                transition: Transition.circularReveal,
-                                duration: const Duration(milliseconds: 800),
-                              );
-                            }),
-                            child: SizedBox(
-                              height: 60,
-                              width: width * 0.8,
-                              child: Stack(
-                                children: [
-                                  const Align(
-                                    alignment: Alignment.topLeft,
-                                    child: FittedBox(
-                                      child: Text(
-                                        "Tuesday",
-                                        style: TextStyle(
-                                          color:
-                                              Color.fromRGBO(93, 159, 196, 1),
-                                          fontSize: 50,
-                                          fontWeight: FontWeight.w500,
+                                    Transform.translate(
+                                      offset: const Offset(0, -3),
+                                      child: const Align(
+                                        alignment: Alignment.bottomLeft,
+                                        child: Divider(
+                                          thickness: 10,
+                                          color: Color.fromRGBO(0, 0, 0, 0.1),
                                         ),
                                       ),
                                     ),
-                                  ),
-                                  Transform.translate(
-                                    offset: const Offset(0, -3),
-                                    child: const Align(
-                                      alignment: Alignment.bottomLeft,
-                                      child: Divider(
-                                        thickness: 10,
-                                        color: Color.fromRGBO(0, 0, 0, 0.1),
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.only(bottom: 20, top: 20),
-                          child: InkWell(
-                            onTap: (() {
-                              Get.to(
-                                const ToDo(
-                                  day: "Wednesday",
+                                  ],
                                 ),
-                                transition: Transition.circularReveal,
-                                duration: const Duration(milliseconds: 800),
-                              );
-                            }),
-                            child: SizedBox(
-                              height: 60,
-                              width: width * 0.8,
-                              child: Stack(
-                                children: [
-                                  const Align(
-                                    alignment: Alignment.topLeft,
-                                    child: FittedBox(
-                                      child: Text(
-                                        "Wednesday",
-                                        style: TextStyle(
-                                          color:
-                                              Color.fromRGBO(93, 159, 196, 1),
-                                          fontSize: 50,
-                                          fontWeight: FontWeight.w500,
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                  Transform.translate(
-                                    offset: const Offset(0, -3),
-                                    child: const Align(
-                                      alignment: Alignment.bottomLeft,
-                                      child: Divider(
-                                        thickness: 10,
-                                        color: Color.fromRGBO(0, 0, 0, 0.1),
-                                      ),
-                                    ),
-                                  ),
-                                ],
                               ),
                             ),
                           ),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.only(bottom: 20, top: 20),
-                          child: InkWell(
-                            onTap: (() {
-                              Get.to(
-                                const ToDo(
-                                  day: "Thursday",
-                                ),
-                                transition: Transition.circularReveal,
-                                duration: const Duration(milliseconds: 800),
-                              );
-                            }),
-                            child: SizedBox(
-                              height: 60,
-                              width: width * 0.8,
-                              child: Stack(
-                                children: [
-                                  const Align(
-                                    alignment: Alignment.topLeft,
-                                    child: FittedBox(
-                                      child: Text(
-                                        "Thursday",
-                                        style: TextStyle(
-                                          color:
-                                              Color.fromRGBO(93, 159, 196, 1),
-                                          fontSize: 50,
-                                          fontWeight: FontWeight.w500,
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                  Transform.translate(
-                                    offset: const Offset(0, -3),
-                                    child: const Align(
-                                      alignment: Alignment.bottomLeft,
-                                      child: Divider(
-                                        thickness: 10,
-                                        color: Color.fromRGBO(0, 0, 0, 0.1),
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.only(bottom: 20, top: 20),
-                          child: InkWell(
-                            onTap: (() {
-                              Get.to(
-                                const ToDo(
-                                  day: "Friday",
-                                ),
-                                transition: Transition.circularReveal,
-                                duration: const Duration(milliseconds: 800),
-                              );
-                            }),
-                            child: SizedBox(
-                              height: 60,
-                              width: width * 0.8,
-                              child: Stack(
-                                children: [
-                                  const Align(
-                                    alignment: Alignment.topLeft,
-                                    child: FittedBox(
-                                      child: Text(
-                                        "Friday",
-                                        style: TextStyle(
-                                          color:
-                                              Color.fromRGBO(93, 159, 196, 1),
-                                          fontSize: 50,
-                                          fontWeight: FontWeight.w500,
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                  Transform.translate(
-                                    offset: const Offset(0, -3),
-                                    child: const Align(
-                                      alignment: Alignment.bottomLeft,
-                                      child: Divider(
-                                        thickness: 10,
-                                        color: Color.fromRGBO(0, 0, 0, 0.1),
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.only(bottom: 20, top: 20),
-                          child: InkWell(
-                            onTap: (() {
-                              Get.to(
-                                const ToDo(
-                                  day: "Saturday",
-                                ),
-                                transition: Transition.circularReveal,
-                                duration: const Duration(milliseconds: 800),
-                              );
-                            }),
-                            child: SizedBox(
-                              height: 60,
-                              width: width * 0.8,
-                              child: Stack(
-                                children: [
-                                  const Align(
-                                    alignment: Alignment.topLeft,
-                                    child: FittedBox(
-                                      child: Text(
-                                        "Saturday",
-                                        style: TextStyle(
-                                          color:
-                                              Color.fromRGBO(93, 159, 196, 1),
-                                          fontSize: 50,
-                                          fontWeight: FontWeight.w500,
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                  Transform.translate(
-                                    offset: const Offset(0, -3),
-                                    child: const Align(
-                                      alignment: Alignment.bottomLeft,
-                                      child: Divider(
-                                        thickness: 10,
-                                        color: Color.fromRGBO(0, 0, 0, 0.1),
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.only(bottom: 20, top: 20),
-                          child: InkWell(
-                            onTap: (() {
-                              Get.to(
-                                const ToDo(
-                                  day: "Sunday",
-                                ),
-                                transition: Transition.circularReveal,
-                                duration: const Duration(milliseconds: 800),
-                              );
-                            }),
-                            child: SizedBox(
-                              height: 60,
-                              width: width * 0.8,
-                              child: Stack(
-                                children: [
-                                  const Align(
-                                    alignment: Alignment.topLeft,
-                                    child: FittedBox(
-                                      child: Text(
-                                        "Sunday",
-                                        style: TextStyle(
-                                          color:
-                                              Color.fromRGBO(93, 159, 196, 1),
-                                          fontSize: 50,
-                                          fontWeight: FontWeight.w500,
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                  Transform.translate(
-                                    offset: const Offset(0, -3),
-                                    child: const Align(
-                                      alignment: Alignment.bottomLeft,
-                                      child: Divider(
-                                        thickness: 10,
-                                        color: Color.fromRGBO(0, 0, 0, 0.1),
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                        ),
                       ],
                     ),
                   ),

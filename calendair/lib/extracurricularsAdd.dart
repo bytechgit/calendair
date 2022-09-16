@@ -25,9 +25,9 @@ class _ExtracurricularsAddState extends State<ExtracurricularsAdd> {
   @override
   void initState() {
     if (widget.ext != null) {
-      extb.day.value = widget.ext!.day;
       titleController.text = widget.ext!.title;
       minutesController.text = widget.ext!.time.toString();
+      extb.index.value = widget.ext!.dayIndex;
     }
     super.initState();
   }
@@ -228,19 +228,17 @@ class _ExtracurricularsAddState extends State<ExtracurricularsAdd> {
                           )),
                       onPressed: () {
                         if (widget.ext != null) {
-                          widget.ext!.day = extb.day.value;
+                          widget.ext!.dayIndex = extb.index.value;
                           widget.ext!.time = int.parse(minutesController.text);
                           widget.ext!.title = titleController.text;
                           // print(extb.getDay());
-                          widget.ext!.date = extb.getDay();
 
                           Firestore().updateExtracurriculars(widget.ext!);
                         } else {
                           Firestore().addExtracurriculars(
                               int.parse(minutesController.text),
                               titleController.text,
-                              extb.day.value,
-                              extb.getDay());
+                              extb.index.value);
                         }
                         Get.back();
                       },

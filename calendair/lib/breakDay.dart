@@ -20,10 +20,9 @@ class BreakDay extends StatefulWidget {
 class _BreakDayState extends State<BreakDay> {
   final gc = Get.find<GoogleClassroom>();
   final extb = Get.find<ExtButton>();
-  final days = ['Mon', 'Tues', 'Wed', 'Thurs', 'Fri', 'Sat', 'Sun'];
+  //final days = ['Mon', 'Tues', 'Wed', 'Thurs', 'Fri', 'Sat', 'Sun'];
   @override
   void initState() {
-    extb.day.value = extb.breakday.value;
     super.initState();
   }
 
@@ -49,7 +48,7 @@ class _BreakDayState extends State<BreakDay> {
               slika: 'calendar',
               onclick: () {
                 Get.off(
-                  dashboard(),
+                  const dashboard(),
                   transition: Transition.circularReveal,
                   duration: const Duration(milliseconds: 800),
                 );
@@ -64,7 +63,7 @@ class _BreakDayState extends State<BreakDay> {
               slika: 'settings',
               onclick: () {
                 Get.off(
-                  Settings(),
+                  const Settings(),
                   transition: Transition.circularReveal,
                   duration: const Duration(milliseconds: 800),
                 );
@@ -174,8 +173,7 @@ class _BreakDayState extends State<BreakDay> {
                             borderRadius: BorderRadius.circular(20.0),
                           )),
                       onPressed: () {
-                        Firestore().addBreakDay(extb.day.value);
-                        extb.breakday.value = extb.day.value;
+                        Firestore().addBreakDay(extb.breakdayIndex.value);
                         Get.back();
                       },
 

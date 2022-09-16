@@ -5,6 +5,8 @@ import 'package:calendair/teacherDashboard.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
+import 'Classes/firestore.dart';
+import 'classes/ExtButton.dart';
 import 'classes/scheduleController.dart';
 
 class Login extends StatelessWidget {
@@ -12,6 +14,7 @@ class Login extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final extb = Get.find<ExtButton>();
     final u = UserAuthentication();
     final sc = Get.find<ScheduleCintroller>();
     final width = MediaQuery.of(context).size.width;
@@ -77,6 +80,9 @@ class Login extends StatelessWidget {
                         onPressed: () async {
                           final result = await u.signInwithGoogle();
                           if (result == "student") {
+                            extb.breakdayIndex.value =
+                                await Firestore().getBreakday();
+
                             sc.listen(u.currentUser!.uid);
 
                             Get.to(

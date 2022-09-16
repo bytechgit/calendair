@@ -1,8 +1,10 @@
+import 'package:calendair/models/ScheduleElementModel.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 class DayToDo extends StatefulWidget {
-  const DayToDo({Key? key}) : super(key: key);
+  final ScheduleElement sc;
+  const DayToDo({Key? key, required this.sc}) : super(key: key);
 
   @override
   State<DayToDo> createState() => _DayToDoState();
@@ -12,7 +14,6 @@ class _DayToDoState extends State<DayToDo> {
   @override
   Widget build(BuildContext context) {
     final width = MediaQuery.of(context).size.width;
-    final height = MediaQuery.of(context).size.height;
     return Scaffold(
         appBar: AppBar(
           backgroundColor: const Color.fromRGBO(93, 159, 196, 1),
@@ -33,10 +34,10 @@ class _DayToDoState extends State<DayToDo> {
               padding: const EdgeInsets.only(top: 30.0),
               child: SizedBox(
                 width: width * 0.7,
-                child: const FittedBox(
+                child: FittedBox(
                   child: Text(
-                    'Genetics Lab',
-                    style: TextStyle(
+                    widget.sc.title,
+                    style: const TextStyle(
                       color: Colors.black,
                       fontSize: 22,
                       fontWeight: FontWeight.w900,
@@ -54,7 +55,7 @@ class _DayToDoState extends State<DayToDo> {
                   Container(
                     height: 20,
                     width: width * 0.04,
-                    decoration: BoxDecoration(
+                    decoration: const BoxDecoration(
                         shape: BoxShape.circle,
                         color: Color.fromRGBO(241, 188, 140, 1)),
                   ),
@@ -62,8 +63,8 @@ class _DayToDoState extends State<DayToDo> {
                     child: Padding(
                       padding: const EdgeInsets.only(left: 20),
                       child: Text(
-                        'Total: 60 Minutes',
-                        style: TextStyle(
+                        'Total: ${widget.sc.time} Minutes',
+                        style: const TextStyle(
                             fontSize: 30,
                             color: Color.fromRGBO(75, 76, 77, 1),
                             fontWeight: FontWeight.bold),
@@ -97,23 +98,23 @@ class _DayToDoState extends State<DayToDo> {
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
+                    children: const [
                       Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 5),
+                        padding: EdgeInsets.symmetric(horizontal: 5),
                         child: Divider(
                           thickness: 5,
                           color: Colors.black,
                         ),
                       ),
                       Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 5),
+                        padding: EdgeInsets.symmetric(horizontal: 5),
                         child: Divider(
                           thickness: 5,
                           color: Colors.black,
                         ),
                       ),
                       Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 5),
+                        padding: EdgeInsets.symmetric(horizontal: 5),
                         child: Divider(
                           thickness: 5,
                           color: Colors.black,
@@ -126,10 +127,10 @@ class _DayToDoState extends State<DayToDo> {
                   padding: const EdgeInsets.only(left: 20),
                   child: SizedBox(
                     width: width * 0.6,
-                    child: const Text(
-                      'Genetics Lab PDF',
+                    child: Text(
+                      '${widget.sc.title} PDF',
                       textAlign: TextAlign.center,
-                      style: TextStyle(
+                      style: const TextStyle(
                         color: Colors.black,
                         fontSize: 35,
                         fontWeight: FontWeight.bold,
@@ -156,9 +157,10 @@ class _DayToDoState extends State<DayToDo> {
               child: SizedBox(
                 width: width * 0.7,
                 child: Text(
-                  'I recommended you guys check the example I posted earlier - it contains useful examples to help you guys complete the lab quicker.',
+                  (widget.sc as ScheduleElementAssignmentCopy).assignemnt.note,
                   textAlign: TextAlign.center,
-                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                  style: const TextStyle(
+                      fontWeight: FontWeight.bold, fontSize: 16),
                 ),
               ),
             ),
@@ -186,9 +188,9 @@ class _DayToDoState extends State<DayToDo> {
                     )),
                 onPressed: () {},
 
-                child: FittedBox(
+                child: const FittedBox(
                   fit: BoxFit.scaleDown,
-                  child: const Text(
+                  child: Text(
                     'Start',
                     textAlign: TextAlign.center,
                     style: TextStyle(

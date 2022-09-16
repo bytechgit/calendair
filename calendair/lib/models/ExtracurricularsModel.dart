@@ -4,19 +4,17 @@ import 'package:quiver/iterables.dart';
 class ExtracurricularsModel {
   String id;
   String studentId;
-  String day;
   String title;
   int time;
-  DateTime date;
+  int dayIndex;
 
   // ExtracurricularsModel({required this.id,required this.studentId,required this.day});
   Map<String, dynamic> toMap() {
     return {
       'studentId': studentId,
-      'day': day,
       'title': title,
       'time': time,
-      "date": date
+      "dayIndex": dayIndex
     };
   }
 
@@ -24,7 +22,6 @@ class ExtracurricularsModel {
       : id = docId,
         studentId = map["studentId"] ?? " ",
         time = map["time"] ?? 0,
-        day = map["day"] ?? " ",
-        date = ((map["date"] ?? Timestamp(0, 0)) as Timestamp).toDate(),
+        dayIndex = map["dayIndex"] ?? 0,
         title = map["title"] ?? " ";
 }

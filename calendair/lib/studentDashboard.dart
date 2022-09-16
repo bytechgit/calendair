@@ -27,10 +27,9 @@ class studentDashboard extends StatefulWidget {
 class _studentDashboardState extends State<studentDashboard> {
   bool open = true;
   final gc = Get.find<GoogleClassroom>();
-  final extb = Get.find<ExtButton>();
+
   @override
   void initState() {
-    Firestore().getBreakday().then((value) => extb.breakday.value = value);
     super.initState();
   }
 

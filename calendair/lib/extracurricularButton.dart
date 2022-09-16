@@ -21,24 +21,27 @@ class _ExtracurricularButtonState extends State<ExtracurricularButton> {
     return InkWell(
       onTap: () {
         if (widget.ext == false) {
-          if (extb.day.value == widget.text) {
-            extb.day.value = "";
+          if (widget.index == extb.breakdayIndex.value) {
+            extb.breakdayIndex.value = -1;
           } else {
-            extb.day.value = widget.text;
+            extb.breakdayIndex.value = widget.index;
           }
         } else {
-          extb.day.value = widget.text;
+          extb.index.value = widget.index;
         }
-        extb.index.value = widget.index;
       },
       child: Padding(
         padding: const EdgeInsets.all(5.0),
         child: Obx(
           () => Container(
             decoration: BoxDecoration(
-                color: extb.day.value == widget.text
-                    ? const Color.fromRGBO(94, 159, 197, 1)
-                    : const Color.fromRGBO(217, 217, 217, 1),
+                color: widget.ext
+                    ? extb.index.value == widget.index
+                        ? const Color.fromRGBO(94, 159, 197, 1)
+                        : const Color.fromRGBO(217, 217, 217, 1)
+                    : extb.breakdayIndex.value == widget.index
+                        ? const Color.fromRGBO(94, 159, 197, 1)
+                        : const Color.fromRGBO(217, 217, 217, 1),
                 borderRadius: const BorderRadius.all(Radius.circular(10))),
             child: Padding(
               padding: const EdgeInsets.all(8.0),

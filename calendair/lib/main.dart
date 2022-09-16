@@ -16,8 +16,9 @@ Future<void> main() async {
   //   DeviceOrientation.portraitDown,
   // ]);
   Get.put(GoogleClassroom());
-  Get.put(ScheduleCintroller());
   Get.put(ExtButton());
+  Get.put(ScheduleCintroller());
+
   Get.put(NavBar()); // To turn off landscape mode
   runApp(const MyApp());
 }
