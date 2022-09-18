@@ -30,6 +30,9 @@ class ScheduleElement {
   }
 
   Future<void> finish(bool finish) async {
+    await Firebase.initializeApp();
+    FirebaseFirestore.instance.settings =
+        const Settings(persistenceEnabled: false);
     FirebaseFirestore.instance
         .collection("Schedule")
         .doc(docId)
