@@ -7,6 +7,7 @@ import 'package:get/get.dart';
 
 import 'Classes/googleClassroom.dart';
 import 'bottomNavBar.dart';
+import 'classes/scheduleController.dart';
 import 'dashboard.dart';
 import 'models/nbar.dart';
 
@@ -21,6 +22,7 @@ class _BreakDayState extends State<BreakDay> {
   final gc = Get.find<GoogleClassroom>();
   final extb = Get.find<ExtButton>();
   //final days = ['Mon', 'Tues', 'Wed', 'Thurs', 'Fri', 'Sat', 'Sun'];
+
   @override
   void initState() {
     super.initState();

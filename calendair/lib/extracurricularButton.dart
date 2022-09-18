@@ -2,10 +2,13 @@ import 'package:calendair/classes/ExtButton.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
+import 'classes/scheduleController.dart';
+
 class ExtracurricularButton extends StatefulWidget {
   final String text;
   final int index;
   final bool ext;
+
   const ExtracurricularButton(
       {Key? key, required this.text, required this.index, this.ext = true})
       : super(key: key);
@@ -16,6 +19,7 @@ class ExtracurricularButton extends StatefulWidget {
 
 class _ExtracurricularButtonState extends State<ExtracurricularButton> {
   final extb = Get.find<ExtButton>();
+  final sc = Get.find<ScheduleCintroller>();
   @override
   Widget build(BuildContext context) {
     return InkWell(
@@ -24,7 +28,13 @@ class _ExtracurricularButtonState extends State<ExtracurricularButton> {
           if (widget.index == extb.breakdayIndex.value) {
             extb.breakdayIndex.value = -1;
           } else {
-            extb.breakdayIndex.value = widget.index;
+            if (sc.scheduleElements.value[widget.index].isEmpty &&
+                sc.scheduleElements.value[widget.index + 7].isEmpty) {
+              extb.breakdayIndex.value = widget.index;
+            } else {
+              Get.snackbar(
+                  "Change schedule", "There are tasks assigned for that day");
+            }
           }
         } else {
           extb.index.value = widget.index;

@@ -120,6 +120,7 @@ class _CalendarState extends State<Calendar> {
                   ),
                 ),
                 SingleChildScrollView(
+                  physics: const ClampingScrollPhysics(),
                   controller: appBarController,
                   scrollDirection: Axis.horizontal,
                   child: Row(
@@ -184,6 +185,7 @@ class _CalendarState extends State<Calendar> {
                 () => Stack(
                   children: [
                     SingleChildScrollView(
+                      physics: const ClampingScrollPhysics(),
                       scrollDirection: Axis.horizontal,
                       controller: gridController,
                       child: Row(
@@ -292,6 +294,7 @@ class _CalendarState extends State<Calendar> {
             Expanded(
               flex: 1,
               child: SingleChildScrollView(
+                physics: const ClampingScrollPhysics(),
                 controller: avgController,
                 scrollDirection: Axis.horizontal,
                 child: Row(

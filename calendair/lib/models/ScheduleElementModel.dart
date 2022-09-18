@@ -11,6 +11,7 @@ class ScheduleElement {
   String title;
   bool checked = false;
   int time = 0;
+  int index;
   String get title_ {
     return title;
   }
@@ -42,6 +43,7 @@ class ScheduleElement {
       required this.docId,
       required this.type,
       required this.title,
+      required this.index,
       this.time = 0,
       int? colorIndeks,
       this.date}) {
@@ -64,20 +66,27 @@ class ScheduleElementReminder extends ScheduleElement {
                 : null,
             title: map["title"] ?? " ",
             studentId: map["studentId"] ?? " ",
+            index: map["index"] ?? " ",
             docId: docId,
             type: map["type"] ?? "");
 }
 
 class ScheduleElementAssignment extends ScheduleElement {
-  DateTime dueDate;
+  late DateTime dueDate;
   String pref = "";
-  String note;
-  String parentId;
+  late String note;
+  late String parentId;
   @override
   String get title_ {
     return "$pref $title";
   }
 
+  ScheduleElementAssignment()
+      : super(docId: "", studentId: "", title: "", type: "", index: 0) {
+    dueDate = DateTime.now();
+    note = "";
+    parentId = "";
+  }
   ScheduleElementAssignment.fromMap(Map<String, dynamic> map, String docId)
       : dueDate = ((map["dueDate"] ?? Timestamp(0, 0)) as Timestamp).toDate(),
         note = map["note"] ?? " ",
@@ -88,6 +97,7 @@ class ScheduleElementAssignment extends ScheduleElement {
                 ? (map["date"] as Timestamp).toDate()
                 : null,
             title: map["title"] ?? " ",
+            index: map["index"] ?? " ",
             studentId: map["studentId"] ?? " ",
             docId: docId,
             type: map["type"] ?? "");
@@ -105,6 +115,7 @@ class ScheduleElementExtracurriculars extends ScheduleElement {
         super(
           title: map["title"] ?? " ",
           studentId: map["studentId"] ?? " ",
+          index: map["index"] ?? " ",
           docId: docId,
           type: map["type"] ?? "",
           time: map["time"] ?? 0,

@@ -135,6 +135,7 @@ class _AssignmentsUpdateState extends State<AssignmentsUpdate> {
                 width: width * 0.7,
                 //height: 40,
                 child: TextField(
+                  keyboardType: TextInputType.number,
                   controller: minscontroller,
                   style: const TextStyle(
                       color: Color.fromRGBO(38, 64, 78, 1), fontSize: 25),

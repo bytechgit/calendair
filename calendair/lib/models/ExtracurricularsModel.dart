@@ -7,6 +7,7 @@ class ExtracurricularsModel {
   String title;
   int time;
   int dayIndex;
+  int index;
 
   // ExtracurricularsModel({required this.id,required this.studentId,required this.day});
   Map<String, dynamic> toMap() {
@@ -14,7 +15,8 @@ class ExtracurricularsModel {
       'studentId': studentId,
       'title': title,
       'time': time,
-      "dayIndex": dayIndex
+      "dayIndex": dayIndex,
+      "index": index
     };
   }
 
@@ -23,5 +25,6 @@ class ExtracurricularsModel {
         studentId = map["studentId"] ?? " ",
         time = map["time"] ?? 0,
         dayIndex = map["dayIndex"] ?? 0,
+        index = map["index"] ?? 1000,
         title = map["title"] ?? " ";
 }

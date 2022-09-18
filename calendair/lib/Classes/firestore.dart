@@ -13,6 +13,8 @@ velika je verovatnoca da ce da se prebaci za sledecu nedelju
 Da li je bitan redosled u toku dana?
  */
 ///////////////////////////////////
+import 'dart:developer';
+
 import 'package:calendair/Classes/googleClassroom.dart';
 import 'package:calendair/models/AssignmentModel.dart';
 import 'package:calendair/models/ExtracurricularsModel.dart';
@@ -20,6 +22,7 @@ import 'package:calendair/models/UserModel.dart';
 import 'package:calendair/models/reminderModel.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:googleapis/classroom/v1.dart';
 import 'Authentication.dart';
@@ -80,12 +83,12 @@ class Firestore {
       required String cm}) async {
     popups.add({
       "class": classId,
-      "dueDate": date,
+      "dueDate": DateUtils.dateOnly(date),
       "title": title,
       "numRate": 0,
       "sumRate": 0,
       "question": cm,
-      "order": DateTime.now(),
+      "order": DateUtils.dateOnly(DateTime.now()),
       "students": ((await courses.doc(classId).get()).data()!
               as Map<String, dynamic>)["students"] ??
           []
@@ -97,9 +100,10 @@ class Firestore {
     await FirebaseFirestore.instance.collection('Schedule').add({
       "studentId": ua.currentUser!.uid,
       //"class": classId,
-      "date": date,
+      "date": DateUtils.dateOnly(date),
       "title": title,
-      "type": "reminder"
+      "type": "reminder",
+      "index": -1
     });
   }
 
@@ -114,9 +118,10 @@ class Firestore {
       final doc = await FirebaseFirestore.instance.collection('Schedule').add({
         "studentId": student,
         //"class": classId,
-        "date": date,
+        "date": DateUtils.dateOnly(date),
         "title": title,
-        "type": "reminder"
+        "type": "reminder",
+        "index": -1
       });
       ids.add(doc.id);
     }
@@ -131,7 +136,7 @@ class Firestore {
         classId: classId, date: date, title: title);
     reminder.add({
       "class": classId,
-      "date": date,
+      "date": DateUtils.dateOnly(date),
       "title": title,
       "studentsCopy":
           ids.map((e) => FirebaseFirestore.instance.doc("Schedule/$e")).toList()
@@ -182,6 +187,7 @@ class Firestore {
   }
 
   void updateExtracurriculars(ExtracurricularsModel ex) {
+    inspect(ex.toMap());
     FirebaseFirestore.instance
         .collection('Schedule')
         .doc(ex.id)
@@ -209,7 +215,9 @@ class Firestore {
       "time": time,
       "dayIndex": dayIndex,
       "studentId": ua.currentUser!.uid,
-      "type": "extracurricular"
+      "type": "extracurricular",
+      "index": 1000,
+      "date": null
     });
   }
 
@@ -247,11 +255,16 @@ class Firestore {
           "time": t,
           "finished": false,
           "title": mya.coursework!.title,
-          "index": -1,
-          "dueDate": mya.coursework!.dueDate ??
-              DateTime.now().add(const Duration(days: 14)),
+          "index": 1000,
+          "dueDate": mya.coursework!.dueDate != null
+              ? DateTime(
+                  mya.coursework!.dueDate!.year!,
+                  mya.coursework!.dueDate!.month!,
+                  mya.coursework!.dueDate!.day!)
+              : DateUtils.dateOnly(
+                  DateTime.now().add(const Duration(days: 14))),
           "type": "assignment",
-          "date": null,
+          "date": DateTime(2100),
           "parentId": mya.coursework!.courseId! + mya.coursework!.id!
         });
         ids.add(FirebaseFirestore.instance.doc("Schedule/${doc.id}"));
@@ -276,8 +289,13 @@ class Firestore {
             .set({
           "note": mya.note,
           "duration": mya.duration,
-          "dueDate": mya.coursework!.dueDate ??
-              DateTime.now().add(const Duration(days: 7)),
+          "dueDate": mya.coursework!.dueDate != null
+              ? DateTime(
+                  mya.coursework!.dueDate!.year!,
+                  mya.coursework!.dueDate!.month!,
+                  mya.coursework!.dueDate!.day!)
+              : DateUtils.dateOnly(
+                  DateTime.now().add(const Duration(days: 14))),
           "title": mya.coursework!.title,
           "studentsCopy": ids,
           "count": getTimes(mya.duration).length
@@ -290,16 +308,26 @@ class Firestore {
             .update({
           "note": mya.note,
           "duration": mya.duration,
-          "dueDate": mya.coursework!.dueDate ??
-              DateTime.now().add(const Duration(days: 7))
+          "dueDate": mya.coursework!.dueDate != null
+              ? DateTime(
+                  mya.coursework!.dueDate!.year!,
+                  mya.coursework!.dueDate!.month!,
+                  mya.coursework!.dueDate!.day!)
+              : DateUtils.dateOnly(
+                  DateTime.now().add(const Duration(days: 14))),
         });
         for (DocumentReference<Map<String, dynamic>> ref
             in (ds.data() as Map<String, dynamic>)["studentsCopy"] ?? []) {
           ref.update({
             "note": mya.note,
             "time": mya.duration, //!da se napravi da ne moze da se menja vreme
-            "dueDate": mya.coursework!.dueDate ??
-                DateTime.now().add(const Duration(days: 7))
+            "dueDate": mya.coursework!.dueDate != null
+                ? DateTime(
+                    mya.coursework!.dueDate!.year!,
+                    mya.coursework!.dueDate!.month!,
+                    mya.coursework!.dueDate!.day!)
+                : DateUtils.dateOnly(
+                    DateTime.now().add(const Duration(days: 14))),
           });
         }
       }
@@ -383,7 +411,8 @@ class Firestore {
     return FirebaseFirestore.instance
         .collection('Popups')
         .where("students", arrayContains: ua.currentUser!.uid)
-        .where("dueDate", isGreaterThanOrEqualTo: DateTime.now())
+        .where("dueDate",
+            isGreaterThanOrEqualTo: DateUtils.dateOnly(DateTime.now()))
         .orderBy("dueDate")
         .snapshots();
   }

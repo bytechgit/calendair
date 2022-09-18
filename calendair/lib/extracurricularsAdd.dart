@@ -228,11 +228,12 @@ class _ExtracurricularsAddState extends State<ExtracurricularsAdd> {
                           )),
                       onPressed: () {
                         if (widget.ext != null) {
+                          if (widget.ext!.dayIndex != extb.index.value) {
+                            widget.ext!.index = 1000;
+                          }
                           widget.ext!.dayIndex = extb.index.value;
                           widget.ext!.time = int.parse(minutesController.text);
                           widget.ext!.title = titleController.text;
-                          // print(extb.getDay());
-
                           Firestore().updateExtracurriculars(widget.ext!);
                         } else {
                           Firestore().addExtracurriculars(
