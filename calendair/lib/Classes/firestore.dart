@@ -255,7 +255,7 @@ class Firestore {
           "time": t,
           "finished": false,
           "title": mya.coursework!.title,
-          "index": 1000,
+          "index": 500,
           "dueDate": mya.coursework!.dueDate != null
               ? DateTime(
                   mya.coursework!.dueDate!.year!,

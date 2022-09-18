@@ -6,19 +6,22 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:sizer/sizer.dart';
 import 'Classes/googleClassroom.dart';
+import 'classes/background.dart';
+import 'classes/timeStream.dart';
 import 'loginRegister.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
   await Firebase.initializeApp();
   // SystemChrome.setPreferredOrientations([
   //   DeviceOrientation.portraitUp,
   //   DeviceOrientation.portraitDown,
   // ]);
+  await Background().initializeService();
   Get.put(GoogleClassroom());
   Get.put(ExtButton());
   Get.put(ScheduleCintroller());
-
   Get.put(NavBar()); // To turn off landscape mode
   runApp(const MyApp());
 }

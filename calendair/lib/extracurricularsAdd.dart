@@ -47,7 +47,7 @@ class _ExtracurricularsAddState extends State<ExtracurricularsAdd> {
             color: Colors.black,
           ),
           onPressed: () {
-            Get.back();
+            Get.back(closeOverlays: true);
           },
         ),
       ),
@@ -241,7 +241,7 @@ class _ExtracurricularsAddState extends State<ExtracurricularsAdd> {
                               titleController.text,
                               extb.index.value);
                         }
-                        Get.back();
+                        Get.back(closeOverlays: true);
                       },
 
                       child: const Text(

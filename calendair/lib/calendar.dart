@@ -1,6 +1,8 @@
 import 'dart:developer';
 
+import 'package:calendair/breakDay.dart';
 import 'package:calendair/calendarAssignment.dart';
+import 'package:calendair/classes/ExtButton.dart';
 import 'package:calendair/classes/scheduleController.dart';
 import 'package:calendair/models/Assigments.dart';
 import 'package:calendair/addReminderStudent.dart';
@@ -22,22 +24,26 @@ class Calendar extends StatefulWidget {
 class _CalendarState extends State<Calendar> {
   final gc = Get.find<GoogleClassroom>();
   final sc = Get.find<ScheduleCintroller>();
+  final breakDay = Get.find<ExtButton>();
   late final List<DragAndDropList> _contents = [];
   _onItemReorder(
       int oldItemIndex, int oldListIndex, int newItemIndex, int newListIndex) {
-    setState(() {
-      var movedI = sc.removeFromScheduleElements(
-          listIndex: oldListIndex, index: oldItemIndex);
-      sc.addInScheduleElements(
-          newListIndex: newListIndex,
-          index: newItemIndex,
-          se: movedI,
-          oldListIndex: oldListIndex);
-      // gc.scheduleElements.value[oldListIndex].removeAt(oldItemIndex);
-      //gc.scheduleElements.value[newListIndex].insert(newItemIndex, movedI);
-      // var movedItem = _contents[oldListIndex].children.removeAt(oldItemIndex);
-      // _contents[newListIndex].children.insert(newItemIndex, movedItem);
-    });
+    if (newListIndex != breakDay.breakdayIndex.value &&
+        newListIndex != breakDay.breakdayIndex.value + 7) {
+      setState(() {
+        var movedI = sc.removeFromScheduleElements(
+            listIndex: oldListIndex, index: oldItemIndex);
+        sc.addInScheduleElements(
+            newListIndex: newListIndex,
+            index: newItemIndex,
+            se: movedI,
+            oldListIndex: oldListIndex);
+        // gc.scheduleElements.value[oldListIndex].removeAt(oldItemIndex);
+        //gc.scheduleElements.value[newListIndex].insert(newItemIndex, movedI);
+        // var movedItem = _contents[oldListIndex].children.removeAt(oldItemIndex);
+        // _contents[newListIndex].children.insert(newItemIndex, movedItem);
+      });
+    }
   }
 
   _onListReorder(int oldListIndex, int newListIndex) {
@@ -214,23 +220,64 @@ class _CalendarState extends State<Calendar> {
                         lastListTargetSize: 0,
                         lastItemTargetHeight: 100,
                         //disableScrolling: true,
-                        children: sc.scheduleElements.value.map((list) {
-                          return DragAndDropList(
-                              contentsWhenEmpty: const SizedBox(),
-                              verticalAlignment: CrossAxisAlignment.stretch,
-                              children: list
-                                  .map(
-                                    (e) => DragAndDropItem(
-                                      child: CalendarAssignment(
-                                        scheduleElement: e,
-                                      ),
-                                      canDrag: true,
-                                      // e.type == "reminder" ? false : true,
-                                    ),
-                                  )
-                                  .toList(),
-                              canDrag: false);
-                        }).toList(),
+                        children: [
+                          for (int i = 0;
+                              i < sc.scheduleElements.value.length;
+                              i++) ...{
+                            if (breakDay.breakdayIndex.value != i &&
+                                breakDay.breakdayIndex.value != i - 7) ...{
+                              DragAndDropList(
+                                  contentsWhenEmpty: const SizedBox(),
+                                  verticalAlignment: CrossAxisAlignment.stretch,
+                                  children: sc.scheduleElements.value[i]
+                                      .map(
+                                        (e) => DragAndDropItem(
+                                          child: CalendarAssignment(
+                                            scheduleElement: e,
+                                          ),
+                                          canDrag: true,
+                                          // e.type == "reminder" ? false : true,
+                                        ),
+                                      )
+                                      .toList(),
+                                  canDrag: false),
+                            } else
+                              DragAndDropList(
+                                  contentsWhenEmpty: const SizedBox(),
+                                  verticalAlignment: CrossAxisAlignment.stretch,
+                                  children: [
+                                    DragAndDropItem(
+                                        child: const Center(
+                                            child: Text(
+                                          'Break day',
+                                          textAlign: TextAlign.center,
+                                          style: TextStyle(
+                                              fontSize: 30,
+                                              fontWeight: FontWeight.bold),
+                                        )),
+                                        canDrag: false)
+                                  ],
+                                  canDrag: false),
+                          }
+                        ],
+
+                        // children: sc.scheduleElements.value.map((list) {
+                        //   return DragAndDropList(
+                        //       contentsWhenEmpty: const SizedBox(),
+                        //       verticalAlignment: CrossAxisAlignment.stretch,
+                        //       children: list
+                        //           .map(
+                        //             (e) => DragAndDropItem(
+                        //               child: CalendarAssignment(
+                        //                 scheduleElement: e,
+                        //               ),
+                        //               canDrag: true,
+                        //               // e.type == "reminder" ? false : true,
+                        //             ),
+                        //           )
+                        //           .toList(),
+                        //       canDrag: false);
+                        // }).toList(),
                         onItemReorder: _onItemReorder,
                         onListReorder: _onListReorder,
                         axis: Axis.horizontal,

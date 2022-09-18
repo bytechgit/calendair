@@ -33,8 +33,10 @@ class _ToDoCheckState extends State<ToDoCheck> {
               decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(5),
                   border: Border.all(color: Colors.grey),
-                  color: selected == false ? Colors.white : Colors.green),
-              child: selected == true
+                  color: widget.el.finished == false
+                      ? Colors.white
+                      : Colors.green),
+              child: widget.el.finished == true
                   ? const Icon(
                       Icons.done,
                       color: Colors.white,
@@ -43,7 +45,8 @@ class _ToDoCheckState extends State<ToDoCheck> {
             ),
             onTap: () {
               setState(() {
-                selected = !selected;
+                widget.el.finished = !widget.el.finished;
+                widget.el.finish(widget.el.finished);
               });
             },
           ),

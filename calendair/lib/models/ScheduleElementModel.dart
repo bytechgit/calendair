@@ -1,6 +1,8 @@
+import 'dart:developer';
 import 'dart:math';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 
 class ScheduleElement {
@@ -9,11 +11,15 @@ class ScheduleElement {
   String docId;
   String type;
   String title;
-  bool checked = false;
+  bool finished;
   int time = 0;
   int index;
   String get title_ {
     return title;
+  }
+
+  Map<String, dynamic> toMap() {
+    return {};
   }
 
   void setRandomColor(int? prevColorIndex) {
@@ -21,6 +27,13 @@ class ScheduleElement {
       colorIndex = (colorIndex + 1) % 5;
       color = _colors[colorIndex];
     }
+  }
+
+  Future<void> finish(bool finish) async {
+    FirebaseFirestore.instance
+        .collection("Schedule")
+        .doc(docId)
+        .update({"finished": finish});
   }
 
   final List _colors = [
@@ -44,6 +57,7 @@ class ScheduleElement {
       required this.type,
       required this.title,
       required this.index,
+      this.finished = false,
       this.time = 0,
       int? colorIndeks,
       this.date}) {
@@ -57,10 +71,8 @@ class ScheduleElement {
 }
 
 class ScheduleElementReminder extends ScheduleElement {
-  int index;
   ScheduleElementReminder.fromMap(Map<String, dynamic> map, String docId)
-      : index = map["index"] ?? -1,
-        super(
+      : super(
             date: map["date"] != null
                 ? (map["date"] as Timestamp).toDate()
                 : null,
@@ -68,10 +80,12 @@ class ScheduleElementReminder extends ScheduleElement {
             studentId: map["studentId"] ?? " ",
             index: map["index"] ?? " ",
             docId: docId,
-            type: map["type"] ?? "");
+            type: map["type"] ?? "",
+            finished: map["finished"] ?? false);
 }
 
 class ScheduleElementAssignment extends ScheduleElement {
+  int timesec = 0;
   late DateTime dueDate;
   String pref = "";
   late String note;
@@ -79,6 +93,22 @@ class ScheduleElementAssignment extends ScheduleElement {
   @override
   String get title_ {
     return "$pref $title";
+  }
+
+  @override
+  Map<String, dynamic> toMap() {
+    return {
+      'time': time,
+      'title': title,
+      'index': index,
+      'studentId': studentId,
+      'docId': docId,
+      'type': type,
+      'note': note,
+      'parentId': parentId,
+      'timesec': timesec,
+      'pref': pref,
+    };
   }
 
   ScheduleElementAssignment()
@@ -91,6 +121,7 @@ class ScheduleElementAssignment extends ScheduleElement {
       : dueDate = ((map["dueDate"] ?? Timestamp(0, 0)) as Timestamp).toDate(),
         note = map["note"] ?? " ",
         parentId = map["parentId"] ?? " ",
+        timesec = (map["time"] ?? 0) * 60,
         super(
             time: map["time"] ?? 0,
             date: map["date"] != null
@@ -98,6 +129,7 @@ class ScheduleElementAssignment extends ScheduleElement {
                 : null,
             title: map["title"] ?? " ",
             index: map["index"] ?? " ",
+            finished: map["finished"] ?? false,
             studentId: map["studentId"] ?? " ",
             docId: docId,
             type: map["type"] ?? "");
@@ -106,17 +138,16 @@ class ScheduleElementAssignment extends ScheduleElement {
 class ScheduleElementExtracurriculars extends ScheduleElement {
   String day;
   int dayIndex;
-  int index;
   ScheduleElementExtracurriculars.fromMap(
       Map<String, dynamic> map, String docId)
-      : index = map["index"] ?? -1,
-        dayIndex = map["dayIndex"] ?? 0,
+      : dayIndex = map["dayIndex"] ?? 0,
         day = map["day"] ?? " ",
         super(
           title: map["title"] ?? " ",
           studentId: map["studentId"] ?? " ",
           index: map["index"] ?? " ",
           docId: docId,
+          finished: map["finished"] ?? false,
           type: map["type"] ?? "",
           time: map["time"] ?? 0,
         );

@@ -57,6 +57,10 @@ dependencies:
   cached_network_image: ^3.2.1
   linked_scroll_controller: ^0.2.0
   sizer: ^2.0.15
+  flutter_background_service: ^2.3.5
+  device_info_plus: ^4.1.2
+  flutter_local_notifications: ^11.0.0
+  shared_preferences: ^2.0.15
 
 dev_dependencies:
   flutter_test:

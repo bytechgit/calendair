@@ -1,5 +1,10 @@
+import 'dart:developer';
+
+import 'package:calendair/classes/background.dart';
+import 'package:calendair/classes/timeStream.dart';
 import 'package:calendair/models/ScheduleElementModel.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_background_service/flutter_background_service.dart';
 import 'package:get/get.dart';
 
 class DayToDo extends StatefulWidget {
@@ -186,18 +191,60 @@ class _DayToDoState extends State<DayToDo> {
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(10.0),
                     )),
-                onPressed: () {},
+                onPressed: () async {
+                  if (widget.sc.finished == false) {
+                    //Background().stopService();
+                    await FlutterBackgroundService().startService();
+                    Background().addAssignment(widget.sc.toMap());
+                  }
 
-                child: const FittedBox(
+                  //Background().initializeService();
+
+                  //FlutterBackgroundService().startService();
+                },
+
+                child: FittedBox(
                   fit: BoxFit.scaleDown,
-                  child: Text(
-                    'Start',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      color: Colors.black,
-                      fontSize: 50,
-                      fontWeight: FontWeight.bold,
-                    ),
+                  child: StreamBuilder<Map<String, dynamic>?>(
+                    stream: FlutterBackgroundService().on('update'),
+                    builder: (context, snapshot) {
+                      if (!snapshot.hasData) {
+                        return const Text(
+                          'Start',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            color: Colors.black,
+                            fontSize: 50,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        );
+                      }
+
+                      final data = snapshot.data!;
+                      String? docId = data["assignment"];
+                      String? time = data["time"];
+                      if (docId == widget.sc.docId) {
+                        return Text(
+                          time ?? '00:00',
+                          textAlign: TextAlign.center,
+                          style: const TextStyle(
+                            color: Colors.black,
+                            fontSize: 50,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        );
+                      } else {
+                        return const Text(
+                          'Start',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            color: Colors.black,
+                            fontSize: 50,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        );
+                      }
+                    },
                   ),
                 ), // <-- Text
               ),

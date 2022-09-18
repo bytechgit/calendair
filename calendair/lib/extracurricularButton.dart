@@ -37,7 +37,11 @@ class _ExtracurricularButtonState extends State<ExtracurricularButton> {
             }
           }
         } else {
-          extb.index.value = widget.index;
+          if (extb.breakdayIndex.value != widget.index) {
+            extb.index.value = widget.index;
+          } else {
+            Get.snackbar("Break day", "Choose another day");
+          }
         }
       },
       child: Padding(

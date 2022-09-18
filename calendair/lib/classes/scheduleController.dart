@@ -1,6 +1,7 @@
 import 'dart:developer';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_background_service/flutter_background_service.dart';
 import 'package:get/get.dart';
 import '../models/ScheduleElementModel.dart';
 import '../models/scheduleFindingResult.dart';
@@ -157,8 +158,8 @@ class ScheduleCintroller extends GetxController {
     }
     if (se is ScheduleElementAssignment) {
       addPrefix(se);
-      updateIndexes(newListIndex, index);
     }
+    updateIndexes(newListIndex, index);
 
     totalTimes.refresh();
   }
@@ -206,10 +207,14 @@ class ScheduleCintroller extends GetxController {
   bool addInSchedule(ScheduleElement se) {
     //! treba da se azuriraju indeksi
     if (se is ScheduleElementReminder) {
-      inspect(se);
       int index = getDayIndex(se.date!);
       if (index != -1) {
+        if (breakday.breakdayIndex.value == index) {
+          index += 1;
+        }
         scheduleElements.value[index].insert(0, se);
+        scheduleElements.value[index]
+            .sort(((a, b) => a.index.compareTo(b.index)));
         return true;
       } else {
         return false;
@@ -217,6 +222,10 @@ class ScheduleCintroller extends GetxController {
     } else if (se is ScheduleElementExtracurriculars) {
       scheduleElements.value[se.dayIndex].add(se);
       scheduleElements.value[se.dayIndex + 7].add(se);
+      scheduleElements.value[se.dayIndex]
+          .sort(((a, b) => a.index.compareTo(b.index)));
+      scheduleElements.value[se.dayIndex + 7]
+          .sort(((a, b) => a.index.compareTo(b.index)));
       totalTimes.value[se.dayIndex] += se.time;
       totalTimes.value[se.dayIndex + 7] += se.time;
       totalTimes.refresh();
@@ -231,10 +240,11 @@ class ScheduleCintroller extends GetxController {
       }
 
       int index = getDayIndex(se.date!);
-      print(index);
       if (index != -1) {
         scheduleElements.value[index].add(se);
         totalTimes.value[index] += se.time;
+        scheduleElements.value[index]
+            .sort(((a, b) => a.index.compareTo(b.index)));
 
         // print(totalTimes.value[4]);
       }
@@ -320,9 +330,9 @@ class ScheduleCintroller extends GetxController {
     return (to.difference(from).inHours / 24).round();
   }
 
-  void updateIndex(ScheduleElement se, index) {
-    if (se is ScheduleElementExtracurriculars) {}
-  }
+  // void updateIndex(ScheduleElement se, index) {
+  //   if (se is ScheduleElementExtracurriculars) {}
+  // }
 
   void addPrefix(ScheduleElementAssignment se) {
     final f = scheduleElements.value
@@ -356,10 +366,12 @@ class ScheduleCintroller extends GetxController {
     //       .update({"index": i});
     // }
     for (int i = 0; i < scheduleElements.value[listIndex].length; i++) {
-      await FirebaseFirestore.instance
-          .collection('Schedule')
-          .doc(scheduleElements.value[listIndex][i].docId)
-          .update({"index": i});
+      if (scheduleElements.value[listIndex][i] is! ScheduleElementReminder) {
+        await FirebaseFirestore.instance
+            .collection('Schedule')
+            .doc(scheduleElements.value[listIndex][i].docId)
+            .update({"index": i});
+      }
     }
   }
 }

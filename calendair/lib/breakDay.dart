@@ -40,7 +40,7 @@ class _BreakDayState extends State<BreakDay> {
             color: Colors.black,
           ),
           onPressed: () {
-            Get.back();
+            Get.back(closeOverlays: true);
           },
         ),
       ),
@@ -176,7 +176,7 @@ class _BreakDayState extends State<BreakDay> {
                           )),
                       onPressed: () {
                         Firestore().addBreakDay(extb.breakdayIndex.value);
-                        Get.back();
+                        Get.back(closeOverlays: true);
                       },
 
                       child: const Text(

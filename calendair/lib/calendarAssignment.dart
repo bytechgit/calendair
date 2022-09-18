@@ -24,7 +24,7 @@ class _CalendarAssignmentState extends State<CalendarAssignment> {
   bool? value = false;
   @override
   void initState() {
-    value = widget.scheduleElement.checked;
+    value = widget.scheduleElement.finished;
     super.initState();
   }
 
@@ -72,12 +72,13 @@ class _CalendarAssignmentState extends State<CalendarAssignment> {
 
                                 onChanged: (inputValue) {
                                   setState(() {
-                                    widget.scheduleElement.checked =
+                                    widget.scheduleElement.finished =
                                         inputValue ?? false;
-                                    print(value);
+                                    widget.scheduleElement
+                                        .finish(inputValue ?? false);
                                   });
                                 },
-                                value: widget.scheduleElement.checked,
+                                value: widget.scheduleElement.finished,
                               )
                             : Image.asset('assets/images/3line.png'),
                       ),
