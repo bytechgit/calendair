@@ -1,3 +1,4 @@
+import 'package:calendair/Classes/fcmNotification.dart';
 import 'package:calendair/Classes/navBar.dart';
 import 'package:calendair/Classes/ExtButton.dart';
 import 'package:calendair/Classes/scheduleController.dart';
@@ -7,18 +8,18 @@ import 'package:get/get.dart';
 import 'package:sizer/sizer.dart';
 import 'Classes/googleClassroom.dart';
 import 'Classes/background.dart';
-import 'Classes/timeStream.dart';
 import 'loginRegister.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   await Firebase.initializeApp();
+  FCMNotification fcm = FCMNotification();
   // SystemChrome.setPreferredOrientations([
   //   DeviceOrientation.portraitUp,
   //   DeviceOrientation.portraitDown,
   // ]);
-  await Background().initializeService();
+  // await Background().initializeService();
   Get.put(GoogleClassroom());
   Get.put(ExtButton());
   Get.put(ScheduleCintroller());
