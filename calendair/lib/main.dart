@@ -1,13 +1,13 @@
 import 'package:calendair/Classes/navBar.dart';
-import 'package:calendair/classes/ExtButton.dart';
-import 'package:calendair/classes/scheduleController.dart';
+import 'package:calendair/Classes/ExtButton.dart';
+import 'package:calendair/Classes/scheduleController.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:sizer/sizer.dart';
 import 'Classes/googleClassroom.dart';
-import 'classes/background.dart';
-import 'classes/timeStream.dart';
+import 'Classes/background.dart';
+import 'Classes/timeStream.dart';
 import 'loginRegister.dart';
 
 Future<void> main() async {

@@ -2,8 +2,8 @@ import 'dart:developer';
 
 import 'package:calendair/breakDay.dart';
 import 'package:calendair/calendarAssignment.dart';
-import 'package:calendair/classes/ExtButton.dart';
-import 'package:calendair/classes/scheduleController.dart';
+import 'package:calendair/Classes/ExtButton.dart';
+import 'package:calendair/Classes/scheduleController.dart';
 import 'package:calendair/models/Assigments.dart';
 import 'package:calendair/addReminderStudent.dart';
 import 'package:calendair/toDo.dart';

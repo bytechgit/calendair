@@ -1,5 +1,5 @@
 import 'package:calendair/Classes/firestore.dart';
-import 'package:calendair/classes/ExtButton.dart';
+import 'package:calendair/Classes/ExtButton.dart';
 import 'package:calendair/extracurricularButton.dart';
 import 'package:calendair/settings.dart';
 import 'package:flutter/material.dart';
@@ -7,7 +7,7 @@ import 'package:get/get.dart';
 
 import 'Classes/googleClassroom.dart';
 import 'bottomNavBar.dart';
-import 'classes/scheduleController.dart';
+import 'Classes/scheduleController.dart';
 import 'dashboard.dart';
 import 'models/nbar.dart';
 

@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'Classes/googleClassroom.dart';
 import 'bottomNavBar.dart';
-import 'classes/ExtButton.dart';
+import 'Classes/ExtButton.dart';
 import 'dashboard.dart';
 import 'models/nbar.dart';
 

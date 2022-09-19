@@ -127,7 +127,7 @@ class Background {
         t = Timer.periodic(Duration(seconds: 1), (timer) async {
           a.timesec--;
           if (a.timesec == 0) {
-            a.finish(true);
+            a.finishFromBackend(true);
             timer.cancel();
             assignment.value = null;
           }

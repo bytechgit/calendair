@@ -63,6 +63,7 @@ class Firestore {
           "type": user.type,
           "name": user.name,
           "picture": user.picture,
+          "times": {}
         }, SetOptions(merge: true));
       }
     });
@@ -74,6 +75,21 @@ class Firestore {
       return ds["type"];
     }
     return "";
+  }
+
+  Future<Map<String, dynamic>> getTimes() async {
+    final ds = await FirebaseFirestore.instance
+        .collection("Users")
+        .doc(ua.currentUser!.uid)
+        .get();
+    return ds.data()!["times"];
+  }
+
+  void setTimes(Map<String, dynamic> t) {
+    FirebaseFirestore.instance
+        .collection("Users")
+        .doc(ua.currentUser!.uid)
+        .update({"times": t});
   }
 
   Future<void> addPopUp(
@@ -221,54 +237,33 @@ class Firestore {
     });
   }
 
-  List<int> getTimes(int time) {
-    if (time < 45) {
-      return [time];
-    } else {
-      final List<int> list = [];
-      for (int i = 0; i < (time / 30).floor() + 1; i++) {
-        int t = time - 30 * (i + 1);
-        if (t <= 15) {
-          list.add(30 + t);
-          break;
-        } else {
-          list.add(30);
-        }
-      }
-      return list;
-    }
-  }
 //!ako je profesor stavio da traje 50 min to je podeljeno na dva dela 30,20 i sad ako je student vec zavrsio ovaj deo od 30 i ostalo mu
 //! od 20 a profesor promeni vreme sta se onda desava
 
-  Future<List<DocumentReference<Map<String, dynamic>>>>
-      insertAssignmentCopyForStudents(MyAssignment mya, String courseId) async {
-    List<DocumentReference<Map<String, dynamic>>> ids = [];
+  Future<List<String>> insertAssignmentCopyForStudents(
+      MyAssignment mya, String courseId) async {
+    List<String> ids = [];
     QuerySnapshot<Map<String, dynamic>> students = await getStudentsFromCourse(
         courseId); //?vec imas studenti koji su na odredjeni predmen ne mora se ponovo citaju
     for (var student in students.docs) {
-      for (var t in getTimes(mya.duration)) {
-        final doc =
-            await FirebaseFirestore.instance.collection('Schedule').add({
-          "studentId": student.id,
-          "note": mya.note,
-          "time": t,
-          "finished": false,
-          "title": mya.coursework!.title,
-          "index": 500,
-          "dueDate": mya.coursework!.dueDate != null
-              ? DateTime(
-                  mya.coursework!.dueDate!.year!,
-                  mya.coursework!.dueDate!.month!,
-                  mya.coursework!.dueDate!.day!)
-              : DateUtils.dateOnly(
-                  DateTime.now().add(const Duration(days: 14))),
-          "type": "assignment",
-          "date": DateTime(2100),
-          "parentId": mya.coursework!.courseId! + mya.coursework!.id!
-        });
-        ids.add(FirebaseFirestore.instance.doc("Schedule/${doc.id}"));
-      }
+      final doc = await FirebaseFirestore.instance.collection('Schedule').add({
+        "studentId": student.id,
+        "note": mya.note,
+        "type": "assignment",
+        "date": DateTime(2100),
+        "index": 100,
+        "time": mya.duration,
+        "times": [],
+        "indexes": [],
+        "finishedList": [],
+        "dates": [],
+        "title": mya.coursework!.title,
+        "dueDate": mya.coursework!.dueDate != null
+            ? DateTime(mya.coursework!.dueDate!.year!,
+                mya.coursework!.dueDate!.month!, mya.coursework!.dueDate!.day!)
+            : DateUtils.dateOnly(DateTime.now().add(const Duration(days: 7))),
+      });
+      ids.add(doc.id);
     }
     return ids;
   }
@@ -294,11 +289,11 @@ class Firestore {
                   mya.coursework!.dueDate!.year!,
                   mya.coursework!.dueDate!.month!,
                   mya.coursework!.dueDate!.day!)
-              : DateUtils.dateOnly(
-                  DateTime.now().add(const Duration(days: 14))),
+              : DateUtils.dateOnly(DateTime.now().add(const Duration(days: 7))),
           "title": mya.coursework!.title,
-          "studentsCopy": ids,
-          "count": getTimes(mya.duration).length
+          "studentsCopy": ids
+              .map((e) => FirebaseFirestore.instance.doc("Schedule/$e"))
+              .toList()
         }, SetOptions(merge: true));
       } else //update
       {
@@ -313,26 +308,118 @@ class Firestore {
                   mya.coursework!.dueDate!.year!,
                   mya.coursework!.dueDate!.month!,
                   mya.coursework!.dueDate!.day!)
-              : DateUtils.dateOnly(
-                  DateTime.now().add(const Duration(days: 14))),
+              : DateUtils.dateOnly(DateTime.now().add(const Duration(days: 7))),
         });
         for (DocumentReference<Map<String, dynamic>> ref
             in (ds.data() as Map<String, dynamic>)["studentsCopy"] ?? []) {
           ref.update({
             "note": mya.note,
-            "time": mya.duration, //!da se napravi da ne moze da se menja vreme
+            "time": mya.duration,
             "dueDate": mya.coursework!.dueDate != null
                 ? DateTime(
                     mya.coursework!.dueDate!.year!,
                     mya.coursework!.dueDate!.month!,
                     mya.coursework!.dueDate!.day!)
                 : DateUtils.dateOnly(
-                    DateTime.now().add(const Duration(days: 14))),
+                    DateTime.now().add(const Duration(days: 7))),
           });
         }
       }
     });
   }
+
+  // Future<List<DocumentReference<Map<String, dynamic>>>>
+  //     insertAssignmentCopyForStudents(MyAssignment mya, String courseId) async {
+  //   List<DocumentReference<Map<String, dynamic>>> ids = [];
+  //   QuerySnapshot<Map<String, dynamic>> students = await getStudentsFromCourse(
+  //       courseId); //?vec imas studenti koji su na odredjeni predmen ne mora se ponovo citaju
+  //   for (var student in students.docs) {
+  //     for (var t in getTimes(mya.duration)) {
+  //       final doc =
+  //           await FirebaseFirestore.instance.collection('Schedule').add({
+  //         "studentId": student.id,
+  //         "note": mya.note,
+  //         "time": t,
+  //         "finished": false,
+  //         "title": mya.coursework!.title,
+  //         "index": 500,
+  //         "dueDate": mya.coursework!.dueDate != null
+  //             ? DateTime(
+  //                 mya.coursework!.dueDate!.year!,
+  //                 mya.coursework!.dueDate!.month!,
+  //                 mya.coursework!.dueDate!.day!)
+  //             : DateUtils.dateOnly(
+  //                 DateTime.now().add(const Duration(days: 14))),
+  //         "type": "assignment",
+  //         "date": DateTime(2100),
+  //         "parentId": mya.coursework!.courseId! + mya.coursework!.id!
+  //       });
+  //       ids.add(FirebaseFirestore.instance.doc("Schedule/${doc.id}"));
+  //     }
+  //   }
+  //   return ids;
+  // }
+
+  // Future<void> insertOrUpdateAssignment(
+  //     MyAssignment mya, String courseId) async {
+  //   FirebaseFirestore.instance
+  //       .collection('Assignments')
+  //       .doc(mya.coursework!.courseId! + mya.coursework!.id!)
+  //       .get()
+  //       .then((DocumentSnapshot ds) async {
+  //     if (!ds.exists) {
+  //       //insert
+  //       final ids = await insertAssignmentCopyForStudents(mya, courseId);
+  //       FirebaseFirestore.instance
+  //           .collection('Assignments')
+  //           .doc(mya.coursework!.courseId! + mya.coursework!.id!)
+  //           .set({
+  //         "note": mya.note,
+  //         "duration": mya.duration,
+  //         "dueDate": mya.coursework!.dueDate != null
+  //             ? DateTime(
+  //                 mya.coursework!.dueDate!.year!,
+  //                 mya.coursework!.dueDate!.month!,
+  //                 mya.coursework!.dueDate!.day!)
+  //             : DateUtils.dateOnly(
+  //                 DateTime.now().add(const Duration(days: 14))),
+  //         "title": mya.coursework!.title,
+  //         "studentsCopy": ids,
+  //         "count": getTimes(mya.duration).length
+  //       }, SetOptions(merge: true));
+  //     } else //update
+  //     {
+  //       FirebaseFirestore.instance
+  //           .collection('Assignments')
+  //           .doc(mya.coursework!.courseId! + mya.coursework!.id!)
+  //           .update({
+  //         "note": mya.note,
+  //         "duration": mya.duration,
+  //         "dueDate": mya.coursework!.dueDate != null
+  //             ? DateTime(
+  //                 mya.coursework!.dueDate!.year!,
+  //                 mya.coursework!.dueDate!.month!,
+  //                 mya.coursework!.dueDate!.day!)
+  //             : DateUtils.dateOnly(
+  //                 DateTime.now().add(const Duration(days: 14))),
+  //       });
+  //       for (DocumentReference<Map<String, dynamic>> ref
+  //           in (ds.data() as Map<String, dynamic>)["studentsCopy"] ?? []) {
+  //         ref.update({
+  //           "note": mya.note,
+  //           "time": mya.duration, //!da se napravi da ne moze da se menja vreme
+  //           "dueDate": mya.coursework!.dueDate != null
+  //               ? DateTime(
+  //                   mya.coursework!.dueDate!.year!,
+  //                   mya.coursework!.dueDate!.month!,
+  //                   mya.coursework!.dueDate!.day!)
+  //               : DateUtils.dateOnly(
+  //                   DateTime.now().add(const Duration(days: 14))),
+  //         });
+  //       }
+  //     }
+  //   });
+  // }
 
   Future<MyAssignment> readMyAssignment(CourseWork cw) async {
     return readMyAssignmentById(cw.courseId! + cw.id!);

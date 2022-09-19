@@ -6,8 +6,8 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import 'Classes/firestore.dart';
-import 'classes/ExtButton.dart';
-import 'classes/scheduleController.dart';
+import 'Classes/ExtButton.dart';
+import 'Classes/scheduleController.dart';
 
 class Login extends StatelessWidget {
   const Login({Key? key}) : super(key: key);

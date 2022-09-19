@@ -1,7 +1,6 @@
-import 'dart:developer';
+import 'package:calendair/Classes/firestore.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_background_service/flutter_background_service.dart';
 import 'package:get/get.dart';
 import '../models/ScheduleElementModel.dart';
 import '../models/scheduleFindingResult.dart';
@@ -12,6 +11,7 @@ class ScheduleCintroller extends GetxController {
       [[], [], [], [], [], [], [], [], [], [], [], [], [], []]);
   final totalTimes = Rx<List<int>>([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]);
   final breakday = Get.find<ExtButton>();
+  Map<String, dynamic>? times;
 
   void listen(String uid) {
     scheduleElements.value = [
@@ -31,7 +31,6 @@ class ScheduleCintroller extends GetxController {
       []
     ];
     totalTimes.value = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
-    //!  TODO: treba da se pozove u login i mozda u register
     FirebaseFirestore.instance
         .collection('Schedule')
         .where("studentId", isEqualTo: uid)
@@ -47,7 +46,8 @@ class ScheduleCintroller extends GetxController {
             se = ScheduleElementReminder.fromMap(doc.doc.data()!, doc.doc.id);
             break;
           case "assignment":
-            se = ScheduleElementAssignment.fromMap(doc.doc.data()!, doc.doc.id);
+            se = ScheduleElementAssignmentMain.fromMap(
+                doc.doc.data()!, doc.doc.id);
             break;
           case "extracurricular":
             se = ScheduleElementExtracurriculars.fromMap(
@@ -101,31 +101,31 @@ class ScheduleCintroller extends GetxController {
     return null;
   }
 
-  void updateScheduleElementDate(
-      ScheduleElement se, int oldIndex, int newIndex) {
-    final doc = FirebaseFirestore.instance.collection('Schedule').doc(se.docId);
-    if (se is ScheduleElementAssignment) {
-      final ind = newIndex - oldIndex;
-      se.date = se.date!.add(Duration(days: ind));
-      doc.update({
-        "date": se.date,
-        //"index": se.index,
-      });
-    } else if (se is ScheduleElementExtracurriculars) {
-      se.dayIndex = newIndex % 7;
-      doc.update({
-        "dayIndex": se.dayIndex,
-        //"index": se.index,
-      });
-    } else if (se is ScheduleElementReminder) {
-      final ind = newIndex - oldIndex;
-      se.date = se.date!.add(Duration(days: ind));
-      //se.index = index ?? -1;
-      doc.update({
-        "date": se.date,
-      });
-    }
-  }
+  // void updateScheduleElementDate(
+  //     ScheduleElement se, int oldIndex, int newIndex) {
+  //   final doc = FirebaseFirestore.instance.collection('Schedule').doc(se.docId);
+  //   if (se is ScheduleElementAssignment) {
+  //     final ind = newIndex - oldIndex;
+  //     se.date = se.date!.add(Duration(days: ind));
+  //     doc.update({
+  //       "date": se.date,
+  //       //"index": se.index,
+  //     });
+  //   } else if (se is ScheduleElementExtracurriculars) {
+  //     se.dayIndex = newIndex % 7;
+  //     doc.update({
+  //       "dayIndex": se.dayIndex,
+  //       //"index": se.index,
+  //     });
+  //   } else if (se is ScheduleElementReminder) {
+  //     final ind = newIndex - oldIndex;
+  //     se.date = se.date!.add(Duration(days: ind));
+  //     //se.index = index ?? -1;
+  //     doc.update({
+  //       "date": se.date,
+  //     });
+  //   }
+  // }
 
   void addInScheduleElements({
     required int oldListIndex,
@@ -134,8 +134,7 @@ class ScheduleCintroller extends GetxController {
     required int index,
   }) {
     if (oldListIndex != newListIndex) {
-      //!index je mozda pomenren
-      updateScheduleElementDate(se, oldListIndex, newListIndex);
+      se.updateDate(newListIndex: newListIndex, oldListIndex: oldListIndex);
     }
 
     if (se is ScheduleElementExtracurriculars) {
@@ -204,8 +203,7 @@ class ScheduleCintroller extends GetxController {
     }
   }
 
-  bool addInSchedule(ScheduleElement se) {
-    //! treba da se azuriraju indeksi
+  Future<bool> addInSchedule(ScheduleElement se) async {
     if (se is ScheduleElementReminder) {
       int index = getDayIndex(se.date!);
       if (index != -1) {
@@ -230,27 +228,27 @@ class ScheduleCintroller extends GetxController {
       totalTimes.value[se.dayIndex + 7] += se.time;
       totalTimes.refresh();
       scheduleElements.refresh();
-    } else if (se is ScheduleElementAssignment) {
-      if (se.date?.year == 2100) {
-        se.date = getDate(se);
-        FirebaseFirestore.instance
-            .collection('Schedule')
-            .doc(se.docId)
-            .update({"date": se.date});
+    } else if (se is ScheduleElementAssignmentMain) {
+      if (se.dates.isEmpty) {
+        await addDates(se);
       }
-
-      int index = getDayIndex(se.date!);
-      if (index != -1) {
-        scheduleElements.value[index].add(se);
-        totalTimes.value[index] += se.time;
+      int i = 0;
+      ScheduleElementAssignment? s;
+      for (var date in se.dates) {
+        s = ScheduleElementAssignment.fromMain(se, i);
+        i++;
+        int index = getDayIndex(date);
+        if (index != -1) {
+          scheduleElements.value[index].add(s);
+          totalTimes.value[index] += s.time;
+          totalTimes.refresh();
+        }
         scheduleElements.value[index]
             .sort(((a, b) => a.index.compareTo(b.index)));
-
-        // print(totalTimes.value[4]);
       }
-
-      totalTimes.refresh();
-      addPrefix(se);
+      if (s != null) {
+        addPrefix(s);
+      }
     }
     return false;
   }
@@ -279,7 +277,7 @@ class ScheduleCintroller extends GetxController {
           addInSchedule(se);
         }
       }
-      if (se is ScheduleElementAssignment) {
+      if (se is ScheduleElementAssignmentMain) {
         //!kasnije treba da se izmeni
         // removeFromScheduleElements(se1: se);
         //addInSchedule(se);
@@ -290,45 +288,45 @@ class ScheduleCintroller extends GetxController {
     scheduleElements.refresh();
   }
 
-  DateTime getDate(ScheduleElementAssignment sea) {
-    final days = daysBetween(DateTime.now(),
-        /*sea.dueDate*/ DateTime.now().add(const Duration(days: 7)));
-    List<int> times = [];
-    final weekday = DateTime.now().weekday - 1;
-    for (int i = weekday; i < days + weekday; i++) {
-      if (i < 14) {
-        if (breakday.breakdayIndex.value != -1 &&
-            (i == breakday.breakdayIndex.value + 1 ||
-                i == breakday.breakdayIndex.value + 1 + 7)) {
-          times.add(100000);
-        } else {
-          times.add(totalTimes.value[i]);
-        }
-      } else {
-        times.add(0);
-      }
-    }
-    int index = minIndex(times);
-    return DateUtils.dateOnly(DateTime.now().add(Duration(days: index)));
-  }
+  // DateTime getDate(ScheduleElementAssignment sea) {
+  //   final days = daysBetween(DateTime.now(),
+  //       /*sea.dueDate*/ DateTime.now().add(const Duration(days: 7)));
+  //   List<int> times = [];
+  //   final weekday = DateTime.now().weekday - 1;
+  //   for (int i = weekday; i < days + weekday; i++) {
+  //     if (i < 14) {
+  //       if (breakday.breakdayIndex.value != -1 &&
+  //           (i == breakday.breakdayIndex.value + 1 ||
+  //               i == breakday.breakdayIndex.value + 1 + 7)) {
+  //         times.add(100000);
+  //       } else {
+  //         times.add(totalTimes.value[i]);
+  //       }
+  //     } else {
+  //       times.add(0);
+  //     }
+  //   }
+  //   int index = minIndex(times);
+  //   return DateUtils.dateOnly(DateTime.now().add(Duration(days: index)));
+  // }
 
-  int minIndex(List<int> l) {
-    int minel = 10000;
-    int mini = 0;
-    for (int i = 0; i < l.length; i++) {
-      if (l[i] < minel) {
-        minel = l[i];
-        mini = i;
-      }
-    }
-    return mini;
-  }
+  // int minIndex(List<int> l) {
+  //   int minel = 10000;
+  //   int mini = 0;
+  //   for (int i = 0; i < l.length; i++) {
+  //     if (l[i] < minel) {
+  //       minel = l[i];
+  //       mini = i;
+  //     }
+  //   }
+  //   return mini;
+  // }
 
-  int daysBetween(DateTime from, DateTime to) {
-    from = DateTime(from.year, from.month, from.day);
-    to = DateTime(to.year, to.month, to.day);
-    return (to.difference(from).inHours / 24).round();
-  }
+  // int daysBetween(DateTime from, DateTime to) {
+  //   from = DateTime(from.year, from.month, from.day);
+  //   to = DateTime(to.year, to.month, to.day);
+  //   return (to.difference(from).inHours / 24).round();
+  // }
 
   // void updateIndex(ScheduleElement se, index) {
   //   if (se is ScheduleElementExtracurriculars) {}
@@ -339,17 +337,16 @@ class ScheduleCintroller extends GetxController {
         .expand((element) => element)
         .whereType<ScheduleElementAssignment>()
         .toList();
-    final list = f.where((element) => (element).parentId == se.parentId);
+    final list = f.where((element) => (element).docId == se.docId);
     for (var element in list) {
       element.pref = "Continue";
       element.color = list.first.color;
     }
-    final first =
-        f.firstWhereOrNull((element) => (element).parentId == se.parentId);
+    final first = f.firstWhereOrNull((element) => (element).docId == se.docId);
     first?.pref = "Start";
 
     final last = f.lastWhere(
-      (element) => (element).parentId == se.parentId,
+      (element) => (element).docId == se.docId,
       orElse: () {
         return ScheduleElementAssignment();
       },
@@ -367,11 +364,48 @@ class ScheduleCintroller extends GetxController {
     // }
     for (int i = 0; i < scheduleElements.value[listIndex].length; i++) {
       if (scheduleElements.value[listIndex][i] is! ScheduleElementReminder) {
-        await FirebaseFirestore.instance
-            .collection('Schedule')
-            .doc(scheduleElements.value[listIndex][i].docId)
-            .update({"index": i});
+        scheduleElements.value[listIndex][i].updateIndex(i);
       }
     }
+  }
+
+  Future<void> addDates(ScheduleElementAssignmentMain sm) async {
+    times ??= await Firestore().getTimes();
+    int time = sm.time;
+    DateTime date = DateUtils.dateOnly(DateTime.now());
+    DateTime minDate = DateUtils.dateOnly(DateTime.now());
+    int minTime = 10000;
+    int curTime = 0;
+    while (time > 0) {
+      int decrTime = time > 45 ? 30 : time;
+      sm.times.add(decrTime);
+      time -= decrTime;
+      minTime = 10000;
+      minDate = DateUtils.dateOnly(DateTime.now());
+      date = DateUtils.dateOnly(DateTime.now());
+      sm.finishedList.add(false);
+      sm.indexes.add(1000);
+      //inicijalno na 1000 jer se stavlj na kraj dana
+      while (date.compareTo(sm.dueDate) <= 0) {
+        if (date.weekday - 1 != breakday.breakdayIndex.value) {
+          curTime = times?[DateUtils.dateOnly(date).toString()] ?? 0;
+          if (curTime < minTime) {
+            minTime = curTime;
+            minDate = date;
+          }
+        }
+        date = date.add(const Duration(days: 1));
+      }
+      sm.dates.add(minDate);
+      times?[DateUtils.dateOnly(minDate).toString()] =
+          (times?[DateUtils.dateOnly(minDate).toString()] ?? 0) + decrTime;
+    }
+    FirebaseFirestore.instance.collection("Schedule").doc(sm.docId).update({
+      "dates": sm.dates,
+      "indexes": sm.indexes,
+      "finishedList": sm.finishedList,
+      "times": sm.times
+    });
+    Firestore().setTimes(times!);
   }
 }
