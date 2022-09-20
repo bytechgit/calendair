@@ -1,5 +1,5 @@
 import 'dart:developer';
-import 'package:calendair/Classes/firestore.dart';
+import 'package:calendair/classes/firestore.dart';
 import 'package:calendair/updateReminder.dart';
 import 'package:calendair/models/CustomCourse.dart';
 import 'package:calendair/models/reminderModel.dart';

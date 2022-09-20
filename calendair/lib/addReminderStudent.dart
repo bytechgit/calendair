@@ -1,4 +1,4 @@
-import 'package:calendair/Classes/firestore.dart';
+import 'package:calendair/classes/firestore.dart';
 import 'package:calendair/settings.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';

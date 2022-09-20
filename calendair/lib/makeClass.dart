@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:googleapis/classroom/v1.dart' as classroom;
 import 'package:sizer/sizer.dart';
-import 'Classes/googleClassroom.dart';
+import 'classes/googleClassroom.dart';
 import 'bottomNavBar.dart';
 import 'models/nbar.dart';
 import 'package:form_field_validator/form_field_validator.dart';

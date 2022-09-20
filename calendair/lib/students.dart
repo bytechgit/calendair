@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:sizer/sizer.dart';
 
-import 'Classes/firestore.dart';
+import 'classes/firestore.dart';
 import 'bottomNavBar.dart';
 import 'models/nbar.dart';
 

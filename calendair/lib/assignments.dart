@@ -6,7 +6,7 @@ import 'package:get/get.dart';
 import 'package:googleapis/classroom/v1.dart';
 import 'package:sizer/sizer.dart';
 
-import 'Classes/googleClassroom.dart';
+import 'classes/googleClassroom.dart';
 import 'bottomNavBar.dart';
 import 'models/nbar.dart';
 

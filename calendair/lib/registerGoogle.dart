@@ -1,11 +1,11 @@
-import 'package:calendair/Classes/Authentication.dart';
+import 'package:calendair/classes/Authentication.dart';
 import 'package:calendair/registerWhatUser.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/src/foundation/key.dart';
 import 'package:flutter/src/widgets/framework.dart';
 import 'package:get/get.dart';
 
-import 'Classes/googleClassroom.dart';
+import 'classes/googleClassroom.dart';
 
 class RegisterGoogle extends StatelessWidget {
   const RegisterGoogle({Key? key}) : super(key: key);

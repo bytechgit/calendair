@@ -1,4 +1,4 @@
-import 'package:calendair/Classes/firestore.dart';
+import 'package:calendair/classes/firestore.dart';
 import 'package:calendair/models/CustomCourse.dart';
 import 'package:calendair/models/PopUpModel.dart';
 import 'package:calendair/popUpsAdd.dart';
@@ -9,7 +9,7 @@ import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:sizer/sizer.dart';
 
-import 'Classes/googleClassroom.dart';
+import 'classes/googleClassroom.dart';
 import 'bottomNavBar.dart';
 import 'models/nbar.dart';
 

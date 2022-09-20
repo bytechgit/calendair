@@ -1,6 +1,6 @@
 // ignore_for_file: unused_local_variable
 
-import 'package:calendair/Classes/navBar.dart';
+import 'package:calendair/classes/navBar.dart';
 import 'package:calendair/models/nbar.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';

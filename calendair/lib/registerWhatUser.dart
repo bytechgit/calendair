@@ -3,8 +3,8 @@ import 'package:calendair/studentDashboard.dart';
 import 'package:calendair/teacherDashboard.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'Classes/firestore.dart';
-import 'Classes/googleClassroom.dart';
+import 'classes/firestore.dart';
+import 'classes/googleClassroom.dart';
 
 class RegisterWhatUser extends StatefulWidget {
   const RegisterWhatUser({Key? key}) : super(key: key);

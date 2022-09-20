@@ -2,7 +2,7 @@ import 'package:calendair/joinNotification.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-import 'Classes/googleClassroom.dart';
+import 'classes/googleClassroom.dart';
 
 class addClass extends StatefulWidget {
   const addClass({Key? key}) : super(key: key);

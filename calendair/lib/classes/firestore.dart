@@ -15,7 +15,7 @@ Da li je bitan redosled u toku dana?
 ///////////////////////////////////
 import 'dart:developer';
 
-import 'package:calendair/Classes/googleClassroom.dart';
+import 'package:calendair/classes/googleClassroom.dart';
 import 'package:calendair/classes/fcmNotification.dart';
 import 'package:calendair/models/AssignmentModel.dart';
 import 'package:calendair/models/ExtracurricularsModel.dart';

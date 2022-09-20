@@ -4,7 +4,7 @@ import 'package:calendair/registerEnterSchoolCode.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-import 'Classes/googleClassroom.dart';
+import 'classes/googleClassroom.dart';
 
 class LoginRegister extends StatefulWidget {
   const LoginRegister({Key? key}) : super(key: key);

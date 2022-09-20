@@ -1,5 +1,5 @@
 import 'dart:developer';
-import 'package:calendair/Classes/Authentication.dart';
+import 'package:calendair/classes/Authentication.dart';
 import 'package:calendair/models/AssignmentModel.dart';
 import 'package:calendair/popUps.dart';
 import 'package:get/get.dart';

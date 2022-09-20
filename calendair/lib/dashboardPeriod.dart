@@ -5,7 +5,7 @@ import 'package:calendair/reminders.dart';
 import 'package:calendair/students.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'Classes/googleClassroom.dart';
+import 'classes/googleClassroom.dart';
 import 'bottomNavBar.dart';
 import 'models/nbar.dart';
 

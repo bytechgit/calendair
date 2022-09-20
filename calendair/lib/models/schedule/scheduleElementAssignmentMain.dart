@@ -4,7 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-import '../../Classes/firestore.dart';
+import '../../classes/firestore.dart';
 
 class ScheduleElementAssignmentMain extends ScheduleElement {
   List<DateTime> dates;

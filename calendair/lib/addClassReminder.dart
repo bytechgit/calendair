@@ -1,4 +1,4 @@
-import 'package:calendair/Classes/firestore.dart';
+import 'package:calendair/classes/firestore.dart';
 import 'package:calendair/models/CustomCourse.dart';
 import 'package:calendair/models/reminderModel.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';

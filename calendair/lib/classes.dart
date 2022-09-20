@@ -1,4 +1,4 @@
-import 'package:calendair/Classes/googleClassroom.dart';
+import 'package:calendair/classes/googleClassroom.dart';
 import 'package:calendair/addClass.dart';
 import 'package:calendair/models/CustomCourse.dart';
 import 'package:calendair/rate.dart';
@@ -7,7 +7,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:sizer/sizer.dart';
-import 'Classes/firestore.dart';
+import 'classes/firestore.dart';
 import 'bottomNavBar.dart';
 import 'dashboard.dart';
 import 'models/nbar.dart';
