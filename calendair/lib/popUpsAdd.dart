@@ -1,4 +1,4 @@
-import 'package:calendair/Classes/firestore.dart';
+import 'package:calendair/classes/firestore.dart';
 import 'package:calendair/models/CustomCourse.dart';
 import 'package:calendair/popUpsConfidenceMeter.dart';
 import 'package:flutter/material.dart';
@@ -233,6 +233,7 @@ class _PopUpsAddState extends State<PopUpsAdd> {
                       )),
                   onPressed: () {
                     Firestore().addPopUp(
+                        courseId: widget.course.id,
                         classId: widget.course.docid,
                         date: date,
                         title: titleController.text,

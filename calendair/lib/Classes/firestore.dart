@@ -73,16 +73,18 @@ class Firestore {
   Future<String> getUserIfExist(String UID) async {
     final ds = await users.doc(UID).get();
     if (ds.exists) {
-      FCMNotification.unsubscribeFromAllTopic();
+      if (ds["type"] == "student") {
+        FCMNotification.unsubscribeFromAllTopic();
 
-      Firestore().getStudentCourses().listen((s) {
-        for (var doc in s.docs) {
-          String courseId = doc.data()["id"];
-          FCMNotification.subscribeToTopic("${courseId}_assignments");
-          FCMNotification.subscribeToTopic("${courseId}_popups");
-          print("SCUBSCRIBED ON${courseId}_assignments");
-        }
-      });
+        Firestore().getStudentCourses().listen((s) {
+          for (var doc in s.docs) {
+            String courseId = doc.data()["id"];
+            FCMNotification.subscribeToTopic("${courseId}_assignments");
+            FCMNotification.subscribeToTopic("${courseId}_popups");
+            print("SCUBSCRIBED ON${courseId}_assignments");
+          }
+        });
+      }
 
       return ds["type"];
     }
@@ -106,6 +108,7 @@ class Firestore {
 
   Future<void> addPopUp(
       {required String classId,
+      required String courseId,
       required DateTime date,
       required String title,
       required String cm}) async {
@@ -122,11 +125,11 @@ class Firestore {
           []
     });
     FCMNotification.sendTopicMessage(
-        channel: "${classId}_popups",
+        channel: "${courseId}_popups",
         title: "Popup added",
         body: "${ua.currentUser!.displayName} added $title");
 
-    print("${classId}_popups");
+    print("${courseId}_popups");
   }
 
   Future<void> addReminderStudent(

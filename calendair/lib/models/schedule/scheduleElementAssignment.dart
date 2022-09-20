@@ -44,7 +44,7 @@ class ScheduleElementAssignment extends ScheduleElementAssignmentMain {
       scheduleLists.addTimes(time, listIndex);
     } else {
       int lIndex = getDayIndex();
-      if (index != -1) {
+      if (lIndex != -1) {
         scheduleLists.addElement(this, lIndex);
         scheduleLists.addTimes(time, lIndex);
       }
