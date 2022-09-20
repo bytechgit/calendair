@@ -1,9 +1,9 @@
-import 'package:calendair/models/ScheduleElementModel.dart';
+import 'package:calendair/models/schedule/scheduleElement.dart';
 
 class FindingResult {
-  late int dayId;
-  late int classId;
+  late int listId;
+  late int elementId;
   late ScheduleElement element;
 
-  FindingResult(this.dayId, this.classId, this.element);
+  FindingResult(this.listId, this.elementId, this.element);
 }

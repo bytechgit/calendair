@@ -1,5 +1,5 @@
 import 'package:calendair/dayToDo.dart';
-import 'package:calendair/models/ScheduleElementModel.dart';
+import 'package:calendair/models/schedule/scheduleElement.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 

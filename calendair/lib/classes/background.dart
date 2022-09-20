@@ -2,8 +2,8 @@ import 'dart:async';
 import 'dart:developer';
 import 'dart:io';
 import 'dart:ui';
-
-import 'package:calendair/models/ScheduleElementModel.dart';
+import 'package:calendair/classes/scheduleLists.dart';
+import 'package:calendair/models/schedule/scheduleElementAssignment.dart';
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_background_service/flutter_background_service.dart';
@@ -16,6 +16,7 @@ class Background {
   static final assignment = Rx<ScheduleElementAssignment?>(null);
   static final Background _singleton = Background._internal();
   void addAssignment(Map<String, dynamic> a) {
+    inspect(a);
     FlutterBackgroundService().invoke("addAssignment", a);
   }
 
@@ -106,6 +107,7 @@ class Background {
         service.setAsBackgroundService();
       });
       service.on('addAssignment').listen((event) {
+        print("sss");
         if (assignment.value == null) {
           assignment.value =
               ScheduleElementAssignment.fromMap(event!, event["docId"]);

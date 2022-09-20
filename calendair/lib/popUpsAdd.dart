@@ -1,10 +1,7 @@
 import 'package:calendair/Classes/firestore.dart';
 import 'package:calendair/models/CustomCourse.dart';
 import 'package:calendair/popUpsConfidenceMeter.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/src/foundation/key.dart';
-import 'package:flutter/src/widgets/framework.dart';
 import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
@@ -14,8 +11,8 @@ import 'bottomNavBar.dart';
 import 'models/nbar.dart';
 
 class PopUpsAdd extends StatefulWidget {
-  CustomCourse course;
-  PopUpsAdd({Key? key, required this.course}) : super(key: key);
+  final CustomCourse course;
+  const PopUpsAdd({Key? key, required this.course}) : super(key: key);
 
   @override
   State<PopUpsAdd> createState() => _PopUpsAddState();
@@ -26,6 +23,7 @@ class _PopUpsAddState extends State<PopUpsAdd> {
   final dateController = TextEditingController();
   final gc = Get.find<GoogleClassroom>();
   DateTime date = DateTime.now();
+  @override
   //final titleController=TextEditingController();
   @override
   Widget build(BuildContext context) {

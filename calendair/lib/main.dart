@@ -2,6 +2,7 @@ import 'package:calendair/Classes/fcmNotification.dart';
 import 'package:calendair/Classes/navBar.dart';
 import 'package:calendair/Classes/ExtButton.dart';
 import 'package:calendair/Classes/scheduleController.dart';
+import 'package:calendair/classes/scheduleLists.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -19,7 +20,8 @@ Future<void> main() async {
   //   DeviceOrientation.portraitUp,
   //   DeviceOrientation.portraitDown,
   // ]);
-  // await Background().initializeService();
+  await Background().initializeService();
+  Get.put(ScheduleLists());
   Get.put(GoogleClassroom());
   Get.put(ExtButton());
   Get.put(ScheduleCintroller());

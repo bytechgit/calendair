@@ -13,6 +13,7 @@ import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:linked_scroll_controller/linked_scroll_controller.dart';
 import 'Classes/googleClassroom.dart';
+import 'classes/scheduleLists.dart';
 
 class Calendar extends StatefulWidget {
   const Calendar({Key? key}) : super(key: key);
@@ -24,6 +25,7 @@ class Calendar extends StatefulWidget {
 class _CalendarState extends State<Calendar> {
   final gc = Get.find<GoogleClassroom>();
   final sc = Get.find<ScheduleCintroller>();
+  final scheduleLists = Get.find<ScheduleLists>();
   final breakDay = Get.find<ExtButton>();
   late final List<DragAndDropList> _contents = [];
   _onItemReorder(
@@ -86,7 +88,6 @@ class _CalendarState extends State<Calendar> {
     super.dispose();
   }
 
-  double _value = 21.0;
   final days = [
     'Mon',
     'Tues',
@@ -222,24 +223,25 @@ class _CalendarState extends State<Calendar> {
                         //disableScrolling: true,
                         children: [
                           for (int i = 0;
-                              i < sc.scheduleElements.value.length;
+                              i < scheduleLists.scheduleElements.value.length;
                               i++) ...{
                             if (breakDay.breakdayIndex.value != i &&
                                 breakDay.breakdayIndex.value != i - 7) ...{
                               DragAndDropList(
                                   contentsWhenEmpty: const SizedBox(),
                                   verticalAlignment: CrossAxisAlignment.stretch,
-                                  children: sc.scheduleElements.value[i]
-                                      .map(
-                                        (e) => DragAndDropItem(
-                                          child: CalendarAssignment(
-                                            scheduleElement: e,
-                                          ),
-                                          canDrag: true,
-                                          // e.type == "reminder" ? false : true,
-                                        ),
-                                      )
-                                      .toList(),
+                                  children:
+                                      scheduleLists.scheduleElements.value[i]
+                                          .map(
+                                            (e) => DragAndDropItem(
+                                              child: CalendarAssignment(
+                                                scheduleElement: e,
+                                              ),
+                                              canDrag: true,
+                                              // e.type == "reminder" ? false : true,
+                                            ),
+                                          )
+                                          .toList(),
                                   canDrag: false),
                             } else
                               DragAndDropList(
@@ -366,11 +368,13 @@ class _CalendarState extends State<Calendar> {
                             Expanded(
                               child: Center(
                                 child: FittedBox(
-                                  child: Text(
-                                    "${sc.totalTimes.value[d]} Minutes",
-                                    style: const TextStyle(
-                                        color:
-                                            Color.fromRGBO(144, 144, 144, 1)),
+                                  child: Obx(
+                                    () => Text(
+                                      "${scheduleLists.totalTimes.value[d]} Minutes",
+                                      style: const TextStyle(
+                                          color:
+                                              Color.fromRGBO(144, 144, 144, 1)),
+                                    ),
                                   ),
                                 ),
                               ),

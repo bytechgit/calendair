@@ -1,5 +1,6 @@
 import 'package:calendair/models/Assigments.dart';
-import 'package:calendair/models/ScheduleElementModel.dart';
+import 'package:calendair/models/schedule/scheduleElement.dart';
+import 'package:calendair/models/schedule/scheduleElementReminder.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/src/foundation/key.dart';

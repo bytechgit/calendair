@@ -1,8 +1,8 @@
 import 'dart:developer';
 
 import 'package:calendair/Classes/background.dart';
-import 'package:calendair/Classes/timeStream.dart';
-import 'package:calendair/models/ScheduleElementModel.dart';
+import 'package:calendair/models/schedule/scheduleElement.dart';
+import 'package:calendair/models/schedule/scheduleElementAssignment.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_background_service/flutter_background_service.dart';
 import 'package:get/get.dart';

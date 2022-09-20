@@ -16,6 +16,7 @@ Da li je bitan redosled u toku dana?
 import 'dart:developer';
 
 import 'package:calendair/Classes/googleClassroom.dart';
+import 'package:calendair/classes/fcmNotification.dart';
 import 'package:calendair/models/AssignmentModel.dart';
 import 'package:calendair/models/ExtracurricularsModel.dart';
 import 'package:calendair/models/UserModel.dart';
@@ -72,6 +73,17 @@ class Firestore {
   Future<String> getUserIfExist(String UID) async {
     final ds = await users.doc(UID).get();
     if (ds.exists) {
+      FCMNotification.unsubscribeFromAllTopic();
+
+      Firestore().getStudentCourses().listen((s) {
+        for (var doc in s.docs) {
+          String courseId = doc.data()["id"];
+          FCMNotification.subscribeToTopic("${courseId}_assignments");
+          FCMNotification.subscribeToTopic("${courseId}_popups");
+          print("SCUBSCRIBED ON${courseId}_assignments");
+        }
+      });
+
       return ds["type"];
     }
     return "";
@@ -109,6 +121,12 @@ class Firestore {
               as Map<String, dynamic>)["students"] ??
           []
     });
+    FCMNotification.sendTopicMessage(
+        channel: "${classId}_popups",
+        title: "Popup added",
+        body: "${ua.currentUser!.displayName} added $title");
+
+    print("${classId}_popups");
   }
 
   Future<void> addReminderStudent(

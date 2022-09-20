@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import 'Classes/scheduleController.dart';
+import 'classes/scheduleLists.dart';
 
 class ExtracurricularButton extends StatefulWidget {
   final String text;
@@ -20,6 +21,7 @@ class ExtracurricularButton extends StatefulWidget {
 class _ExtracurricularButtonState extends State<ExtracurricularButton> {
   final extb = Get.find<ExtButton>();
   final sc = Get.find<ScheduleCintroller>();
+  final scheduleLists = Get.find<ScheduleLists>();
   @override
   Widget build(BuildContext context) {
     return InkWell(
@@ -28,8 +30,9 @@ class _ExtracurricularButtonState extends State<ExtracurricularButton> {
           if (widget.index == extb.breakdayIndex.value) {
             extb.breakdayIndex.value = -1;
           } else {
-            if (sc.scheduleElements.value[widget.index].isEmpty &&
-                sc.scheduleElements.value[widget.index + 7].isEmpty) {
+            if (scheduleLists.scheduleElements.value[widget.index].isEmpty &&
+                scheduleLists
+                    .scheduleElements.value[widget.index + 7].isEmpty) {
               extb.breakdayIndex.value = widget.index;
             } else {
               Get.snackbar(

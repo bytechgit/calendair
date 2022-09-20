@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:calendair/classes/LocalDatabase.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -13,7 +14,7 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
 
 class FCMNotification {
   static final FCMNotification _instance = FCMNotification._internal();
-
+  static LocalDatabase localDB = LocalDatabase();
   late AndroidNotificationChannel channel;
   late FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin;
   static String? _token;
@@ -31,19 +32,26 @@ class FCMNotification {
 
     _getFCMToken().then((token) async {
       print(_token);
-      await subscribeToTopic("545599618019_assignments");
+      // await subscribeToTopic("545599618019_assignments");
       //sendDeviceMessage(token: _token, body: "body", title: "title");
-      await sendTopicMessage(
-          channel: "545599618019_assignments", title: "title", body: "body");
+      //await sendTopicMessage(
+      //  channel: "545599618019_assignments", title: "title", body: "body");
     });
   }
 
   static subscribeToTopic(String channel) async {
     await FirebaseMessaging.instance.subscribeToTopic(channel);
+    localDB.insertTopic(channel);
   }
 
   static unsubscribeFromTopic(String channel) async {
     await FirebaseMessaging.instance.unsubscribeFromTopic(channel);
+  }
+
+  static unsubscribeFromAllTopic() async {
+    for (var el in (await localDB.getTopics())) {
+      unsubscribeFromTopic(el);
+    }
   }
 
   void _listenFCM() {

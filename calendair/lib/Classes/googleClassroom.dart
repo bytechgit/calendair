@@ -1,7 +1,6 @@
 import 'dart:developer';
 import 'package:calendair/Classes/Authentication.dart';
 import 'package:calendair/models/AssignmentModel.dart';
-import 'package:calendair/models/ScheduleElementModel.dart';
 import 'package:calendair/popUps.dart';
 import 'package:get/get.dart';
 import 'package:googleapis/classroom/v1.dart';

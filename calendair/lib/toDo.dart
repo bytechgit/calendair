@@ -1,4 +1,4 @@
-import 'package:calendair/models/ScheduleElementModel.dart';
+import 'package:calendair/models/schedule/scheduleElementAssignment.dart';
 import 'package:calendair/settings.dart';
 import 'package:calendair/toDoCheck.dart';
 import 'package:flutter/material.dart';
@@ -7,6 +7,7 @@ import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'bottomNavBar.dart';
 import 'Classes/scheduleController.dart';
+import 'classes/scheduleLists.dart';
 import 'dashboard.dart';
 import 'models/nbar.dart';
 
@@ -38,6 +39,7 @@ class _ToDoState extends State<ToDo> {
   }
 
   final sc = Get.find<ScheduleCintroller>();
+  final scheduleLists = Get.find<ScheduleLists>();
   @override
   Widget build(BuildContext context) {
     final width = MediaQuery.of(context).size.width;
@@ -130,7 +132,8 @@ class _ToDoState extends State<ToDo> {
                       child: Obx(
                         () => Column(
                           children: [
-                            ...sc.scheduleElements.value[widget.index]
+                            ...scheduleLists
+                                .scheduleElements.value[widget.index]
                                 .map((el) {
                               if (el is ScheduleElementAssignment) {
                                 return ToDoCheck(el: el);
