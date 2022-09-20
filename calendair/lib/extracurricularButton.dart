@@ -1,8 +1,8 @@
-import 'package:calendair/Classes/ExtButton.dart';
+import 'package:calendair/classes/ExtButton.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-import 'Classes/scheduleController.dart';
+import 'classes/scheduleController.dart';
 import 'classes/scheduleLists.dart';
 
 class ExtracurricularButton extends StatefulWidget {

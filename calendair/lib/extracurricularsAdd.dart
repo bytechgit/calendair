@@ -1,12 +1,12 @@
-import 'package:calendair/Classes/firestore.dart';
+import 'package:calendair/classes/firestore.dart';
 import 'package:calendair/extracurricularButton.dart';
 import 'package:calendair/models/ExtracurricularsModel.dart';
 import 'package:calendair/settings.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'Classes/googleClassroom.dart';
+import 'classes/googleClassroom.dart';
 import 'bottomNavBar.dart';
-import 'Classes/ExtButton.dart';
+import 'classes/ExtButton.dart';
 import 'dashboard.dart';
 import 'models/nbar.dart';
 

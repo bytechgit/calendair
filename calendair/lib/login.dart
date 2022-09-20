@@ -1,13 +1,13 @@
-import 'package:calendair/Classes/Authentication.dart';
+import 'package:calendair/classes/Authentication.dart';
 import 'package:calendair/registerEnterSchoolCode.dart';
 import 'package:calendair/studentDashboard.dart';
 import 'package:calendair/teacherDashboard.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-import 'Classes/firestore.dart';
-import 'Classes/ExtButton.dart';
-import 'Classes/scheduleController.dart';
+import 'classes/firestore.dart';
+import 'classes/ExtButton.dart';
+import 'classes/scheduleController.dart';
 
 class Login extends StatelessWidget {
   const Login({Key? key}) : super(key: key);

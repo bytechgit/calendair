@@ -1,9 +1,9 @@
 import 'dart:developer';
-import 'package:calendair/Classes/firestore.dart';
+import 'package:calendair/classes/firestore.dart';
 import 'package:calendair/bottomNavBar.dart';
 import 'package:calendair/breakDay.dart';
-import 'package:calendair/Classes.dart';
-import 'package:calendair/Classes/ExtButton.dart';
+import 'package:calendair/classes.dart';
+import 'package:calendair/classes/ExtButton.dart';
 import 'package:calendair/confidenceMeter.dart';
 import 'package:calendair/extracurriculars.dart';
 import 'package:calendair/models/PopUpModel.dart';
@@ -13,7 +13,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:sizer/sizer.dart';
-import 'Classes/googleClassroom.dart';
+import 'classes/googleClassroom.dart';
 import 'dashboard.dart';
 import 'models/nbar.dart';
 

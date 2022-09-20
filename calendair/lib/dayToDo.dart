@@ -1,6 +1,6 @@
 import 'dart:developer';
 
-import 'package:calendair/Classes/background.dart';
+import 'package:calendair/classes/background.dart';
 import 'package:calendair/models/schedule/scheduleElement.dart';
 import 'package:calendair/models/schedule/scheduleElementAssignment.dart';
 import 'package:flutter/material.dart';

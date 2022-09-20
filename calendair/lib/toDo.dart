@@ -6,7 +6,7 @@ import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'bottomNavBar.dart';
-import 'Classes/scheduleController.dart';
+import 'classes/scheduleController.dart';
 import 'classes/scheduleLists.dart';
 import 'dashboard.dart';
 import 'models/nbar.dart';

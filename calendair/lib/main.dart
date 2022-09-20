@@ -1,14 +1,14 @@
-import 'package:calendair/Classes/fcmNotification.dart';
-import 'package:calendair/Classes/navBar.dart';
-import 'package:calendair/Classes/ExtButton.dart';
-import 'package:calendair/Classes/scheduleController.dart';
+import 'package:calendair/classes/fcmNotification.dart';
+import 'package:calendair/classes/navBar.dart';
+import 'package:calendair/classes/ExtButton.dart';
+import 'package:calendair/classes/scheduleController.dart';
 import 'package:calendair/classes/scheduleLists.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:sizer/sizer.dart';
-import 'Classes/googleClassroom.dart';
-import 'Classes/background.dart';
+import 'classes/googleClassroom.dart';
+import 'classes/background.dart';
 import 'loginRegister.dart';
 
 Future<void> main() async {
