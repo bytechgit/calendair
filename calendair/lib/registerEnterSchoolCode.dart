@@ -2,8 +2,6 @@ import 'package:calendair/registerGoogle.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-import 'login.dart';
-
 class RegisterEnterSchoolCode extends StatefulWidget {
   const RegisterEnterSchoolCode({Key? key}) : super(key: key);
 
@@ -134,7 +132,8 @@ class _RegisterEnterSchoolCodeState extends State<RegisterEnterSchoolCode> {
                       child: ElevatedButton(
                         style: ElevatedButton.styleFrom(
                             shadowColor: const Color.fromRGBO(247, 247, 247, 1),
-                            primary: const Color.fromRGBO(94, 159, 197, 1),
+                            backgroundColor:
+                                const Color.fromRGBO(94, 159, 197, 1),
                             elevation: 0,
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(18.0),

@@ -1,9 +1,9 @@
+import 'dart:developer';
+
 import 'package:calendair/models/schedule/scheduleElement.dart';
 import 'package:calendair/models/schedule/scheduleElementAssignment.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
-
 import '../../classes/firestore.dart';
 
 class ScheduleElementAssignmentMain extends ScheduleElement {
@@ -11,11 +11,16 @@ class ScheduleElementAssignmentMain extends ScheduleElement {
   DateTime dueDate;
   List<int> times;
   List<bool> finishedList;
+  List<int> remainingTimes;
   List<int> indexes;
   String note;
 
   Future<void> addDates() async {
-    timesList ??= await Firestore().getTimes();
+    if (scheduleLists.timesList == null) {
+      print("null");
+    }
+    scheduleLists.timesList ??= await Firestore().getTimes();
+
     int time = this.time;
     DateTime date = DateUtils.dateOnly(DateTime.now());
     DateTime minDate = DateUtils.dateOnly(DateTime.now());
@@ -24,6 +29,7 @@ class ScheduleElementAssignmentMain extends ScheduleElement {
     while (time > 0) {
       int decrTime = time > 45 ? 30 : time;
       times.add(decrTime);
+      remainingTimes.add(decrTime);
       time -= decrTime;
       minTime = 10000;
       minDate = DateUtils.dateOnly(DateTime.now());
@@ -33,7 +39,9 @@ class ScheduleElementAssignmentMain extends ScheduleElement {
       //inicijalno na 1000 jer se stavlj na kraj dana
       while (date.compareTo(dueDate) <= 0) {
         if (date.weekday - 1 != breakday.breakdayIndex.value) {
-          curTime = timesList?[DateUtils.dateOnly(date).toString()] ?? 0;
+          curTime =
+              scheduleLists.timesList?[DateUtils.dateOnly(date).toString()] ??
+                  0;
           if (curTime < minTime) {
             minTime = curTime;
             minDate = date;
@@ -42,16 +50,19 @@ class ScheduleElementAssignmentMain extends ScheduleElement {
         date = date.add(const Duration(days: 1));
       }
       dates.add(minDate);
-      timesList?[DateUtils.dateOnly(minDate).toString()] =
-          (timesList?[DateUtils.dateOnly(minDate).toString()] ?? 0) + decrTime;
+      scheduleLists.timesList?[DateUtils.dateOnly(minDate).toString()] =
+          (scheduleLists.timesList?[DateUtils.dateOnly(minDate).toString()] ??
+                  0) +
+              decrTime;
     }
     FirebaseFirestore.instance.collection("Schedule").doc(docId).update({
       "dates": dates,
       "indexes": indexes,
       "finishedList": finishedList,
-      "times": times
+      "times": times,
+      "remainingTimes": remainingTimes
     });
-    Firestore().setTimes(timesList!);
+    await Firestore().setTimes(scheduleLists.timesList!);
   }
 
   ScheduleElementAssignmentMain(
@@ -61,7 +72,8 @@ class ScheduleElementAssignmentMain extends ScheduleElement {
       required this.finishedList,
       required this.indexes,
       required this.note,
-      required this.times})
+      required this.times,
+      required this.remainingTimes})
       : super(
             title: title,
             docId: docId,
@@ -117,6 +129,9 @@ class ScheduleElementAssignmentMain extends ScheduleElement {
             .toList(),
         finishedList = ((map["finishedList"] ?? []) as List<dynamic>)
             .map((e) => e as bool)
+            .toList(),
+        remainingTimes = ((map["remainingTimes"] ?? []) as List<dynamic>)
+            .map((e) => e as int)
             .toList(),
         indexes = ((map["indexes"] ?? []) as List<dynamic>)
             .map((e) => e as int)

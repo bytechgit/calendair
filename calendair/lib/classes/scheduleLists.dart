@@ -8,6 +8,7 @@ import 'package:get/get.dart';
 import '../models/schedule/scheduleElementAssignment.dart';
 
 class ScheduleLists extends GetxController {
+  Map<String, dynamic>? timesList;
   final scheduleElements = Rx<List<List<ScheduleElement>>>(
       [[], [], [], [], [], [], [], [], [], [], [], [], [], []]);
   final totalTimes = Rx<List<int>>([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]);

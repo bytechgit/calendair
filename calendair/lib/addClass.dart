@@ -4,14 +4,14 @@ import 'package:get/get.dart';
 
 import 'classes/googleClassroom.dart';
 
-class addClass extends StatefulWidget {
-  const addClass({Key? key}) : super(key: key);
+class AddClass extends StatefulWidget {
+  const AddClass({Key? key}) : super(key: key);
 
   @override
-  State<addClass> createState() => _addClassState();
+  State<AddClass> createState() => _AddClassState();
 }
 
-class _addClassState extends State<addClass> {
+class _AddClassState extends State<AddClass> {
   final gc = Get.find<GoogleClassroom>();
   final codeController = TextEditingController();
   @override
@@ -121,7 +121,8 @@ class _addClassState extends State<addClass> {
                       child: ElevatedButton(
                         style: ElevatedButton.styleFrom(
                           shadowColor: const Color.fromRGBO(247, 247, 247, 1),
-                          primary: const Color.fromRGBO(94, 159, 197, 1),
+                          backgroundColor:
+                              const Color.fromRGBO(94, 159, 197, 1),
                           elevation: 0,
                           shape: const CircleBorder(),
                         ),
@@ -130,14 +131,14 @@ class _addClassState extends State<addClass> {
                               await gc.enrolToCourse(codeController.text);
                           if (name != "" && name != "Error") {
                             Get.to(
-                              joinNotification(name: name),
+                              JoinNotification(name: name),
                               transition: Transition.circularReveal,
                               duration: const Duration(milliseconds: 800),
                             );
                           }
                         },
 
-                        child: Icon(
+                        child: const Icon(
                           Icons.arrow_forward_ios_rounded,
                           color: Colors.black,
                         ), // <-- Text

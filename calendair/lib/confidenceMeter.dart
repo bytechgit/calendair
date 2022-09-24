@@ -7,11 +7,11 @@ import 'package:syncfusion_flutter_core/theme.dart';
 import 'package:syncfusion_flutter_sliders/sliders.dart';
 
 class ConfidenceMeter extends StatefulWidget {
-  String id;
-  String message;
-  String question;
+  final String id;
+  final String message;
+  final String question;
 
-  ConfidenceMeter(
+  const ConfidenceMeter(
       {Key? key,
       required this.id,
       required this.message,
@@ -80,7 +80,7 @@ class _ConfidenceMeterState extends State<ConfidenceMeter> {
                   child: ElevatedButton(
                     style: ElevatedButton.styleFrom(
                         shadowColor: const Color.fromRGBO(247, 247, 247, 1),
-                        primary: const Color.fromRGBO(94, 159, 197, 1),
+                        backgroundColor: const Color.fromRGBO(94, 159, 197, 1),
                         elevation: 0,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(10.0),
@@ -115,7 +115,7 @@ class _ConfidenceMeterState extends State<ConfidenceMeter> {
                   Column(
                     children: [
                       SizedBox(
-                        width: width * 0.55,
+                        //width: width * 0.55,
                         child: FittedBox(
                           fit: BoxFit.scaleDown,
                           child: Text(
@@ -133,13 +133,14 @@ class _ConfidenceMeterState extends State<ConfidenceMeter> {
                         width: width * 0.5,
                         child: SfSliderTheme(
                           data: SfSliderThemeData(
-                            activeTrackHeight: 12,
-                            inactiveTrackHeight: 12,
-                          ),
+                              activeTrackHeight: 12,
+                              inactiveTrackHeight: 12,
+                              inactiveTrackColor:
+                                  Color.fromARGB(255, 147, 192, 220)),
                           child: SfSlider(
                             min: 0.0,
                             max: 100.0,
-                            interval: 49,
+                            interval: 50,
                             showDividers: true,
                             value: _value,
                             dividerShape: DividerShape(),
@@ -167,7 +168,8 @@ class _ConfidenceMeterState extends State<ConfidenceMeter> {
                     child: ElevatedButton(
                       style: ElevatedButton.styleFrom(
                           shadowColor: const Color.fromRGBO(247, 247, 247, 1),
-                          primary: const Color.fromRGBO(94, 159, 197, 1),
+                          backgroundColor:
+                              const Color.fromRGBO(94, 159, 197, 1),
                           elevation: 0,
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(10.0),
@@ -231,6 +233,6 @@ class DividerShape extends SfDividerShape {
           ..style = PaintingStyle.fill
           ..color = isActive
               ? themeData.activeTrackColor!
-              : const Color.fromRGBO(202, 225, 239, 1));
+              : const Color.fromARGB(255, 147, 192, 220));
   }
 }

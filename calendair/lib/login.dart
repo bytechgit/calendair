@@ -1,17 +1,15 @@
 import 'package:calendair/classes/Authentication.dart';
 import 'package:calendair/registerEnterSchoolCode.dart';
-import 'package:calendair/studentDashboard.dart';
+import 'package:calendair/StudentDashboard.dart';
 import 'package:calendair/teacherDashboard.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-
 import 'classes/firestore.dart';
 import 'classes/ExtButton.dart';
 import 'classes/scheduleController.dart';
 
 class Login extends StatelessWidget {
   const Login({Key? key}) : super(key: key);
-
   @override
   Widget build(BuildContext context) {
     final extb = Get.find<ExtButton>();
@@ -72,7 +70,7 @@ class Login extends StatelessWidget {
                       child: ElevatedButton.icon(
                         style: ElevatedButton.styleFrom(
                             shadowColor: const Color.fromRGBO(247, 247, 247, 1),
-                            primary: Colors.white,
+                            backgroundColor: Colors.white,
                             elevation: 0,
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(25.0),
@@ -82,21 +80,21 @@ class Login extends StatelessWidget {
                           if (result == "student") {
                             extb.breakdayIndex.value =
                                 await Firestore().getBreakday();
-
                             sc.listen(u.currentUser!.uid);
-
                             Get.to(
-                              const studentDashboard(),
+                              const StudentDashboard(),
                               transition: Transition.circularReveal,
                               duration: const Duration(milliseconds: 800),
                             );
                           } else if (result == "teacher") {
+                            sc.streamSubscription?.cancel();
                             Get.to(
                               const TeacherDashboard(),
                               transition: Transition.circularReveal,
                               duration: const Duration(milliseconds: 800),
                             );
                           } else if (result == "") {
+                            sc.streamSubscription?.cancel();
                             Get.snackbar('Register', 'Please register');
                             Get.to(
                               const RegisterEnterSchoolCode(),
@@ -105,7 +103,6 @@ class Login extends StatelessWidget {
                             );
                           }
                         },
-
                         icon: Image.asset(
                           'assets/images/google.png',
                           width: 24,

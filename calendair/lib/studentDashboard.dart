@@ -3,7 +3,6 @@ import 'package:calendair/classes/firestore.dart';
 import 'package:calendair/bottomNavBar.dart';
 import 'package:calendair/breakDay.dart';
 import 'package:calendair/classes.dart';
-import 'package:calendair/classes/ExtButton.dart';
 import 'package:calendair/confidenceMeter.dart';
 import 'package:calendair/extracurriculars.dart';
 import 'package:calendair/models/PopUpModel.dart';
@@ -17,14 +16,14 @@ import 'classes/googleClassroom.dart';
 import 'dashboard.dart';
 import 'models/nbar.dart';
 
-class studentDashboard extends StatefulWidget {
-  const studentDashboard({Key? key}) : super(key: key);
+class StudentDashboard extends StatefulWidget {
+  const StudentDashboard({Key? key}) : super(key: key);
 
   @override
-  State<studentDashboard> createState() => _studentDashboardState();
+  State<StudentDashboard> createState() => _StudentDashboardState();
 }
 
-class _studentDashboardState extends State<studentDashboard> {
+class _StudentDashboardState extends State<StudentDashboard> {
   bool open = true;
   final gc = Get.find<GoogleClassroom>();
 
@@ -47,7 +46,7 @@ class _studentDashboardState extends State<studentDashboard> {
               slika: 'calendar',
               onclick: () {
                 Get.to(
-                  dashboard(),
+                  const Dashboard(),
                   transition: Transition.circularReveal,
                   duration: const Duration(milliseconds: 800),
                 );
@@ -105,14 +104,15 @@ class _studentDashboardState extends State<studentDashboard> {
                           style: ElevatedButton.styleFrom(
                               shadowColor:
                                   const Color.fromRGBO(247, 247, 247, 1),
-                              primary: const Color.fromRGBO(94, 159, 197, 1),
+                              backgroundColor:
+                                  const Color.fromRGBO(94, 159, 197, 1),
                               elevation: 0,
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(10.0),
                               )),
                           onPressed: () {
                             Get.to(
-                              const classes(),
+                              const Classes(),
                               transition: Transition.circularReveal,
                               duration: const Duration(milliseconds: 800),
                             );
@@ -142,7 +142,8 @@ class _studentDashboardState extends State<studentDashboard> {
                           style: ElevatedButton.styleFrom(
                               shadowColor:
                                   const Color.fromRGBO(247, 247, 247, 1),
-                              primary: const Color.fromRGBO(94, 159, 197, 1),
+                              backgroundColor:
+                                  const Color.fromRGBO(94, 159, 197, 1),
                               elevation: 0,
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(10.0),
@@ -179,7 +180,8 @@ class _studentDashboardState extends State<studentDashboard> {
                           style: ElevatedButton.styleFrom(
                               shadowColor:
                                   const Color.fromRGBO(247, 247, 247, 1),
-                              primary: const Color.fromRGBO(94, 159, 197, 1),
+                              backgroundColor:
+                                  const Color.fromRGBO(94, 159, 197, 1),
                               elevation: 0,
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(10.0),

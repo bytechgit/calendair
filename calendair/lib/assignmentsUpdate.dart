@@ -204,7 +204,7 @@ class _AssignmentsUpdateState extends State<AssignmentsUpdate> {
                 child: ElevatedButton(
                   style: ElevatedButton.styleFrom(
                       shadowColor: const Color.fromRGBO(247, 247, 247, 1),
-                      primary: const Color.fromRGBO(94, 159, 197, 1),
+                      backgroundColor: const Color.fromRGBO(94, 159, 197, 1),
                       elevation: 0,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(10.0),

@@ -1,4 +1,3 @@
-import 'package:calendair/popUpsConfidenceMeter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
@@ -6,8 +5,8 @@ import 'package:syncfusion_flutter_core/theme.dart';
 import 'package:syncfusion_flutter_sliders/sliders.dart';
 
 class Results extends StatefulWidget {
-  double rez;
-  Results({Key? key, required this.rez}) : super(key: key);
+  final double rez;
+  const Results({Key? key, required this.rez}) : super(key: key);
 
   @override
   State<Results> createState() => _ResultsState();
@@ -34,16 +33,14 @@ class _ResultsState extends State<Results> {
     super.dispose();
   }
 
-  double _value = 21.0;
   @override
   Widget build(BuildContext context) {
-    print(widget.rez);
     final width = MediaQuery.of(context).size.width;
     return Scaffold(
       resizeToAvoidBottomInset: false,
       appBar: AppBar(
         elevation: 0,
-        backgroundColor: Color.fromRGBO(247, 247, 247, 1),
+        backgroundColor: const Color.fromRGBO(247, 247, 247, 1),
         leading: IconButton(
           icon: const Icon(
             Icons.arrow_back_ios,
@@ -66,7 +63,7 @@ class _ResultsState extends State<Results> {
                 child: ElevatedButton(
                   style: ElevatedButton.styleFrom(
                       shadowColor: const Color.fromRGBO(247, 247, 247, 1),
-                      primary: const Color.fromRGBO(94, 159, 197, 1),
+                      backgroundColor: const Color.fromRGBO(94, 159, 197, 1),
                       elevation: 0,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(10.0),
@@ -174,6 +171,6 @@ class DividerShape extends SfDividerShape {
           ..style = PaintingStyle.fill
           ..color = isActive
               ? themeData.activeTrackColor!
-              : Color.fromRGBO(202, 225, 239, 1));
+              : const Color.fromRGBO(202, 225, 239, 1));
   }
 }

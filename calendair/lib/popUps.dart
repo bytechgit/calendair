@@ -8,7 +8,6 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:sizer/sizer.dart';
-
 import 'classes/googleClassroom.dart';
 import 'bottomNavBar.dart';
 import 'models/nbar.dart';
@@ -159,7 +158,8 @@ class _PopUpsState extends State<PopUps> {
                     child: ElevatedButton(
                       style: ElevatedButton.styleFrom(
                           shadowColor: const Color.fromRGBO(247, 247, 247, 1),
-                          primary: const Color.fromRGBO(94, 159, 197, 1),
+                          backgroundColor:
+                              const Color.fromRGBO(94, 159, 197, 1),
                           elevation: 0,
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(10.0),
@@ -192,7 +192,8 @@ class _PopUpsState extends State<PopUps> {
                     child: ElevatedButton(
                       style: ElevatedButton.styleFrom(
                           shadowColor: const Color.fromRGBO(247, 247, 247, 1),
-                          primary: const Color.fromRGBO(94, 159, 197, 1),
+                          backgroundColor:
+                              const Color.fromRGBO(94, 159, 197, 1),
                           elevation: 0,
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(10.0),

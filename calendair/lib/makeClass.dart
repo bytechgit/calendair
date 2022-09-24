@@ -10,7 +10,6 @@ import 'package:form_field_validator/form_field_validator.dart';
 
 class MakeClass extends StatefulWidget {
   const MakeClass({Key? key}) : super(key: key);
-
   @override
   State<MakeClass> createState() => _MakeClassState();
 }
@@ -19,6 +18,7 @@ class _MakeClassState extends State<MakeClass> {
   GlobalKey<FormState> formkey = GlobalKey<FormState>();
   final periodController = TextEditingController();
   final nameController = TextEditingController();
+  @override
   Widget build(BuildContext context) {
     final gc = Get.find<GoogleClassroom>();
 
@@ -166,7 +166,8 @@ class _MakeClassState extends State<MakeClass> {
                     child: ElevatedButton(
                       style: ElevatedButton.styleFrom(
                           shadowColor: const Color.fromRGBO(247, 247, 247, 1),
-                          primary: const Color.fromRGBO(94, 159, 197, 1),
+                          backgroundColor:
+                              const Color.fromRGBO(94, 159, 197, 1),
                           elevation: 0,
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(15.0),
@@ -239,7 +240,7 @@ class _MakeClassState extends State<MakeClass> {
                                                                 Get.off(
                                                                   GeneratingClassCode(
                                                                       futureCode: Future.delayed(
-                                                                          Duration(
+                                                                          const Duration(
                                                                               seconds: 1),
                                                                           () {
                                                                     return e.enrollmentCode ??
@@ -265,7 +266,7 @@ class _MakeClassState extends State<MakeClass> {
                                       ),
                                     );
                                   } else {
-                                    return Center(
+                                    return const Center(
                                       child: CircularProgressIndicator(),
                                     );
                                   }
@@ -296,7 +297,7 @@ class _MakeClassState extends State<MakeClass> {
                     width: 60,
                     height: 60,
                     decoration: const BoxDecoration(
-                      color: const Color.fromRGBO(94, 159, 197, 1),
+                      color: Color.fromRGBO(94, 159, 197, 1),
                       shape: BoxShape.circle,
                     ),
                     child: const Icon(Icons.arrow_forward_ios),

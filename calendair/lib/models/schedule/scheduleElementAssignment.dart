@@ -18,7 +18,8 @@ class ScheduleElementAssignment extends ScheduleElementAssignmentMain {
             times: m.times,
             finishedList: m.finishedList,
             note: m.note,
-            indexes: m.indexes) {
+            indexes: m.indexes,
+            remainingTimes: m.remainingTimes) {
     index = m.indexes[i];
     finished = m.finishedList[i];
     date = m.dates[i];
@@ -79,13 +80,16 @@ class ScheduleElementAssignment extends ScheduleElementAssignmentMain {
   }
 
   @override
-  void finish(bool f) {
+  void finish(bool f, {int? time}) {
     finished = f;
     finishedList[i] = f;
-    FirebaseFirestore.instance
-        .collection('Schedule')
-        .doc(docId)
-        .update({"finishedList": finishedList});
+    if (time != null) {
+      remainingTimes[i] = time;
+    } else {
+      remainingTimes[i] = f ? 0 : this.time;
+    }
+    FirebaseFirestore.instance.collection('Schedule').doc(docId).update(
+        {"finishedList": finishedList, "remainingTimes": remainingTimes});
   }
 
   @override

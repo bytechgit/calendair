@@ -12,14 +12,14 @@ import 'bottomNavBar.dart';
 import 'dashboard.dart';
 import 'models/nbar.dart';
 
-class classes extends StatefulWidget {
-  const classes({Key? key}) : super(key: key);
+class Classes extends StatefulWidget {
+  const Classes({Key? key}) : super(key: key);
 
   @override
-  State<classes> createState() => _classesState();
+  State<Classes> createState() => _ClassesState();
 }
 
-class _classesState extends State<classes> {
+class _ClassesState extends State<Classes> {
   final gc = Get.find<GoogleClassroom>();
   @override
   Widget build(BuildContext context) {
@@ -42,7 +42,7 @@ class _classesState extends State<classes> {
               slika: 'calendar',
               onclick: () {
                 Get.off(
-                  dashboard(),
+                  const Dashboard(),
                   transition: Transition.circularReveal,
                   duration: const Duration(milliseconds: 800),
                 );
@@ -51,13 +51,13 @@ class _classesState extends State<classes> {
               slika: 'home',
               onclick: () {
                 Get.until((route) =>
-                    (route as GetPageRoute).routeName == '/studentDashboard');
+                    (route as GetPageRoute).routeName == '/StudentDashboard');
               }),
           NBar(
               slika: 'settings',
               onclick: () {
                 Get.off(
-                  s.Settings(),
+                  const s.Settings(),
                   transition: Transition.circularReveal,
                   duration: const Duration(milliseconds: 800),
                 );
@@ -163,7 +163,7 @@ class _classesState extends State<classes> {
                                                   ),
                                                   onTap: () {
                                                     Get.to(
-                                                      rate(
+                                                      Rate(
                                                         name: cc.name,
                                                         back3: false,
                                                       ),
@@ -189,7 +189,7 @@ class _classesState extends State<classes> {
                                   ]),
                                 );
                               } else {
-                                return Center(
+                                return const Center(
                                   child: CircularProgressIndicator(),
                                 );
                               }
@@ -205,7 +205,7 @@ class _classesState extends State<classes> {
                                 style: ElevatedButton.styleFrom(
                                     shadowColor:
                                         const Color.fromRGBO(247, 247, 247, 1),
-                                    primary:
+                                    backgroundColor:
                                         const Color.fromRGBO(94, 159, 197, 1),
                                     elevation: 0,
                                     shape: RoundedRectangleBorder(
@@ -213,7 +213,7 @@ class _classesState extends State<classes> {
                                     )),
                                 onPressed: () {
                                   Get.to(
-                                    const addClass(),
+                                    const AddClass(),
                                     transition: Transition.circularReveal,
                                     duration: const Duration(milliseconds: 800),
                                   );
@@ -233,7 +233,7 @@ class _classesState extends State<classes> {
                           ),
                         ),
                         Transform.translate(
-                          offset: Offset(-15, 20),
+                          offset: const Offset(-15, 20),
                           child: Align(
                             alignment: Alignment.bottomLeft,
                             child: SizedBox(

@@ -138,7 +138,7 @@ class _PopUpsAddState extends State<PopUpsAdd> {
                   DatePicker.showDatePicker(context,
                       showTitleActions: true,
                       minTime: DateTime.now(),
-                      maxTime: DateTime.now().add(Duration(days: 600)),
+                      maxTime: DateTime.now().add(const Duration(days: 600)),
                       theme: const DatePickerTheme(
                           headerColor: Color.fromARGB(255, 176, 176, 176),
                           backgroundColor: Color.fromRGBO(94, 159, 197, 1),
@@ -191,7 +191,7 @@ class _PopUpsAddState extends State<PopUpsAdd> {
                 child: ElevatedButton(
                   style: ElevatedButton.styleFrom(
                       shadowColor: const Color.fromRGBO(247, 247, 247, 1),
-                      primary: const Color.fromRGBO(94, 159, 197, 1),
+                      backgroundColor: const Color.fromRGBO(94, 159, 197, 1),
                       elevation: 0,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(10.0),
@@ -226,7 +226,7 @@ class _PopUpsAddState extends State<PopUpsAdd> {
                 child: ElevatedButton(
                   style: ElevatedButton.styleFrom(
                       shadowColor: const Color.fromRGBO(247, 247, 247, 1),
-                      primary: const Color.fromRGBO(94, 159, 197, 1),
+                      backgroundColor: const Color.fromRGBO(94, 159, 197, 1),
                       elevation: 0,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(10.0),

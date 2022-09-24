@@ -1,11 +1,6 @@
 import 'package:calendair/models/CustomCourse.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/src/foundation/key.dart';
-import 'package:flutter/src/widgets/framework.dart';
 import 'package:get/get.dart';
-import 'package:googleapis/classroom/v1.dart';
-
 import 'classes/googleClassroom.dart';
 import 'bottomNavBar.dart';
 import 'models/nbar.dart';
@@ -133,7 +128,7 @@ class _PopUpsConfidenceMeterState extends State<PopUpsConfidenceMeter> {
                 child: ElevatedButton(
                   style: ElevatedButton.styleFrom(
                       shadowColor: const Color.fromRGBO(247, 247, 247, 1),
-                      primary: const Color.fromRGBO(94, 159, 197, 1),
+                      backgroundColor: const Color.fromRGBO(94, 159, 197, 1),
                       elevation: 0,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(10.0),
@@ -142,7 +137,6 @@ class _PopUpsConfidenceMeterState extends State<PopUpsConfidenceMeter> {
                     gc.confidence = con.text;
                     Get.back();
                   },
-
                   child: const Text(
                     'Update',
                     textAlign: TextAlign.center,

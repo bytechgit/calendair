@@ -33,7 +33,8 @@ class Firestore {
   static final Firestore _singleton = Firestore._internal();
   final ua = UserAuthentication();
   final gc = Get.find<GoogleClassroom>();
-
+  String? userName;
+  String? userImgUrl;
   factory Firestore() {
     return _singleton;
   }
@@ -70,12 +71,21 @@ class Firestore {
     });
   }
 
+  void updateUser({required String name, String? img}) {
+    userName = name;
+    userImgUrl = img ?? userImgUrl;
+    users
+        .doc(ua.currentUser!.uid)
+        .update({"name": userName, "picture": userImgUrl});
+  }
+
   Future<String> getUserIfExist(String UID) async {
     final ds = await users.doc(UID).get();
     if (ds.exists) {
+      userName = ds["name"];
+      userImgUrl = ds["picture"];
       if (ds["type"] == "student") {
         FCMNotification.unsubscribeFromAllTopic();
-
         Firestore().getStudentCourses().listen((s) {
           for (var doc in s.docs) {
             String courseId = doc.data()["id"];
@@ -99,8 +109,8 @@ class Firestore {
     return ds.data()!["times"];
   }
 
-  void setTimes(Map<String, dynamic> t) {
-    FirebaseFirestore.instance
+  Future<void> setTimes(Map<String, dynamic> t) async {
+    await FirebaseFirestore.instance
         .collection("Users")
         .doc(ua.currentUser!.uid)
         .update({"times": t});

@@ -1,10 +1,7 @@
 import 'package:calendair/classes/Authentication.dart';
 import 'package:calendair/registerWhatUser.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/src/foundation/key.dart';
-import 'package:flutter/src/widgets/framework.dart';
 import 'package:get/get.dart';
-
 import 'classes/googleClassroom.dart';
 
 class RegisterGoogle extends StatelessWidget {
@@ -69,7 +66,7 @@ class RegisterGoogle extends StatelessWidget {
                       child: ElevatedButton.icon(
                         style: ElevatedButton.styleFrom(
                             shadowColor: const Color.fromRGBO(247, 247, 247, 1),
-                            primary: Colors.white,
+                            backgroundColor: Colors.white,
                             elevation: 0,
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(25.0),
@@ -78,7 +75,6 @@ class RegisterGoogle extends StatelessWidget {
                           await u.signInwithGoogle();
                           // gc.getCourseListTeacher();
                         },
-
                         icon: Image.asset(
                           'assets/images/google.png',
                           width: 24,
@@ -98,7 +94,8 @@ class RegisterGoogle extends StatelessWidget {
                     child: ElevatedButton(
                       style: ElevatedButton.styleFrom(
                           shadowColor: const Color.fromRGBO(247, 247, 247, 1),
-                          primary: const Color.fromRGBO(94, 159, 197, 1),
+                          backgroundColor:
+                              const Color.fromRGBO(94, 159, 197, 1),
                           elevation: 0,
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(18.0),

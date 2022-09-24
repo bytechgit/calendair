@@ -1,19 +1,9 @@
-import 'dart:developer';
-
 import 'package:calendair/accountSettings.dart';
 import 'package:calendair/notifications.dart';
-import 'package:calendair/rate.dart';
-import 'package:calendair/studentDashboard.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/src/foundation/key.dart';
-import 'package:flutter/src/widgets/framework.dart';
 import 'package:get/get.dart';
-import 'package:get/get_navigation/src/routes/transitions_type.dart';
-
 import 'classes/googleClassroom.dart';
-import 'addClass.dart';
 import 'bottomNavBar.dart';
-import 'calendar.dart';
 import 'dashboard.dart';
 import 'models/nbar.dart';
 
@@ -49,7 +39,7 @@ class _SettingsState extends State<Settings> {
               slika: 'calendar',
               onclick: () {
                 Get.off(
-                  dashboard(),
+                  const Dashboard(),
                   transition: Transition.circularReveal,
                   duration: const Duration(milliseconds: 800),
                 );
@@ -57,14 +47,14 @@ class _SettingsState extends State<Settings> {
           NBar(
               slika: 'home',
               onclick: () {
-                Get.until((route) =>
-                    (route as GetPageRoute).routeName == '/studentDashboard');
+                Get.until(
+                    (route) => route.settings.name == '/StudentDashboard');
               }),
           NBar(
               slika: 'settings',
               onclick: () {
                 Get.off(
-                  Settings(),
+                  const Settings(),
                   transition: Transition.circularReveal,
                   duration: const Duration(milliseconds: 800),
                 );
@@ -110,7 +100,7 @@ class _SettingsState extends State<Settings> {
                 child: Container(
                   width: width * 0.75,
                   decoration: const BoxDecoration(
-                      color: const Color.fromRGBO(93, 159, 196, 1),
+                      color: Color.fromRGBO(93, 159, 196, 1),
                       borderRadius: BorderRadius.only(
                           topRight: Radius.circular(30),
                           bottomRight: Radius.circular(30))),
@@ -166,7 +156,7 @@ class _SettingsState extends State<Settings> {
                   ),
                 ),
               ),
-              Expanded(child: SizedBox()),
+              const Expanded(child: SizedBox()),
               Image.asset(
                 'assets/images/logoSettings.png',
                 width: width * 0.5,

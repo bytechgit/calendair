@@ -75,7 +75,7 @@ class Background {
       ),
     );
 
-    //service.startService();
+    service.startService();
   }
 
 // to ensure this is executed
@@ -107,7 +107,6 @@ class Background {
         service.setAsBackgroundService();
       });
       service.on('addAssignment').listen((event) {
-        print("sss");
         if (assignment.value == null) {
           assignment.value =
               ScheduleElementAssignment.fromMap(event!, event["docId"]);
@@ -126,7 +125,7 @@ class Background {
         if (t != null) {
           t!.cancel();
         }
-        t = Timer.periodic(Duration(seconds: 1), (timer) async {
+        t = Timer.periodic(const Duration(seconds: 1), (timer) async {
           a.timesec--;
           if (a.timesec == 0) {
             a.finishFromBackend(true);

@@ -1,10 +1,6 @@
-import 'dart:developer';
-
-import 'package:calendair/breakDay.dart';
 import 'package:calendair/calendarAssignment.dart';
 import 'package:calendair/classes/ExtButton.dart';
 import 'package:calendair/classes/scheduleController.dart';
-import 'package:calendair/models/Assigments.dart';
 import 'package:calendair/addReminderStudent.dart';
 import 'package:calendair/toDo.dart';
 import 'package:drag_and_drop_lists/drag_and_drop_lists.dart';
@@ -107,11 +103,11 @@ class _CalendarState extends State<Calendar> {
   @override
   Widget build(BuildContext context) {
     final width = MediaQuery.of(context).size.width;
-    return Scaffold(
-      resizeToAvoidBottomInset: false,
-      appBar: AppBar(
-        flexibleSpace: Center(
-          child: SafeArea(
+    return SafeArea(
+      child: Scaffold(
+        resizeToAvoidBottomInset: false,
+        appBar: AppBar(
+          flexibleSpace: Center(
             child: Column(
               children: [
                 const Expanded(
@@ -145,7 +141,6 @@ class _CalendarState extends State<Calendar> {
                               duration: const Duration(milliseconds: 800),
                             )!
                                 .then((value) {
-                              print(Get.currentRoute);
                               if (Get.currentRoute == "/Calendar") {
                                 SystemChrome.setPreferredOrientations([
                                   DeviceOrientation.landscapeRight,
@@ -177,216 +172,219 @@ class _CalendarState extends State<Calendar> {
               ],
             ),
           ),
+          elevation: 0,
+          backgroundColor: const Color.fromRGBO(94, 158, 197, 1),
+          leading: null,
+          automaticallyImplyLeading: false,
         ),
-        elevation: 0,
-        backgroundColor: const Color.fromRGBO(94, 158, 197, 1),
-        leading: null,
-        automaticallyImplyLeading: false,
-      ),
-      body: SafeArea(
-        child: Column(
-          children: [
-            Expanded(
-              flex: 10,
-              child: Obx(
-                () => Stack(
-                  children: [
-                    SingleChildScrollView(
-                      physics: const ClampingScrollPhysics(),
-                      scrollDirection: Axis.horizontal,
-                      controller: gridController,
-                      child: Row(
-                        children: days
-                            .map((e) => Container(
-                                  width: width / 7,
-                                  decoration: BoxDecoration(
-                                      border: Border.all(
-                                          color: const Color.fromRGBO(
-                                              94, 158, 197, 1),
-                                          width: 2)),
-                                ))
-                            .toList(),
+        body: SafeArea(
+          child: Column(
+            children: [
+              Expanded(
+                flex: 10,
+                child: Obx(
+                  () => Stack(
+                    children: [
+                      SingleChildScrollView(
+                        physics: const ClampingScrollPhysics(),
+                        scrollDirection: Axis.horizontal,
+                        controller: gridController,
+                        child: Row(
+                          children: days
+                              .map((e) => Container(
+                                    width: width / 7,
+                                    decoration: BoxDecoration(
+                                        border: Border.all(
+                                            color: const Color.fromRGBO(
+                                                94, 158, 197, 1),
+                                            width: 2)),
+                                  ))
+                              .toList(),
+                        ),
                       ),
-                    ),
-                    Obx(
-                      () => DragAndDropLists(
-                        scrollController: calendarController,
-                        itemDragHandle: !gc.edit.value
-                            ? const DragHandle(child: SizedBox())
-                            : null,
-                        listDragHandle: !gc.edit.value
-                            ? const DragHandle(child: SizedBox())
-                            : null,
+                      Obx(
+                        () => DragAndDropLists(
+                          scrollController: calendarController,
+                          itemDragHandle: !gc.edit.value
+                              ? const DragHandle(child: SizedBox())
+                              : null,
+                          listDragHandle: !gc.edit.value
+                              ? const DragHandle(child: SizedBox())
+                              : null,
 
-                        lastListTargetSize: 0,
-                        lastItemTargetHeight: 100,
-                        //disableScrolling: true,
-                        children: [
-                          for (int i = 0;
-                              i < scheduleLists.scheduleElements.value.length;
-                              i++) ...{
-                            if (breakDay.breakdayIndex.value != i &&
-                                breakDay.breakdayIndex.value != i - 7) ...{
-                              DragAndDropList(
-                                  contentsWhenEmpty: const SizedBox(),
-                                  verticalAlignment: CrossAxisAlignment.stretch,
-                                  children:
-                                      scheduleLists.scheduleElements.value[i]
-                                          .map(
-                                            (e) => DragAndDropItem(
-                                              child: CalendarAssignment(
-                                                scheduleElement: e,
+                          lastListTargetSize: 0,
+                          lastItemTargetHeight: 100,
+                          //disableScrolling: true,
+                          children: [
+                            for (int i = 0;
+                                i < scheduleLists.scheduleElements.value.length;
+                                i++) ...{
+                              if (breakDay.breakdayIndex.value != i &&
+                                  breakDay.breakdayIndex.value != i - 7) ...{
+                                DragAndDropList(
+                                    contentsWhenEmpty: const SizedBox(),
+                                    verticalAlignment:
+                                        CrossAxisAlignment.stretch,
+                                    children:
+                                        scheduleLists.scheduleElements.value[i]
+                                            .map(
+                                              (e) => DragAndDropItem(
+                                                child: CalendarAssignment(
+                                                  scheduleElement: e,
+                                                ),
+                                                canDrag: true,
+                                                // e.type == "reminder" ? false : true,
                                               ),
-                                              canDrag: true,
-                                              // e.type == "reminder" ? false : true,
-                                            ),
-                                          )
-                                          .toList(),
-                                  canDrag: false),
-                            } else
-                              DragAndDropList(
-                                  contentsWhenEmpty: const SizedBox(),
-                                  verticalAlignment: CrossAxisAlignment.stretch,
-                                  children: [
-                                    DragAndDropItem(
-                                        child: const Center(
-                                            child: Text(
-                                          'Break day',
-                                          textAlign: TextAlign.center,
-                                          style: TextStyle(
-                                              fontSize: 30,
-                                              fontWeight: FontWeight.bold),
-                                        )),
-                                        canDrag: false)
-                                  ],
-                                  canDrag: false),
-                          }
-                        ],
+                                            )
+                                            .toList(),
+                                    canDrag: false),
+                              } else
+                                DragAndDropList(
+                                    contentsWhenEmpty: const SizedBox(),
+                                    verticalAlignment:
+                                        CrossAxisAlignment.stretch,
+                                    children: [
+                                      DragAndDropItem(
+                                          child: const Center(
+                                              child: Text(
+                                            'Break day',
+                                            textAlign: TextAlign.center,
+                                            style: TextStyle(
+                                                fontSize: 30,
+                                                fontWeight: FontWeight.bold),
+                                          )),
+                                          canDrag: false)
+                                    ],
+                                    canDrag: false),
+                            }
+                          ],
 
-                        // children: sc.scheduleElements.value.map((list) {
-                        //   return DragAndDropList(
-                        //       contentsWhenEmpty: const SizedBox(),
-                        //       verticalAlignment: CrossAxisAlignment.stretch,
-                        //       children: list
-                        //           .map(
-                        //             (e) => DragAndDropItem(
-                        //               child: CalendarAssignment(
-                        //                 scheduleElement: e,
-                        //               ),
-                        //               canDrag: true,
-                        //               // e.type == "reminder" ? false : true,
-                        //             ),
-                        //           )
-                        //           .toList(),
-                        //       canDrag: false);
-                        // }).toList(),
-                        onItemReorder: _onItemReorder,
-                        onListReorder: _onListReorder,
-                        axis: Axis.horizontal,
-                        listWidth: width / 7,
-                        listPadding: const EdgeInsets.symmetric(horizontal: 0),
+                          // children: sc.scheduleElements.value.map((list) {
+                          //   return DragAndDropList(
+                          //       contentsWhenEmpty: const SizedBox(),
+                          //       verticalAlignment: CrossAxisAlignment.stretch,
+                          //       children: list
+                          //           .map(
+                          //             (e) => DragAndDropItem(
+                          //               child: CalendarAssignment(
+                          //                 scheduleElement: e,
+                          //               ),
+                          //               canDrag: true,
+                          //               // e.type == "reminder" ? false : true,
+                          //             ),
+                          //           )
+                          //           .toList(),
+                          //       canDrag: false);
+                          // }).toList(),
+                          onItemReorder: _onItemReorder,
+                          onListReorder: _onListReorder,
+                          axis: Axis.horizontal,
+                          listWidth: width / 7,
+                          listPadding:
+                              const EdgeInsets.symmetric(horizontal: 0),
+                        ),
                       ),
-                    ),
-                    if (!gc.edit.value)
+                      if (!gc.edit.value)
+                        Align(
+                          alignment: Alignment.bottomLeft,
+                          child: Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: InkWell(
+                              onTap: () {
+                                gc.edit.value = !gc.edit.value;
+                              },
+                              child: Image.asset(
+                                'assets/images/calendarhammer.png',
+                                width: 40,
+                              ),
+                            ),
+                          ),
+                        ),
                       Align(
-                        alignment: Alignment.bottomLeft,
+                        alignment: Alignment.bottomRight,
                         child: Padding(
                           padding: const EdgeInsets.all(8.0),
                           child: InkWell(
-                            onTap: () {
-                              gc.edit.value = !gc.edit.value;
+                            onTap: () async {
+                              if (gc.edit.value == true) {
+                                gc.edit.value = false;
+                              } else {
+                                await SystemChrome.setPreferredOrientations([
+                                  DeviceOrientation.landscapeRight,
+                                  DeviceOrientation.landscapeLeft,
+                                  DeviceOrientation.portraitUp,
+                                  DeviceOrientation.portraitDown,
+                                ]);
+                                Get.to(
+                                  const Reminder(),
+                                  transition: Transition.circularReveal,
+                                  duration: const Duration(milliseconds: 800),
+                                );
+                              }
                             },
-                            child: Image.asset(
-                              'assets/images/calendarhammer.png',
-                              width: 40,
+                            child: Obx(
+                              () => Image.asset(
+                                gc.edit.value
+                                    ? 'assets/images/calendaredited.png'
+                                    : 'assets/images/calendarplus.png',
+                                width: 40,
+                              ),
                             ),
                           ),
                         ),
                       ),
-                    Align(
-                      alignment: Alignment.bottomRight,
-                      child: Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: InkWell(
-                          onTap: () async {
-                            if (gc.edit.value == true) {
-                              gc.edit.value = false;
-                            } else {
-                              await SystemChrome.setPreferredOrientations([
-                                DeviceOrientation.landscapeRight,
-                                DeviceOrientation.landscapeLeft,
-                                DeviceOrientation.portraitUp,
-                                DeviceOrientation.portraitDown,
-                              ]);
-                              Get.to(
-                                const Reminder(),
-                                transition: Transition.circularReveal,
-                                duration: const Duration(milliseconds: 800),
-                              );
-                            }
-                          },
-                          child: Obx(
-                            () => Image.asset(
-                              gc.edit.value
-                                  ? 'assets/images/calendaredited.png'
-                                  : 'assets/images/calendarplus.png',
-                              width: 40,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
-            ),
-            Expanded(
-              flex: 1,
-              child: SingleChildScrollView(
-                physics: const ClampingScrollPhysics(),
-                controller: avgController,
-                scrollDirection: Axis.horizontal,
-                child: Row(
-                  children: [
-                    for (int d = 0; d < 14; d++)
-                      Container(
-                        width: width / 7,
-                        decoration: const BoxDecoration(
-                          border: Border(
-                              left: BorderSide(
-                                  color: Color.fromRGBO(94, 158, 197, 1),
-                                  width: 2),
-                              right: BorderSide(
-                                  color: Color.fromRGBO(94, 158, 197, 1),
-                                  width: 2),
-                              top: BorderSide(
-                                  color: Color.fromRGBO(94, 158, 197, 1),
-                                  width: 2)),
-                        ),
-                        child: Column(
-                          children: [
-                            Expanded(
-                              child: Center(
-                                child: FittedBox(
-                                  child: Obx(
-                                    () => Text(
-                                      "${scheduleLists.totalTimes.value[d]} Minutes",
-                                      style: const TextStyle(
-                                          color:
-                                              Color.fromRGBO(144, 144, 144, 1)),
+              Expanded(
+                flex: 1,
+                child: SingleChildScrollView(
+                  physics: const ClampingScrollPhysics(),
+                  controller: avgController,
+                  scrollDirection: Axis.horizontal,
+                  child: Row(
+                    children: [
+                      for (int d = 0; d < 14; d++)
+                        Container(
+                          width: width / 7,
+                          decoration: const BoxDecoration(
+                            border: Border(
+                                left: BorderSide(
+                                    color: Color.fromRGBO(94, 158, 197, 1),
+                                    width: 2),
+                                right: BorderSide(
+                                    color: Color.fromRGBO(94, 158, 197, 1),
+                                    width: 2),
+                                top: BorderSide(
+                                    color: Color.fromRGBO(94, 158, 197, 1),
+                                    width: 2)),
+                          ),
+                          child: Column(
+                            children: [
+                              Expanded(
+                                child: Center(
+                                  child: FittedBox(
+                                    child: Obx(
+                                      () => Text(
+                                        "${scheduleLists.totalTimes.value[d]} Minutes",
+                                        style: const TextStyle(
+                                            color: Color.fromRGBO(
+                                                144, 144, 144, 1)),
+                                      ),
                                     ),
                                   ),
                                 ),
-                              ),
-                            )
-                          ],
-                        ),
-                      )
-                  ],
+                              )
+                            ],
+                          ),
+                        )
+                    ],
+                  ),
                 ),
-              ),
-            )
-          ],
+              )
+            ],
+          ),
         ),
       ),
     );

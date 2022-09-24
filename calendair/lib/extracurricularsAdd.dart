@@ -57,7 +57,7 @@ class _ExtracurricularsAddState extends State<ExtracurricularsAdd> {
               slika: 'calendar',
               onclick: () {
                 Get.off(
-                  const dashboard(),
+                  const Dashboard(),
                   transition: Transition.circularReveal,
                   duration: const Duration(milliseconds: 800),
                 );
@@ -66,7 +66,7 @@ class _ExtracurricularsAddState extends State<ExtracurricularsAdd> {
               slika: 'home',
               onclick: () {
                 Get.until((route) =>
-                    (route as GetPageRoute).routeName == '/studentDashboard');
+                    (route as GetPageRoute).routeName == '/StudentDashboard');
               }),
           NBar(
               slika: 'settings',
@@ -221,7 +221,8 @@ class _ExtracurricularsAddState extends State<ExtracurricularsAdd> {
                     child: ElevatedButton(
                       style: ElevatedButton.styleFrom(
                           shadowColor: const Color.fromRGBO(247, 247, 247, 1),
-                          primary: const Color.fromRGBO(94, 159, 197, 1),
+                          backgroundColor:
+                              const Color.fromRGBO(94, 159, 197, 1),
                           elevation: 0,
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(20.0),
@@ -243,7 +244,6 @@ class _ExtracurricularsAddState extends State<ExtracurricularsAdd> {
                         }
                         Get.back(closeOverlays: true);
                       },
-
                       child: const Text(
                         'Save',
                         textAlign: TextAlign.center,

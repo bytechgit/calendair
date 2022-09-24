@@ -27,7 +27,7 @@ class _TeacherDashboardState extends State<TeacherDashboard> {
     return Scaffold(
       resizeToAvoidBottomInset: false,
       appBar: AppBar(
-        backgroundColor: Color.fromRGBO(93, 159, 196, 1),
+        backgroundColor: const Color.fromRGBO(93, 159, 196, 1),
         leading: null,
         automaticallyImplyLeading: false,
       ),
@@ -151,7 +151,7 @@ class _TeacherDashboardState extends State<TeacherDashboard> {
                                 style: ElevatedButton.styleFrom(
                                     shadowColor:
                                         const Color.fromRGBO(247, 247, 247, 1),
-                                    primary:
+                                    backgroundColor:
                                         const Color.fromRGBO(94, 159, 197, 1),
                                     elevation: 0,
                                     shape: RoundedRectangleBorder(
@@ -164,7 +164,6 @@ class _TeacherDashboardState extends State<TeacherDashboard> {
                                     duration: const Duration(milliseconds: 800),
                                   );
                                 },
-
                                 child: const Text(
                                   'Make a class',
                                   textAlign: TextAlign.center,

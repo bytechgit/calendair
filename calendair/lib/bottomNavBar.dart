@@ -2,10 +2,7 @@
 
 import 'package:calendair/classes/navBar.dart';
 import 'package:calendair/models/nbar.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/src/foundation/key.dart';
-import 'package:flutter/src/widgets/framework.dart';
 import 'package:get/get.dart';
 
 class BottomNavBar extends StatefulWidget {
@@ -43,7 +40,7 @@ class _BottomNavBarState extends State<BottomNavBar> {
             Expanded(
                 child: SizedBox(
               child: Padding(
-                padding: EdgeInsets.all(3.0),
+                padding: const EdgeInsets.all(3.0),
                 child: InkWell(
                   onTap: widget.items[i].onclick,
                   child: Container(

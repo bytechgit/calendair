@@ -5,16 +5,14 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
-
 import 'bottomNavBar.dart';
 import 'models/nbar.dart';
 
 class PopUpsResults extends StatefulWidget {
-  CustomCourse course;
-  List<QueryDocumentSnapshot<Object?>> list;
-  PopUpsResults({Key? key, required this.course, required this.list})
+  final CustomCourse course;
+  final List<QueryDocumentSnapshot<Object?>> list;
+  const PopUpsResults({Key? key, required this.course, required this.list})
       : super(key: key);
-
   @override
   State<PopUpsResults> createState() => _PopUpsResultsState();
 }
@@ -107,7 +105,7 @@ class _PopUpsResultsState extends State<PopUpsResults> {
                               style: ElevatedButton.styleFrom(
                                   shadowColor:
                                       const Color.fromRGBO(247, 247, 247, 1),
-                                  primary:
+                                  backgroundColor:
                                       const Color.fromRGBO(94, 159, 197, 1),
                                   elevation: 0,
                                   shape: RoundedRectangleBorder(
@@ -122,7 +120,6 @@ class _PopUpsResultsState extends State<PopUpsResults> {
                                   duration: const Duration(milliseconds: 800),
                                 );
                               },
-
                               child: Padding(
                                 padding: const EdgeInsets.all(8.0),
                                 child: RichText(

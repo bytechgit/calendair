@@ -42,7 +42,7 @@ class _ExtracurricularsState extends State<Extracurriculars> {
               slika: 'calendar',
               onclick: () {
                 Get.off(
-                  dashboard(),
+                  const Dashboard(),
                   transition: Transition.circularReveal,
                   duration: const Duration(milliseconds: 800),
                 );
@@ -51,7 +51,7 @@ class _ExtracurricularsState extends State<Extracurriculars> {
               slika: 'home',
               onclick: () {
                 Get.until((route) =>
-                    (route as GetPageRoute).routeName == '/studentDashboard');
+                    (route as GetPageRoute).routeName == '/StudentDashboard');
               }),
           NBar(
               slika: 'settings',
@@ -136,8 +136,9 @@ class _ExtracurricularsState extends State<Extracurriculars> {
                                         style: ElevatedButton.styleFrom(
                                             shadowColor: const Color.fromRGBO(
                                                 247, 247, 247, 1),
-                                            primary: const Color.fromRGBO(
-                                                94, 159, 197, 1),
+                                            backgroundColor:
+                                                const Color.fromRGBO(
+                                                    94, 159, 197, 1),
                                             elevation: 0,
                                             shape: RoundedRectangleBorder(
                                               borderRadius:
@@ -201,7 +202,7 @@ class _ExtracurricularsState extends State<Extracurriculars> {
                   child: ElevatedButton(
                     style: ElevatedButton.styleFrom(
                         shadowColor: const Color.fromRGBO(247, 247, 247, 1),
-                        primary: const Color.fromRGBO(94, 159, 197, 1),
+                        backgroundColor: const Color.fromRGBO(94, 159, 197, 1),
                         elevation: 0,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(20.0),
@@ -225,9 +226,9 @@ class _ExtracurricularsState extends State<Extracurriculars> {
                   ),
                 ),
               ),
-              Expanded(
-                child: SizedBox(),
+              const Expanded(
                 flex: 1,
+                child: SizedBox(),
               )
             ],
           ),

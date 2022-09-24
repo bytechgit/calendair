@@ -1,20 +1,13 @@
 import 'dart:async';
-import 'dart:convert';
-import 'dart:developer';
-import 'package:calendair/assignments.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'LocalDatabase.dart';
 import 'package:calendair/models/User.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:hive_flutter/hive_flutter.dart';
-import 'package:http/http.dart' as http;
-
 import 'firestore.dart';
 
 class UserAuthentication extends GetxController {

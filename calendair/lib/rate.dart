@@ -3,18 +3,18 @@ import 'package:get/get.dart';
 import 'package:syncfusion_flutter_core/theme.dart';
 import 'package:syncfusion_flutter_sliders/sliders.dart';
 
-class rate extends StatefulWidget {
+class Rate extends StatefulWidget {
   final bool back3;
-  String name;
-  rate({Key? key, required this.name, this.back3 = true}) : super(key: key);
+  final String name;
+  const Rate({Key? key, required this.name, this.back3 = true})
+      : super(key: key);
 
   @override
-  State<rate> createState() => _rateState();
+  State<Rate> createState() => _RateState();
 }
 
-class _rateState extends State<rate> {
+class _RateState extends State<Rate> {
   double _value = 0;
-  double _currentSliderValue = 20;
   @override
   Widget build(BuildContext context) {
     final width = MediaQuery.of(context).size.width;
@@ -116,7 +116,8 @@ class _rateState extends State<rate> {
                     child: ElevatedButton(
                       style: ElevatedButton.styleFrom(
                           shadowColor: const Color.fromRGBO(247, 247, 247, 1),
-                          primary: const Color.fromRGBO(94, 159, 197, 1),
+                          backgroundColor:
+                              const Color.fromRGBO(94, 159, 197, 1),
                           elevation: 0,
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(18.0),
@@ -141,8 +142,8 @@ class _rateState extends State<rate> {
                   ),
                 ),
                 Expanded(
-                  child: Container(),
                   flex: 3,
+                  child: Container(),
                 ),
               ]),
             )));

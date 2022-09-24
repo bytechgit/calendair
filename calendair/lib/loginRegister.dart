@@ -1,5 +1,4 @@
 import 'package:calendair/login.dart';
-import 'package:calendair/registerWhatUser.dart';
 import 'package:calendair/registerEnterSchoolCode.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -45,7 +44,8 @@ class _LoginRegisterState extends State<LoginRegister> {
                       child: ElevatedButton(
                         style: ElevatedButton.styleFrom(
                             shadowColor: const Color.fromRGBO(247, 247, 247, 1),
-                            primary: const Color.fromRGBO(94, 159, 197, 1),
+                            backgroundColor:
+                                const Color.fromRGBO(94, 159, 197, 1),
                             elevation: 0,
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(12.0),
@@ -57,7 +57,6 @@ class _LoginRegisterState extends State<LoginRegister> {
                             duration: const Duration(milliseconds: 800),
                           );
                         },
-
                         child: const Text(
                           'Login',
                           style: TextStyle(
@@ -77,7 +76,8 @@ class _LoginRegisterState extends State<LoginRegister> {
                       child: ElevatedButton(
                         style: ElevatedButton.styleFrom(
                             shadowColor: const Color.fromRGBO(247, 247, 247, 1),
-                            primary: const Color.fromRGBO(94, 159, 197, 1),
+                            backgroundColor:
+                                const Color.fromRGBO(94, 159, 197, 1),
                             elevation: 0,
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(12.0),
@@ -89,7 +89,6 @@ class _LoginRegisterState extends State<LoginRegister> {
                             duration: const Duration(milliseconds: 800),
                           );
                         },
-
                         child: const Text(
                           'Register',
                           style: TextStyle(

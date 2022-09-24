@@ -1,4 +1,3 @@
-import 'dart:developer';
 import 'package:calendair/classes/firestore.dart';
 import 'package:calendair/updateReminder.dart';
 import 'package:calendair/models/CustomCourse.dart';
@@ -93,8 +92,6 @@ class _RemindersState extends State<Reminders> {
                   stream: Firestore().getTeacherRemider(widget.course.docid),
                   builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
                     if (snapshot.hasData) {
-                      //inspect(snapshot.data);
-                      print("aaaaa");
                       return SingleChildScrollView(
                         child: Column(
                           children: [
@@ -193,7 +190,8 @@ class _RemindersState extends State<Reminders> {
                     child: ElevatedButton(
                       style: ElevatedButton.styleFrom(
                           shadowColor: const Color.fromRGBO(247, 247, 247, 1),
-                          primary: const Color.fromRGBO(94, 159, 197, 1),
+                          backgroundColor:
+                              const Color.fromRGBO(94, 159, 197, 1),
                           elevation: 0,
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(10.0),

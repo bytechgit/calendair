@@ -3,6 +3,7 @@ import 'package:calendair/classes/navBar.dart';
 import 'package:calendair/classes/ExtButton.dart';
 import 'package:calendair/classes/scheduleController.dart';
 import 'package:calendair/classes/scheduleLists.dart';
+import 'package:calendair/classes/timerAssignment.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -15,15 +16,17 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   await Firebase.initializeApp();
+  // ignore: unused_local_variable
   FCMNotification fcm = FCMNotification();
   // SystemChrome.setPreferredOrientations([
   //   DeviceOrientation.portraitUp,
   //   DeviceOrientation.portraitDown,
   // ]);
-  await Background().initializeService();
+  // await Background().initializeService();
   Get.put(ScheduleLists());
   Get.put(GoogleClassroom());
   Get.put(ExtButton());
+  Get.put(TimerAssignment());
   Get.put(ScheduleCintroller());
   Get.put(NavBar()); // To turn off landscape mode
   runApp(const MyApp());

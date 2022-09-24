@@ -10,8 +10,8 @@ import 'bottomNavBar.dart';
 import 'models/nbar.dart';
 
 class DashboardPeriod extends StatefulWidget {
-  CustomCourse course;
-  DashboardPeriod({Key? key, required this.course}) : super(key: key);
+  final CustomCourse course;
+  const DashboardPeriod({Key? key, required this.course}) : super(key: key);
 
   @override
   State<DashboardPeriod> createState() => _DashboardPeriodState();

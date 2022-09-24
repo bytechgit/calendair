@@ -1,12 +1,7 @@
-import 'package:calendair/makeClass.dart';
-import 'package:calendair/teacherDashboard.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/src/foundation/key.dart';
-import 'package:flutter/src/widgets/framework.dart';
 import 'package:get/get.dart';
 import 'package:progress_indicators/progress_indicators.dart';
 import 'package:sizer/sizer.dart';
-
 import 'bottomNavBar.dart';
 import 'models/nbar.dart';
 
@@ -207,10 +202,10 @@ class _GeneratingClassCodeState extends State<GeneratingClassCode> {
                       width: 60,
                       height: 60,
                       decoration: const BoxDecoration(
-                        color: const Color.fromRGBO(94, 159, 197, 1),
+                        color: Color.fromRGBO(94, 159, 197, 1),
                         shape: BoxShape.circle,
                       ),
-                      child: Icon(Icons.arrow_forward_ios),
+                      child: const Icon(Icons.arrow_forward_ios),
                     ),
                   ),
                 ],

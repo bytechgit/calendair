@@ -1,5 +1,5 @@
 import 'package:calendair/settings.dart';
-import 'package:calendair/studentDashboard.dart';
+import 'package:calendair/StudentDashboard.dart';
 import 'package:calendair/toDo.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -9,19 +9,17 @@ import 'bottomNavBar.dart';
 import 'calendar.dart';
 import 'models/nbar.dart';
 
-class dashboard extends StatefulWidget {
-  const dashboard({Key? key}) : super(key: key);
+class Dashboard extends StatefulWidget {
+  const Dashboard({Key? key}) : super(key: key);
 
   @override
-  State<dashboard> createState() => _dashboardState();
+  State<Dashboard> createState() => _DashboardState();
 }
 
-class _dashboardState extends State<dashboard> {
+class _DashboardState extends State<Dashboard> {
   @override
   void initState() {
     SystemChrome.setPreferredOrientations([
-      DeviceOrientation.landscapeRight,
-      DeviceOrientation.landscapeLeft,
       DeviceOrientation.portraitUp,
       DeviceOrientation.portraitDown,
     ]);
@@ -65,7 +63,7 @@ class _dashboardState extends State<dashboard> {
                     slika: 'calendar',
                     onclick: () {
                       Get.off(
-                        const dashboard(),
+                        const Dashboard(),
                         transition: Transition.circularReveal,
                         duration: const Duration(milliseconds: 800),
                       );
@@ -75,7 +73,7 @@ class _dashboardState extends State<dashboard> {
                     onclick: () {
                       Get.until((route) =>
                           (route as GetPageRoute).routeName ==
-                          '/studentDashboard');
+                          '/StudentDashboard');
                     }),
                 NBar(
                     slika: 'settings',
@@ -169,19 +167,19 @@ class _dashboardState extends State<dashboard> {
                 padding: const EdgeInsets.fromLTRB(0, 50, 20, 0),
                 child: Container(
                   width: 100,
-                  child: Center(
+                  height: 100,
+                  decoration: BoxDecoration(
+                    border: Border.all(color: Colors.black, width: 3),
+                    shape: BoxShape.circle,
+                    color: Colors.white,
+                  ),
+                  child: const Center(
                     child: Text(
                       'See Week',
                       style:
                           TextStyle(fontSize: 21, fontWeight: FontWeight.w500),
                       textAlign: TextAlign.center,
                     ),
-                  ),
-                  height: 100,
-                  decoration: BoxDecoration(
-                    border: Border.all(color: Colors.black, width: 3),
-                    shape: BoxShape.circle,
-                    color: Colors.white,
                   ),
                 ),
               ),

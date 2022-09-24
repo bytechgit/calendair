@@ -31,6 +31,7 @@ class _BreakDayState extends State<BreakDay> {
   Widget build(BuildContext context) {
     final width = MediaQuery.of(context).size.width;
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: AppBar(
         backgroundColor: const Color.fromRGBO(93, 159, 196, 1),
         leading: IconButton(
@@ -49,7 +50,7 @@ class _BreakDayState extends State<BreakDay> {
               slika: 'calendar',
               onclick: () {
                 Get.off(
-                  const dashboard(),
+                  const Dashboard(),
                   transition: Transition.circularReveal,
                   duration: const Duration(milliseconds: 800),
                 );
@@ -58,7 +59,7 @@ class _BreakDayState extends State<BreakDay> {
               slika: 'home',
               onclick: () {
                 Get.until((route) =>
-                    (route as GetPageRoute).routeName == '/studentDashboard');
+                    (route as GetPageRoute).routeName == '/StudentDashboard');
               }),
           NBar(
               slika: 'settings',
@@ -99,7 +100,7 @@ class _BreakDayState extends State<BreakDay> {
                 ),
                 Container(
                   decoration: BoxDecoration(
-                    color: Color.fromRGBO(217, 217, 217, 1),
+                    color: const Color.fromARGB(255, 217, 217, 217),
                     borderRadius: BorderRadius.circular(15.0),
                   ),
                   width: width * 0.85,
@@ -168,7 +169,8 @@ class _BreakDayState extends State<BreakDay> {
                     child: ElevatedButton(
                       style: ElevatedButton.styleFrom(
                           shadowColor: const Color.fromRGBO(247, 247, 247, 1),
-                          primary: const Color.fromRGBO(94, 159, 197, 1),
+                          backgroundColor:
+                              const Color.fromRGBO(94, 159, 197, 1),
                           elevation: 0,
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(20.0),

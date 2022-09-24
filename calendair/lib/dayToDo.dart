@@ -1,10 +1,7 @@
-import 'dart:developer';
-
-import 'package:calendair/classes/background.dart';
+import 'package:calendair/classes/timerAssignment.dart';
 import 'package:calendair/models/schedule/scheduleElement.dart';
 import 'package:calendair/models/schedule/scheduleElementAssignment.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_background_service/flutter_background_service.dart';
 import 'package:get/get.dart';
 
 class DayToDo extends StatefulWidget {
@@ -16,6 +13,7 @@ class DayToDo extends StatefulWidget {
 }
 
 class _DayToDoState extends State<DayToDo> {
+  final timer = Get.find<TimerAssignment>();
   @override
   Widget build(BuildContext context) {
     final width = MediaQuery.of(context).size.width;
@@ -186,65 +184,34 @@ class _DayToDoState extends State<DayToDo> {
               child: ElevatedButton(
                 style: ElevatedButton.styleFrom(
                     shadowColor: const Color.fromRGBO(247, 247, 247, 1),
-                    primary: const Color.fromRGBO(94, 159, 197, 1),
+                    backgroundColor: const Color.fromRGBO(94, 159, 197, 1),
                     elevation: 0,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(10.0),
                     )),
                 onPressed: () async {
                   if (widget.sc.finished == false) {
+                    timer.start(widget.sc as ScheduleElementAssignment);
                     //Background().stopService();
-                    await FlutterBackgroundService().startService();
-                    Background().addAssignment(widget.sc.toMap());
+                    //await FlutterBackgroundService().startService();
+                    //Background().addAssignment(widget.sc.toMap());
                   }
-
                   //Background().initializeService();
-
                   //FlutterBackgroundService().startService();
                 },
 
                 child: FittedBox(
                   fit: BoxFit.scaleDown,
-                  child: StreamBuilder<Map<String, dynamic>?>(
-                    stream: FlutterBackgroundService().on('update'),
-                    builder: (context, snapshot) {
-                      if (!snapshot.hasData) {
-                        return const Text(
-                          'Start',
-                          textAlign: TextAlign.center,
-                          style: TextStyle(
-                            color: Colors.black,
-                            fontSize: 50,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        );
-                      }
-
-                      final data = snapshot.data!;
-                      String? docId = data["assignment"];
-                      String? time = data["time"];
-                      if (docId == widget.sc.docId) {
-                        return Text(
-                          time ?? '00:00',
-                          textAlign: TextAlign.center,
-                          style: const TextStyle(
-                            color: Colors.black,
-                            fontSize: 50,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        );
-                      } else {
-                        return const Text(
-                          'Start',
-                          textAlign: TextAlign.center,
-                          style: TextStyle(
-                            color: Colors.black,
-                            fontSize: 50,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        );
-                      }
-                    },
+                  child: Obx(
+                    () => Text(
+                      timer.sea.value == widget.sc ? timer.time.value : 'Start',
+                      textAlign: TextAlign.center,
+                      style: const TextStyle(
+                        color: Colors.black,
+                        fontSize: 50,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
                   ),
                 ), // <-- Text
               ),

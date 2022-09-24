@@ -1,5 +1,4 @@
 import 'dart:async';
-
 import 'package:calendair/loginRegister.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';

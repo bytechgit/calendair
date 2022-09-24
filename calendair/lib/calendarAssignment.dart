@@ -1,17 +1,13 @@
-import 'package:calendair/models/Assigments.dart';
 import 'package:calendair/models/schedule/scheduleElement.dart';
 import 'package:calendair/models/schedule/scheduleElementReminder.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/src/foundation/key.dart';
-import 'package:flutter/src/widgets/framework.dart';
 import 'package:get/get.dart';
 
 import 'classes/googleClassroom.dart';
 
 class CalendarAssignment extends StatefulWidget {
-  ScheduleElement scheduleElement;
-  CalendarAssignment({
+  final ScheduleElement scheduleElement;
+  const CalendarAssignment({
     Key? key,
     required this.scheduleElement,
   }) : super(key: key);

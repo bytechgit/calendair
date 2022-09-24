@@ -24,7 +24,6 @@ class ScheduleElement {
     return title;
   }
 
-  Map<String, dynamic>? timesList;
   Map<String, dynamic> toMap() {
     return {};
   }
@@ -74,7 +73,7 @@ class ScheduleElement {
         .update({"date": date});
   }
 
-  void finish(bool f) {
+  void finish(bool f, {int? time}) {
     FirebaseFirestore.instance
         .collection('Schedule')
         .doc(docId)

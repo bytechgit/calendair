@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:calendair/classes/scheduleLists.dart';
 import 'package:calendair/models/schedule/ScheduleElementExtracurriculars.dart';
 import 'package:calendair/models/schedule/scheduleElement.dart';
@@ -10,12 +12,14 @@ import 'ExtButton.dart';
 
 class ScheduleCintroller extends GetxController {
   final breakday = Get.find<ExtButton>();
+  StreamSubscription? streamSubscription;
   final scheduleLists = Get.find<ScheduleLists>();
   Map<String, dynamic>? times;
 
   void listen(String uid) {
     scheduleLists.init();
-    FirebaseFirestore.instance
+    streamSubscription?.cancel();
+    streamSubscription = FirebaseFirestore.instance
         .collection('Schedule')
         .where("studentId", isEqualTo: uid)
         .orderBy("date")

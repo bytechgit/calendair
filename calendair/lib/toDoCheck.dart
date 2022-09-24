@@ -4,8 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 class ToDoCheck extends StatefulWidget {
-  ScheduleElement el;
-  ToDoCheck({Key? key, required this.el}) : super(key: key);
+  final ScheduleElement el;
+  const ToDoCheck({Key? key, required this.el}) : super(key: key);
 
   @override
   State<ToDoCheck> createState() => _ToDoCheckState();
@@ -23,9 +23,6 @@ class _ToDoCheckState extends State<ToDoCheck> {
         mainAxisAlignment: MainAxisAlignment.start,
         mainAxisSize: MainAxisSize.max,
         children: [
-          // SizedBox(
-          //   width: width * 0.15,
-          // ),
           GestureDetector(
             child: Container(
               height: 35,
@@ -70,7 +67,7 @@ class _ToDoCheckState extends State<ToDoCheck> {
                   ),
                   transition: Transition.circularReveal,
                   duration: const Duration(milliseconds: 800),
-                );
+                )?.then((value) => {setState(() {})});
               },
               child: Padding(
                 padding: const EdgeInsets.only(left: 10),
