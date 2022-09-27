@@ -1,5 +1,4 @@
 import 'package:calendair/settings.dart';
-import 'package:calendair/StudentDashboard.dart';
 import 'package:calendair/toDo.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';

@@ -1,6 +1,6 @@
 import 'package:calendair/classes/Authentication.dart';
 import 'package:calendair/registerEnterSchoolCode.dart';
-import 'package:calendair/StudentDashboard.dart';
+import 'package:calendair/studentDashboard.dart';
 import 'package:calendair/teacherDashboard.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
