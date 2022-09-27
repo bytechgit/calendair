@@ -40,7 +40,8 @@ class Firestore {
   }
 
   final firestore = FirebaseFirestore.instance;
-  CollectionReference users = FirebaseFirestore.instance.collection('Users');
+  CollectionReference<Map<String, dynamic>> users =
+      FirebaseFirestore.instance.collection('Users');
   CollectionReference courses =
       FirebaseFirestore.instance.collection('Courses');
   CollectionReference popups = FirebaseFirestore.instance.collection('Popups');
@@ -82,8 +83,9 @@ class Firestore {
   Future<String> getUserIfExist(String UID) async {
     final ds = await users.doc(UID).get();
     if (ds.exists) {
-      userName = ds["name"];
-      userImgUrl = ds["picture"];
+      inspect(ds.data());
+      userName = ds.data()!["name"];
+      userImgUrl = ds.data()!["picture"];
       if (ds["type"] == "student") {
         FCMNotification.unsubscribeFromAllTopic();
         Firestore().getStudentCourses().listen((s) {

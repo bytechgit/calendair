@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:developer';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -81,6 +82,7 @@ class UserAuthentication extends GetxController {
         currentUser = auth.currentUser;
         // Get.snackbar("Welcome ", currentUser?.displayName ?? "",
         //     duration: const Duration(seconds: 3));
+        inspect(currentUser);
         return await Firestore().getUserIfExist(currentUser!.uid);
       }
 
