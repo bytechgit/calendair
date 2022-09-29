@@ -18,6 +18,14 @@ class _PopUpsConfidenceMeterState extends State<PopUpsConfidenceMeter> {
   final gc = Get.find<GoogleClassroom>();
   final con = TextEditingController();
   @override
+  void initState() {
+    if (gc.confidence.isNotEmpty) {
+      con.text = gc.confidence;
+    }
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
     final width = MediaQuery.of(context).size.width;
     return Scaffold(

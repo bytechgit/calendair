@@ -77,7 +77,8 @@ class _RegisterWhatUserState extends State<RegisterWhatUser> {
                                 picture: gc.ua.currentUser!.photoURL ?? "",
                                 type: "student",
                                 breakday: -1,
-                                courses: []));
+                                courses: [],
+                                times: {}));
                         // gc.getCourseListStudent();
                         Get.to(
                           const StudentDashboard(),
@@ -120,7 +121,8 @@ class _RegisterWhatUserState extends State<RegisterWhatUser> {
                                 picture: gc.ua.currentUser!.photoURL ?? "",
                                 type: "teacher",
                                 breakday: -1,
-                                courses: []));
+                                courses: [],
+                                times: {}));
                         //gc.getCourseListTeacher();
                         Get.to(
                           const TeacherDashboard(),

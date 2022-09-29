@@ -66,41 +66,53 @@ class Firestore {
           'name': user.name,
           "picture": user.picture,
           "times": {},
-          "breakday": -1,
-          "remindersNotification": [
-            NotificationSettingsModel(
-                'Remind to complete unfinished assignments the day before the due date',
-                false,
-                "finishAssignments"),
-            NotificationSettingsModel(
-                'Send inspirational quote to encourage studying', false, null)
-          ].map((e) => e.toMap()).toList(),
-          "updatesNotification": [
-            NotificationSettingsModel(
-                'Update on teacher announcements', false, null),
-            NotificationSettingsModel(
-                'Update on confidence meter popups', false, "popups"),
-            NotificationSettingsModel(
-                'Update on TOS and app development updates', false, null)
-          ].map((e) => e.toMap()).toList(),
-          "assignmentsNotification": [
-            NotificationSettingsModel('Send when a new assignment is posted',
-                false, "newAssignments"),
-            NotificationSettingsModel(
-                'Send when a new exam is posted', false, null),
-            NotificationSettingsModel(
-                'Send notification when assignment is done (via timer) ',
-                false,
-                "assignmentFinished"),
-            NotificationSettingsModel(
-                'Keep notification pinned with an ongoing assignment timer',
-                false,
-                null),
-            NotificationSettingsModel('Notify when teacher edits an assignment',
-                false, "assignmentsEdit"),
-          ].map((e) => e.toMap()).toList(),
+          if (user.type == "student") ...{
+            "breakday": -1,
+            "remindersNotification": [
+              NotificationSettingsModel(
+                  'Remind to complete unfinished assignments the day before the due date',
+                  false,
+                  "finishAssignments"),
+              NotificationSettingsModel(
+                  'Send inspirational quote to encourage studying', false, null)
+            ].map((e) => e.toMap()).toList(),
+            "updatesNotification": [
+              NotificationSettingsModel(
+                  'Update on teacher announcements', false, null),
+              NotificationSettingsModel(
+                  'Update on confidence meter popups', false, "popups"),
+              NotificationSettingsModel(
+                  'Update on TOS and app development updates', false, null)
+            ].map((e) => e.toMap()).toList(),
+            "assignmentsNotification": [
+              NotificationSettingsModel('Send when a new assignment is posted',
+                  false, "newAssignments"),
+              NotificationSettingsModel(
+                  'Send when a new exam is posted', false, null),
+              NotificationSettingsModel(
+                  'Send notification when assignment is done (via timer) ',
+                  false,
+                  "assignmentFinished"),
+              NotificationSettingsModel(
+                  'Keep notification pinned with an ongoing assignment timer',
+                  false,
+                  null),
+              NotificationSettingsModel(
+                  'Notify when teacher edits an assignment',
+                  false,
+                  "assignmentsEdit"),
+            ].map((e) => e.toMap()).toList(),
+          }
         }, user.id);
-        users.doc(user.id).set(firebaseUser!.toMap(), SetOptions(merge: true));
+        if (user.type == "student") {
+          users
+              .doc(user.id)
+              .set(firebaseUser!.toMapStudent(), SetOptions(merge: true));
+        } else {
+          users
+              .doc(user.id)
+              .set(firebaseUser!.toMapTeacher(), SetOptions(merge: true));
+        }
       }
     });
   }
@@ -195,14 +207,15 @@ class Firestore {
               as Map<String, dynamic>)["students"] ??
           []
     });
+    print("${courseId}popups");
     FCMNotification.sendTopicMessage(
-        channel: "${courseId}_popups",
+        channel: "${classId}popups",
         title: "Popup added",
         body: "${ua.currentUser!.displayName} added $title");
-
-    print("${courseId}_popups");
   }
 
+  //lSutwl51je0Vz1lKQwdEpopups
+//I/flutter (32204): MIMasVGWgVkOpCbRrXmCpopups
   Future<void> addReminderStudent(
       {required DateTime date, required String title}) async {
     await FirebaseFirestore.instance.collection('Schedule').add({
@@ -405,6 +418,11 @@ class Firestore {
         .get()
         .then((DocumentSnapshot ds) async {
       if (!ds.exists) {
+        FCMNotification.sendTopicMessage(
+            channel: "${courseId}newAssignments",
+            title: "Assignment added",
+            body:
+                "${ua.currentUser!.displayName} added ${mya.coursework!.title}");
         final List<String> materials = [];
         for (classroom.Material element in mya.coursework!.materials ?? []) {
           inspect(element);
@@ -438,6 +456,11 @@ class Firestore {
         }, SetOptions(merge: true));
       } else //update
       {
+        FCMNotification.sendTopicMessage(
+            channel: "${courseId}assignmentsEdit",
+            title: "Assignment changed",
+            body:
+                "${ua.currentUser!.displayName} changed the assignment ${mya.coursework!.title}");
         FirebaseFirestore.instance
             .collection('Assignments')
             .doc(mya.coursework!.courseId! + mya.coursework!.id!)

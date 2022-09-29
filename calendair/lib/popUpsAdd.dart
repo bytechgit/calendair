@@ -23,8 +23,13 @@ class _PopUpsAddState extends State<PopUpsAdd> {
   final dateController = TextEditingController();
   final gc = Get.find<GoogleClassroom>();
   DateTime date = DateTime.now();
-  @override
   //final titleController=TextEditingController();
+  @override
+  void initState() {
+    gc.confidence = "";
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     final width = MediaQuery.of(context).size.width;

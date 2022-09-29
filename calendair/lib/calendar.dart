@@ -10,6 +10,7 @@ import 'package:get/get.dart';
 import 'package:linked_scroll_controller/linked_scroll_controller.dart';
 import 'classes/googleClassroom.dart';
 import 'classes/scheduleLists.dart';
+import 'package:intl/intl.dart';
 
 class Calendar extends StatefulWidget {
   const Calendar({Key? key}) : super(key: key);
@@ -55,6 +56,9 @@ class _CalendarState extends State<Calendar> {
   late ScrollController avgController;
   late ScrollController gridController;
   late ScrollController appBarController;
+  int dayOffset = 0;
+  DateTime startDate =
+      DateTime.now().subtract(Duration(days: DateTime.now().weekday - 1));
 
   @override
   void initState() {
@@ -68,6 +72,14 @@ class _CalendarState extends State<Calendar> {
     avgController = _controllers.addAndGet();
     gridController = _controllers.addAndGet();
     appBarController = _controllers.addAndGet();
+    calendarController.addListener(() {
+      int offset = (calendarController.offset / (Get.width / 7)).floor();
+      if (offset != dayOffset) {
+        setState(() {
+          dayOffset = offset;
+        });
+      }
+    });
   }
 
   @override
@@ -107,12 +119,12 @@ class _CalendarState extends State<Calendar> {
           flexibleSpace: Center(
             child: Column(
               children: [
-                const Expanded(
+                Expanded(
                   child: FittedBox(
                     fit: BoxFit.scaleDown,
                     child: Text(
-                      "Weekly Average : 58 mins",
-                      style: TextStyle(
+                      "${DateFormat("MM/dd").format(startDate.add(Duration(days: dayOffset)))} - ${DateFormat("MM/dd").format(startDate.add(Duration(days: 6 + dayOffset)))}",
+                      style: const TextStyle(
                           color: Colors.black,
                           fontSize: 15,
                           fontWeight: FontWeight.bold),

@@ -30,7 +30,7 @@ class ScheduleElementAssignmentMain extends ScheduleElement {
     while (time > 0) {
       int decrTime = time > 45 ? 30 : time;
       times.add(decrTime);
-      remainingTimes.add(decrTime);
+      remainingTimes.add(decrTime * 60);
       time -= decrTime;
       minTime = 10000;
       minDate = DateUtils.dateOnly(DateTime.now());
@@ -102,6 +102,7 @@ class ScheduleElementAssignmentMain extends ScheduleElement {
   @override
   Future<void> addInSchedule({int? listIndex, int? index}) async {
     if (dates.isEmpty) {
+      print("eeee");
       await addDates();
     }
     ScheduleElementAssignment? s;

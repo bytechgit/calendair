@@ -6,6 +6,7 @@ class UserModel {
   String picture;
   String type;
   int breakday;
+  Map<String, dynamic> times;
   List<String> courses = [];
   List<NotificationSettingsModel> remindersNotification = [];
   List<NotificationSettingsModel> assignmentsNotification = [];
@@ -17,8 +18,9 @@ class UserModel {
       required this.picture,
       required this.type,
       required this.courses,
-      required this.breakday});
-  Map<String, dynamic> toMap() {
+      required this.breakday,
+      required this.times});
+  Map<String, dynamic> toMapStudent() {
     return {
       'name': name,
       'picture': picture,
@@ -33,11 +35,22 @@ class UserModel {
     };
   }
 
+  Map<String, dynamic> toMapTeacher() {
+    return {
+      'name': name,
+      'picture': picture,
+      'courses': courses,
+      "breakday": breakday,
+      'type': type,
+    };
+  }
+
   UserModel.fromMap(Map<String, dynamic> map, String idDoc)
       : id = idDoc,
         name = map["name"] ?? " ",
         picture = map["picture"] ?? " ",
         type = map["type"] ?? " ",
+        times = map["times"] ?? {},
         breakday = map["breakday"] ?? -1,
         courses = ((map["courses"] ?? []) as List<dynamic>)
             .map((e) => e.toString())
