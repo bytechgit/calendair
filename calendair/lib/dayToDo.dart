@@ -3,6 +3,8 @@ import 'package:calendair/models/schedule/scheduleElement.dart';
 import 'package:calendair/models/schedule/scheduleElementAssignment.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:sizer/sizer.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class DayToDo extends StatefulWidget {
   final ScheduleElement sc;
@@ -98,32 +100,101 @@ class _DayToDoState extends State<DayToDo> {
                   decoration: BoxDecoration(
                     border: Border.all(color: Colors.black),
                   ),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: const [
-                      Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 5),
-                        child: Divider(
-                          thickness: 5,
+                  child: InkWell(
+                    onTap: () {
+                      Get.defaultDialog(
+                        title: "Materials",
+                        titleStyle: const TextStyle(
                           color: Colors.black,
+                          fontSize: 25,
+                          fontWeight: FontWeight.w400,
                         ),
-                      ),
-                      Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 5),
-                        child: Divider(
-                          thickness: 5,
-                          color: Colors.black,
+                        content: SizedBox(
+                          height: 50.h,
+                          child: SingleChildScrollView(
+                            child: Column(
+                              children: [
+                                ////printskrin bluetooth
+                                const SizedBox(
+                                  width: double.infinity,
+                                ),
+                                ...(widget.sc as ScheduleElementAssignment)
+                                    .materials
+                                    .map((e) => Padding(
+                                          padding: const EdgeInsets.all(8.0),
+                                          child: SizedBox(
+                                            child: Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.start,
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.center,
+                                              children: [
+                                                Expanded(
+                                                  child: SizedBox(
+                                                    child: Text(
+                                                      e,
+                                                      style: const TextStyle(
+                                                        color: Colors.black,
+                                                        fontSize: 18,
+                                                        fontWeight:
+                                                            FontWeight.w400,
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ),
+                                                Align(
+                                                  alignment:
+                                                      Alignment.centerRight,
+                                                  child: IconButton(
+                                                      iconSize: 30,
+                                                      onPressed: () async {
+                                                        await launchUrl(
+                                                            Uri.parse(e),
+                                                            mode: LaunchMode
+                                                                .externalApplication);
+
+                                                        Get.back();
+                                                      },
+                                                      icon: const Icon(
+                                                          Icons.arrow_right)),
+                                                )
+                                              ],
+                                            ),
+                                          ),
+                                        ))
+                              ],
+                            ),
+                          ),
                         ),
-                      ),
-                      Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 5),
-                        child: Divider(
-                          thickness: 5,
-                          color: Colors.black,
+                      );
+                    },
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: const [
+                        Padding(
+                          padding: EdgeInsets.symmetric(horizontal: 5),
+                          child: Divider(
+                            thickness: 5,
+                            color: Colors.black,
+                          ),
                         ),
-                      )
-                    ],
+                        Padding(
+                          padding: EdgeInsets.symmetric(horizontal: 5),
+                          child: Divider(
+                            thickness: 5,
+                            color: Colors.black,
+                          ),
+                        ),
+                        Padding(
+                          padding: EdgeInsets.symmetric(horizontal: 5),
+                          child: Divider(
+                            thickness: 5,
+                            color: Colors.black,
+                          ),
+                        )
+                      ],
+                    ),
                   ),
                 ),
                 Padding(

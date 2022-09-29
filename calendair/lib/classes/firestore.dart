@@ -14,18 +14,18 @@ Da li je bitan redosled u toku dana?
  */
 ///////////////////////////////////
 import 'dart:developer';
-
 import 'package:calendair/classes/googleClassroom.dart';
 import 'package:calendair/classes/fcmNotification.dart';
 import 'package:calendair/models/AssignmentModel.dart';
 import 'package:calendair/models/ExtracurricularsModel.dart';
 import 'package:calendair/models/UserModel.dart';
+import 'package:calendair/models/notificationSettingsModel.dart';
 import 'package:calendair/models/reminderModel.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:googleapis/classroom/v1.dart';
+import 'package:googleapis/classroom/v1.dart' as classroom;
 import 'Authentication.dart';
 import 'package:intl/intl.dart';
 
@@ -33,14 +33,14 @@ class Firestore {
   static final Firestore _singleton = Firestore._internal();
   final ua = UserAuthentication();
   final gc = Get.find<GoogleClassroom>();
-  String? userName;
-  String? userImgUrl;
+  UserModel? firebaseUser;
   factory Firestore() {
     return _singleton;
   }
 
   final firestore = FirebaseFirestore.instance;
-  CollectionReference users = FirebaseFirestore.instance.collection('Users');
+  CollectionReference<Map<String, dynamic>> users =
+      FirebaseFirestore.instance.collection('Users');
   CollectionReference courses =
       FirebaseFirestore.instance.collection('Courses');
   CollectionReference popups = FirebaseFirestore.instance.collection('Popups');
@@ -60,42 +60,103 @@ class Firestore {
   void addUserIfNotExist({required UserModel user}) {
     users.doc(user.id).get().then((DocumentSnapshot ds) {
       if (!ds.exists) {
-        users.doc(user.id).set({
+        firebaseUser = UserModel.fromMap({
           "courses": [],
           "type": user.type,
-          "name": user.name,
+          'name': user.name,
           "picture": user.picture,
-          "times": {}
-        }, SetOptions(merge: true));
+          "times": {},
+          "breakday": -1,
+          "remindersNotification": [
+            NotificationSettingsModel(
+                'Remind to complete unfinished assignments the day before the due date',
+                false,
+                "finishAssignments"),
+            NotificationSettingsModel(
+                'Send inspirational quote to encourage studying', false, null)
+          ].map((e) => e.toMap()).toList(),
+          "updatesNotification": [
+            NotificationSettingsModel(
+                'Update on teacher announcements', false, null),
+            NotificationSettingsModel(
+                'Update on confidence meter popups', false, "popups"),
+            NotificationSettingsModel(
+                'Update on TOS and app development updates', false, null)
+          ].map((e) => e.toMap()).toList(),
+          "assignmentsNotification": [
+            NotificationSettingsModel('Send when a new assignment is posted',
+                false, "newAssignments"),
+            NotificationSettingsModel(
+                'Send when a new exam is posted', false, null),
+            NotificationSettingsModel(
+                'Send notification when assignment is done (via timer) ',
+                false,
+                "assignmentFinished"),
+            NotificationSettingsModel(
+                'Keep notification pinned with an ongoing assignment timer',
+                false,
+                null),
+            NotificationSettingsModel('Notify when teacher edits an assignment',
+                false, "assignmentsEdit"),
+          ].map((e) => e.toMap()).toList(),
+        }, user.id);
+        users.doc(user.id).set(firebaseUser!.toMap(), SetOptions(merge: true));
       }
     });
   }
 
+  void subscribeToTopics() {
+    if (firebaseUser != null) {
+      for (var obj in firebaseUser!.remindersNotification) {
+        if (obj.channel != null && obj.checked == true) {
+          for (var id in firebaseUser!.courses) {
+            FCMNotification.subscribeToTopic("$id" "${obj.channel!}");
+            print("$id" "${obj.channel!}");
+          }
+        }
+      }
+      for (var obj in firebaseUser!.assignmentsNotification) {
+        if (obj.channel != null && obj.checked == true) {
+          if (obj.channel == "assignmentFinished") {
+          } else {
+            for (var id in firebaseUser!.courses) {
+              FCMNotification.subscribeToTopic("$id" "${obj.channel!}");
+              print("$id" "${obj.channel!}");
+            }
+          }
+        }
+      }
+      for (var obj in firebaseUser!.updatesNotification) {
+        if (obj.channel != null && obj.checked == true) {
+          for (var id in firebaseUser!.courses) {
+            FCMNotification.subscribeToTopic("$id" "${obj.channel!}");
+            print("$id" "${obj.channel!}");
+          }
+        }
+      }
+    }
+  }
+
   void updateUser({required String name, String? img}) {
-    userName = name;
-    userImgUrl = img ?? userImgUrl;
-    users
-        .doc(ua.currentUser!.uid)
-        .update({"name": userName, "picture": userImgUrl});
+    firebaseUser?.name = name;
+    if (img != null) {
+      firebaseUser?.picture = img;
+    }
+    if (firebaseUser != null) {
+      users.doc(ua.currentUser!.uid).update(
+          {"name": firebaseUser!.name, "picture": firebaseUser!.picture});
+    }
   }
 
   Future<String> getUserIfExist(String UID) async {
     final ds = await users.doc(UID).get();
     if (ds.exists) {
-      userName = ds["name"];
-      userImgUrl = ds["picture"];
+      firebaseUser = UserModel.fromMap(ds.data()!, ds.id);
+      inspect(firebaseUser);
       if (ds["type"] == "student") {
         FCMNotification.unsubscribeFromAllTopic();
-        Firestore().getStudentCourses().listen((s) {
-          for (var doc in s.docs) {
-            String courseId = doc.data()["id"];
-            FCMNotification.subscribeToTopic("${courseId}_assignments");
-            FCMNotification.subscribeToTopic("${courseId}_popups");
-            print("SCUBSCRIBED ON${courseId}_assignments");
-          }
-        });
+        subscribeToTopics();
       }
-
       return ds["type"];
     }
     return "";
@@ -242,10 +303,45 @@ class Firestore {
   }
 
   void addBreakDay(int dayIndex) {
+    firebaseUser?.breakday = dayIndex;
     FirebaseFirestore.instance
         .collection('Users')
         .doc(ua.currentUser!.uid)
         .update({"breakday": dayIndex});
+  }
+
+  void updateNotificationSettings(
+      String settings, NotificationSettingsModel nsm) {
+    if (nsm.channel != null && nsm.checked == true) {
+      for (var id in firebaseUser!.courses) {
+        FCMNotification.subscribeToTopic("$id" "${nsm.channel!}");
+        print("$id" "${nsm.channel!}");
+      }
+    } else if (nsm.channel != null && nsm.checked == false) {
+      for (var id in firebaseUser!.courses) {
+        FCMNotification.unsubscribeFromTopic("$id" "${nsm.channel!}");
+        print("unsubscribe $id" "${nsm.channel!}");
+      }
+    }
+
+    final doc =
+        FirebaseFirestore.instance.collection('Users').doc(ua.currentUser!.uid);
+    if (settings == "assignmentsNotification") {
+      doc.update({
+        settings:
+            firebaseUser?.assignmentsNotification.map((e) => e.toMap()).toList()
+      });
+    } else if (settings == "updatesNotification") {
+      doc.update({
+        settings:
+            firebaseUser?.updatesNotification.map((e) => e.toMap()).toList()
+      });
+    } else if (settings == "remindersNotification") {
+      doc.update({
+        settings:
+            firebaseUser?.remindersNotification.map((e) => e.toMap()).toList()
+      });
+    }
   }
 
   Future<int> getBreakday() async {
@@ -268,11 +364,8 @@ class Firestore {
     });
   }
 
-//!ako je profesor stavio da traje 50 min to je podeljeno na dva dela 30,20 i sad ako je student vec zavrsio ovaj deo od 30 i ostalo mu
-//! od 20 a profesor promeni vreme sta se onda desava
-
   Future<List<String>> insertAssignmentCopyForStudents(
-      MyAssignment mya, String courseId) async {
+      MyAssignment mya, String courseId, List<String> materials) async {
     List<String> ids = [];
     QuerySnapshot<Map<String, dynamic>> students = await getStudentsFromCourse(
         courseId); //?vec imas studenti koji su na odredjeni predmen ne mora se ponovo citaju
@@ -292,7 +385,12 @@ class Firestore {
         "dueDate": mya.coursework!.dueDate != null
             ? DateTime(mya.coursework!.dueDate!.year!,
                 mya.coursework!.dueDate!.month!, mya.coursework!.dueDate!.day!)
-            : DateUtils.dateOnly(DateTime.now().add(const Duration(days: 7))),
+            : DateUtils.dateOnly(
+                DateTime.now().add(
+                  const Duration(days: 7),
+                ),
+              ),
+        "materials": materials
       });
       ids.add(doc.id);
     }
@@ -307,8 +405,20 @@ class Firestore {
         .get()
         .then((DocumentSnapshot ds) async {
       if (!ds.exists) {
+        final List<String> materials = [];
+        for (classroom.Material element in mya.coursework!.materials ?? []) {
+          inspect(element);
+          if (element.driveFile != null) {
+            materials.add(element.driveFile!.driveFile?.alternateLink ?? "");
+          } else if (element.link != null) {
+            materials.add(element.link!.url ?? "");
+          } else if (element.youtubeVideo != null) {
+            materials.add(element.youtubeVideo!.alternateLink ?? "");
+          }
+        }
         //insert
-        final ids = await insertAssignmentCopyForStudents(mya, courseId);
+        final ids =
+            await insertAssignmentCopyForStudents(mya, courseId, materials);
         FirebaseFirestore.instance
             .collection('Assignments')
             .doc(mya.coursework!.courseId! + mya.coursework!.id!)
@@ -452,7 +562,7 @@ class Firestore {
   //   });
   // }
 
-  Future<MyAssignment> readMyAssignment(CourseWork cw) async {
+  Future<MyAssignment> readMyAssignment(classroom.CourseWork cw) async {
     return readMyAssignmentById(cw.courseId! + cw.id!);
   }
 

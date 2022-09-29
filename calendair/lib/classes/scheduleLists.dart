@@ -99,4 +99,16 @@ class ScheduleLists extends GetxController {
     last.pref = "Finish";
     refresh();
   }
+
+  bool breakDayIsEmpty(int index) {
+    print(index);
+    inspect(scheduleElements.value[index]);
+    if (scheduleElements.value[index].isNotEmpty ||
+        scheduleElements.value[index + 7].isNotEmpty) {
+      print("false");
+      return false;
+    }
+    print("true");
+    return true;
+  }
 }

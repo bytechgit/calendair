@@ -1,17 +1,19 @@
-import 'package:calendair/classes/ExtButton.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-
 import 'classes/scheduleController.dart';
-import 'classes/scheduleLists.dart';
 
 class ExtracurricularButton extends StatefulWidget {
   final String text;
   final int index;
-  final bool ext;
+  final int selectedIndex;
+  final Function() onClick;
 
   const ExtracurricularButton(
-      {Key? key, required this.text, required this.index, this.ext = true})
+      {Key? key,
+      required this.text,
+      required this.index,
+      this.selectedIndex = -1,
+      required this.onClick})
       : super(key: key);
 
   @override
@@ -19,58 +21,54 @@ class ExtracurricularButton extends StatefulWidget {
 }
 
 class _ExtracurricularButtonState extends State<ExtracurricularButton> {
-  final extb = Get.find<ExtButton>();
-  final sc = Get.find<ScheduleCintroller>();
-  final scheduleLists = Get.find<ScheduleLists>();
+  final sc = Get.find<ScheduleController>();
   @override
   Widget build(BuildContext context) {
     return InkWell(
-      onTap: () {
-        if (widget.ext == false) {
-          if (widget.index == extb.breakdayIndex.value) {
-            extb.breakdayIndex.value = -1;
-          } else {
-            if (scheduleLists.scheduleElements.value[widget.index].isEmpty &&
-                scheduleLists
-                    .scheduleElements.value[widget.index + 7].isEmpty) {
-              extb.breakdayIndex.value = widget.index;
-            } else {
-              Get.snackbar(
-                  "Change schedule", "There are tasks assigned for that day");
-            }
-          }
-        } else {
-          if (extb.breakdayIndex.value != widget.index) {
-            extb.index.value = widget.index;
-          } else {
-            Get.snackbar("Break day", "Choose another day");
-          }
-        }
-      },
+      onTap: widget.onClick, //() {
+      // if (widget.ext == false) {
+      //   if (widget.index == extb.breakdayIndex.value) {
+      //     extb.breakdayIndex.value = -1;
+      //   } else {
+      //     if (scheduleLists.scheduleElements.value[widget.index].isEmpty &&
+      //         scheduleLists
+      //             .scheduleElements.value[widget.index + 7].isEmpty) {
+      //       extb.breakdayIndex.value = widget.index;
+      //     } else {
+      //       Get.snackbar(
+      //           "Change schedule", "There are tasks assigned for that day");
+      //     }
+      //   }
+      // } else {
+      //   if (extb.breakdayIndex.value != widget.index) {
+      //     extb.index.value = widget.index;
+      //   } else {
+      //     Get.snackbar("Break day", "Choose another day");
+      //   }
+      // }
+      //},
       child: Padding(
         padding: const EdgeInsets.all(5.0),
-        child: Obx(
-          () => Container(
-            decoration: BoxDecoration(
-                color: widget.ext
-                    ? extb.index.value == widget.index
-                        ? const Color.fromRGBO(94, 159, 197, 1)
-                        : const Color.fromRGBO(217, 217, 217, 1)
-                    : extb.breakdayIndex.value == widget.index
-                        ? const Color.fromRGBO(94, 159, 197, 1)
-                        : const Color.fromRGBO(217, 217, 217, 1),
-                borderRadius: const BorderRadius.all(Radius.circular(10))),
-            child: Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: FittedBox(
-                fit: BoxFit.scaleDown,
-                child: Text(
-                  widget.text,
-                  textAlign: TextAlign.center,
-                  style: const TextStyle(
-                    color: Colors.black,
-                    fontSize: 30,
-                  ),
+        child: Container(
+          width: 80,
+          decoration: BoxDecoration(
+            color: widget.index == widget.selectedIndex
+                ? const Color.fromRGBO(94, 159, 197, 1)
+                : const Color.fromRGBO(217, 217, 217, 1),
+            borderRadius: const BorderRadius.all(
+              Radius.circular(10),
+            ),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: FittedBox(
+              fit: BoxFit.scaleDown,
+              child: Text(
+                widget.text,
+                textAlign: TextAlign.center,
+                style: const TextStyle(
+                  color: Colors.black,
+                  fontSize: 30,
                 ),
               ),
             ),

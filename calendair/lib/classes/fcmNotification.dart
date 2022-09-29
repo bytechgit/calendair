@@ -31,7 +31,6 @@ class FCMNotification {
     _listenFCM();
 
     _getFCMToken().then((token) async {
-      print(_token);
       // await subscribeToTopic("545599618019_assignments");
       //sendDeviceMessage(token: _token, body: "body", title: "title");
       //await sendTopicMessage(
@@ -68,7 +67,6 @@ class FCMNotification {
             //ovde hvata notifikacije u aplikaciji
             android: AndroidNotificationDetails(
               channel.id, channel.name,
-              // TODO add a proper drawable resource to android, for now using
               //      one that already exists in example app.
               icon: 'ic_launcher',
               playSound: true,
@@ -87,7 +85,7 @@ class FCMNotification {
     });
 
     FirebaseMessaging.instance.onTokenRefresh.listen((fcmToken) {
-      print("NEW TOKEN: " + fcmToken);
+      //print("NEW TOKEN: " + fcmToken);
     }).onError((err) {
       // Error getting token.
     });

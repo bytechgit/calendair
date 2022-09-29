@@ -1,11 +1,11 @@
 import 'package:calendair/classes/fcmNotification.dart';
 import 'package:calendair/classes/navBar.dart';
-import 'package:calendair/classes/ExtButton.dart';
 import 'package:calendair/classes/scheduleController.dart';
 import 'package:calendair/classes/scheduleLists.dart';
 import 'package:calendair/classes/timerAssignment.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:sizer/sizer.dart';
 import 'classes/googleClassroom.dart';
@@ -25,11 +25,13 @@ Future<void> main() async {
   // await Background().initializeService();
   Get.put(ScheduleLists());
   Get.put(GoogleClassroom());
-  Get.put(ExtButton());
   Get.put(TimerAssignment());
-  Get.put(ScheduleCintroller());
-  Get.put(NavBar()); // To turn off landscape mode
-  runApp(const MyApp());
+  Get.put(ScheduleController());
+  Get.put(NavBar());
+  SystemChrome.setPreferredOrientations(
+      [DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]).then((_) {
+    runApp(const MyApp());
+  }); // To turn off landscape mode
 }
 
 class MyApp extends StatelessWidget {

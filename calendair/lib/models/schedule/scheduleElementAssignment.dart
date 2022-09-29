@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:calendair/models/schedule/scheduleElementAssignmentMain.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -19,12 +21,13 @@ class ScheduleElementAssignment extends ScheduleElementAssignmentMain {
             finishedList: m.finishedList,
             note: m.note,
             indexes: m.indexes,
-            remainingTimes: m.remainingTimes) {
+            remainingTimes: m.remainingTimes,
+            materials: m.materials) {
     index = m.indexes[i];
     finished = m.finishedList[i];
     date = m.dates[i];
     time = m.times[i];
-    timesec = time * 60;
+    timesec = m.remainingTimes[i];
     dates = m.dates;
   }
 
@@ -85,8 +88,10 @@ class ScheduleElementAssignment extends ScheduleElementAssignmentMain {
     finishedList[i] = f;
     if (time != null) {
       remainingTimes[i] = time;
+      timesec = time;
     } else {
-      remainingTimes[i] = f ? 0 : this.time;
+      remainingTimes[i] = f ? 0 : this.time * 60;
+      timesec = this.time * 60;
     }
     FirebaseFirestore.instance.collection('Schedule').doc(docId).update(
         {"finishedList": finishedList, "remainingTimes": remainingTimes});

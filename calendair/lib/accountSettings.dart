@@ -1,3 +1,4 @@
+import 'dart:developer';
 import 'dart:io';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:calendair/classes/firestore.dart';
@@ -25,7 +26,8 @@ class _AccountSettingsState extends State<AccountSettings> {
   bool uploading = false;
   @override
   void initState() {
-    name.text = Firestore().userName ?? "";
+    inspect(Firestore().firebaseUser);
+    name.text = Firestore().firebaseUser?.name ?? "";
     super.initState();
   }
 
@@ -127,7 +129,8 @@ class _AccountSettingsState extends State<AccountSettings> {
                                   width: 200,
                                   height: 200,
                                   fit: BoxFit.cover,
-                                  imageUrl: Firestore().userImgUrl ?? "",
+                                  imageUrl:
+                                      Firestore().firebaseUser?.picture ?? "",
                                   placeholder: (context, url) => const Center(
                                       child: CircularProgressIndicator()),
                                   errorWidget: (context, url, error) =>
@@ -235,7 +238,8 @@ class _AccountSettingsState extends State<AccountSettings> {
                           } on FirebaseException catch (e) {
                             //   // ...
                           }
-                        } else if (Firestore().userName != name.text) {
+                        } else if (Firestore().firebaseUser?.name !=
+                            name.text) {
                           Firestore().updateUser(name: name.text);
                         }
                         setState(() {

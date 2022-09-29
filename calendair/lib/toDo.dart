@@ -35,7 +35,7 @@ class _ToDoState extends State<ToDo> {
     super.initState();
   }
 
-  final sc = Get.find<ScheduleCintroller>();
+  final sc = Get.find<ScheduleController>();
   final scheduleLists = Get.find<ScheduleLists>();
   @override
   Widget build(BuildContext context) {
@@ -59,7 +59,7 @@ class _ToDoState extends State<ToDo> {
               slika: 'calendar',
               onclick: () {
                 Get.until((route) =>
-                    (route as GetPageRoute).routeName == '/dashboard');
+                    (route as GetPageRoute).routeName == '/Dashboard');
               }),
           NBar(
               slika: 'home',

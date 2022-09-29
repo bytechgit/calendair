@@ -1,5 +1,5 @@
 import 'package:calendair/classes/firestore.dart';
-import 'package:calendair/classes/ExtButton.dart';
+import 'package:calendair/classes/scheduleLists.dart';
 import 'package:calendair/extracurricularButton.dart';
 import 'package:calendair/settings.dart';
 import 'package:flutter/material.dart';
@@ -19,12 +19,17 @@ class BreakDay extends StatefulWidget {
 
 class _BreakDayState extends State<BreakDay> {
   final gc = Get.find<GoogleClassroom>();
-  final extb = Get.find<ExtButton>();
-  //final days = ['Mon', 'Tues', 'Wed', 'Thurs', 'Fri', 'Sat', 'Sun'];
+  final days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+  final scheduleLists = Get.find<ScheduleLists>();
+
+  int selectedIndex = -1;
 
   @override
   void initState() {
     super.initState();
+    setState(() {
+      selectedIndex = Firestore().firebaseUser?.breakday ?? -1;
+    });
   }
 
   @override
@@ -118,45 +123,29 @@ class _BreakDayState extends State<BreakDay> {
                   padding: const EdgeInsets.only(top: 18.0),
                   child: SizedBox(
                     width: width * 0.6,
-                    child: Column(
+                    child: Wrap(
+                      alignment: WrapAlignment.center,
                       children: [
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: const [
-                            Expanded(
-                                child: ExtracurricularButton(
-                                    text: "Mon", index: 0, ext: false)),
-                            Expanded(
-                                child: ExtracurricularButton(
-                                    text: "Tue", index: 1, ext: false)),
-                          ],
-                        ),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: const [
-                            Expanded(
-                                child: ExtracurricularButton(
-                                    text: "Wed", index: 2, ext: false)),
-                            Expanded(
-                                child: ExtracurricularButton(
-                                    text: "Thu", index: 3, ext: false)),
-                          ],
-                        ),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: const [
-                            Expanded(
-                                child: ExtracurricularButton(
-                                    text: "Fri", index: 4, ext: false)),
-                            Expanded(
-                                child: ExtracurricularButton(
-                                    text: "Sat", index: 5, ext: false)),
-                          ],
-                        ),
-                        SizedBox(
-                            width: width * 0.3,
-                            child: const ExtracurricularButton(
-                                text: "Sun", index: 6, ext: false)),
+                        for (int i = 0; i < days.length; i++)
+                          ExtracurricularButton(
+                            text: days[i],
+                            index: i,
+                            selectedIndex: selectedIndex,
+                            onClick: () {
+                              setState(() {
+                                if (selectedIndex == i) {
+                                  selectedIndex = -1;
+                                } else {
+                                  if (!scheduleLists.breakDayIsEmpty(i)) {
+                                    Get.snackbar(
+                                        "Break day", "Choose another day");
+                                    return;
+                                  }
+                                  selectedIndex = i;
+                                }
+                              });
+                            },
+                          ),
                       ],
                     ),
                   ),
@@ -176,7 +165,7 @@ class _BreakDayState extends State<BreakDay> {
                             borderRadius: BorderRadius.circular(20.0),
                           )),
                       onPressed: () {
-                        Firestore().addBreakDay(extb.breakdayIndex.value);
+                        Firestore().addBreakDay(selectedIndex);
                         Get.back(closeOverlays: true);
                       },
 

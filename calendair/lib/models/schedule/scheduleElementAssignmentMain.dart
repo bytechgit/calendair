@@ -12,6 +12,7 @@ class ScheduleElementAssignmentMain extends ScheduleElement {
   List<int> times;
   List<bool> finishedList;
   List<int> remainingTimes;
+  List<String> materials;
   List<int> indexes;
   String note;
 
@@ -38,7 +39,7 @@ class ScheduleElementAssignmentMain extends ScheduleElement {
       indexes.add(1000);
       //inicijalno na 1000 jer se stavlj na kraj dana
       while (date.compareTo(dueDate) <= 0) {
-        if (date.weekday - 1 != breakday.breakdayIndex.value) {
+        if (date.weekday - 1 != Firestore().firebaseUser!.breakday) {
           curTime =
               scheduleLists.timesList?[DateUtils.dateOnly(date).toString()] ??
                   0;
@@ -73,7 +74,8 @@ class ScheduleElementAssignmentMain extends ScheduleElement {
       required this.indexes,
       required this.note,
       required this.times,
-      required this.remainingTimes})
+      required this.remainingTimes,
+      required this.materials})
       : super(
             title: title,
             docId: docId,
@@ -135,6 +137,9 @@ class ScheduleElementAssignmentMain extends ScheduleElement {
             .toList(),
         indexes = ((map["indexes"] ?? []) as List<dynamic>)
             .map((e) => e as int)
+            .toList(),
+        materials = ((map["materials"] ?? []) as List<dynamic>)
+            .map((e) => e.toString())
             .toList(),
         super(
             time: map["time"] ?? 0,

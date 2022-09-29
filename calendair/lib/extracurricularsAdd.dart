@@ -6,7 +6,6 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'classes/googleClassroom.dart';
 import 'bottomNavBar.dart';
-import 'classes/ExtButton.dart';
 import 'dashboard.dart';
 import 'models/nbar.dart';
 
@@ -21,19 +20,21 @@ class ExtracurricularsAdd extends StatefulWidget {
 class _ExtracurricularsAddState extends State<ExtracurricularsAdd> {
   final titleController = TextEditingController();
   final minutesController = TextEditingController();
-  final extb = Get.find<ExtButton>();
+  int selectedIndex = -1;
   @override
   void initState() {
     if (widget.ext != null) {
       titleController.text = widget.ext!.title;
       minutesController.text = widget.ext!.time.toString();
-      extb.index.value = widget.ext!.dayIndex;
+      setState(() {
+        selectedIndex = widget.ext!.dayIndex;
+      });
     }
     super.initState();
   }
 
   final gc = Get.find<GoogleClassroom>();
-  final days = ['Mon', 'Tues', 'Wed', 'Thurs', 'Fri', 'Sat', 'Sun'];
+  final days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 
   @override
   Widget build(BuildContext context) {
@@ -134,45 +135,20 @@ class _ExtracurricularsAddState extends State<ExtracurricularsAdd> {
                   padding: const EdgeInsets.all(8.0),
                   child: SizedBox(
                     width: width * 0.6,
-                    child: Column(
+                    child: Wrap(
+                      alignment: WrapAlignment.center,
                       children: [
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: const [
-                            Expanded(
-                                child: ExtracurricularButton(
-                                    text: "Mon", index: 0)),
-                            Expanded(
-                                child: ExtracurricularButton(
-                                    text: "Tue", index: 1)),
-                          ],
-                        ),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: const [
-                            Expanded(
-                                child: ExtracurricularButton(
-                                    text: "Wed", index: 2)),
-                            Expanded(
-                                child: ExtracurricularButton(
-                                    text: "Thu", index: 3)),
-                          ],
-                        ),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: const [
-                            Expanded(
-                                child: ExtracurricularButton(
-                                    text: "Fri", index: 4)),
-                            Expanded(
-                                child: ExtracurricularButton(
-                                    text: "Sat", index: 5)),
-                          ],
-                        ),
-                        SizedBox(
-                            width: width * 0.3,
-                            child: const ExtracurricularButton(
-                                text: "Sun", index: 6)),
+                        for (int i = 0; i < days.length; i++)
+                          ExtracurricularButton(
+                            text: days[i],
+                            index: i,
+                            selectedIndex: selectedIndex,
+                            onClick: () {
+                              setState(() {
+                                selectedIndex = i;
+                              });
+                            },
+                          ),
                       ],
                     ),
                   ),
@@ -228,11 +204,27 @@ class _ExtracurricularsAddState extends State<ExtracurricularsAdd> {
                             borderRadius: BorderRadius.circular(20.0),
                           )),
                       onPressed: () {
+                        if (titleController.text.isEmpty) {
+                          Get.snackbar("A required field is mising",
+                              'Please enter title');
+                          return;
+                        }
+                        if (minutesController.text.isEmpty ||
+                            int.tryParse(minutesController.text) == null) {
+                          Get.snackbar("A required field is mising",
+                              'Please enter time');
+                          return;
+                        }
+                        if (Firestore().firebaseUser?.breakday ==
+                            selectedIndex) {
+                          Get.snackbar("Breakday", 'Please select another day');
+                          return;
+                        }
                         if (widget.ext != null) {
-                          if (widget.ext!.dayIndex != extb.index.value) {
+                          if (widget.ext!.dayIndex != selectedIndex) {
                             widget.ext!.index = 1000;
                           }
-                          widget.ext!.dayIndex = extb.index.value;
+                          widget.ext!.dayIndex = selectedIndex;
                           widget.ext!.time = int.parse(minutesController.text);
                           widget.ext!.title = titleController.text;
                           Firestore().updateExtracurriculars(widget.ext!);
@@ -240,7 +232,7 @@ class _ExtracurricularsAddState extends State<ExtracurricularsAdd> {
                           Firestore().addExtracurriculars(
                               int.parse(minutesController.text),
                               titleController.text,
-                              extb.index.value);
+                              selectedIndex);
                         }
                         Get.back(closeOverlays: true);
                       },

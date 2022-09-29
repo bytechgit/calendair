@@ -1,5 +1,5 @@
 import 'package:calendair/calendarAssignment.dart';
-import 'package:calendair/classes/ExtButton.dart';
+import 'package:calendair/classes/firestore.dart';
 import 'package:calendair/classes/scheduleController.dart';
 import 'package:calendair/addReminderStudent.dart';
 import 'package:calendair/toDo.dart';
@@ -20,14 +20,13 @@ class Calendar extends StatefulWidget {
 
 class _CalendarState extends State<Calendar> {
   final gc = Get.find<GoogleClassroom>();
-  final sc = Get.find<ScheduleCintroller>();
+  final sc = Get.find<ScheduleController>();
   final scheduleLists = Get.find<ScheduleLists>();
-  final breakDay = Get.find<ExtButton>();
   late final List<DragAndDropList> _contents = [];
   _onItemReorder(
       int oldItemIndex, int oldListIndex, int newItemIndex, int newListIndex) {
-    if (newListIndex != breakDay.breakdayIndex.value &&
-        newListIndex != breakDay.breakdayIndex.value + 7) {
+    if (newListIndex != Firestore().firebaseUser!.breakday &&
+        newListIndex != Firestore().firebaseUser!.breakday + 7) {
       setState(() {
         var movedI = sc.removeFromScheduleElements(
             listIndex: oldListIndex, index: oldItemIndex);
@@ -74,8 +73,6 @@ class _CalendarState extends State<Calendar> {
   @override
   dispose() {
     SystemChrome.setPreferredOrientations([
-      DeviceOrientation.landscapeRight,
-      DeviceOrientation.landscapeLeft,
       DeviceOrientation.portraitUp,
       DeviceOrientation.portraitDown,
     ]);
@@ -131,7 +128,7 @@ class _CalendarState extends State<Calendar> {
                       for (int i = 0; i < days.length; i++)
                         InkWell(
                           onTap: (() {
-                            Get.to(
+                            Get.off(
                               ToDo(
                                 index: i,
                                 day: days[i],
@@ -139,15 +136,7 @@ class _CalendarState extends State<Calendar> {
                               ),
                               transition: Transition.circularReveal,
                               duration: const Duration(milliseconds: 800),
-                            )!
-                                .then((value) {
-                              if (Get.currentRoute == "/Calendar") {
-                                SystemChrome.setPreferredOrientations([
-                                  DeviceOrientation.landscapeRight,
-                                  DeviceOrientation.landscapeLeft,
-                                ]);
-                              }
-                            });
+                            );
                           }),
                           child: SizedBox(
                             width: width / 7,
@@ -219,8 +208,10 @@ class _CalendarState extends State<Calendar> {
                             for (int i = 0;
                                 i < scheduleLists.scheduleElements.value.length;
                                 i++) ...{
-                              if (breakDay.breakdayIndex.value != i &&
-                                  breakDay.breakdayIndex.value != i - 7) ...{
+                              if (Firestore().firebaseUser!.breakday == -1 ||
+                                  Firestore().firebaseUser!.breakday != i &&
+                                      Firestore().firebaseUser!.breakday !=
+                                          i - 7) ...{
                                 DragAndDropList(
                                     contentsWhenEmpty: const SizedBox(),
                                     verticalAlignment:
@@ -309,13 +300,7 @@ class _CalendarState extends State<Calendar> {
                               if (gc.edit.value == true) {
                                 gc.edit.value = false;
                               } else {
-                                await SystemChrome.setPreferredOrientations([
-                                  DeviceOrientation.landscapeRight,
-                                  DeviceOrientation.landscapeLeft,
-                                  DeviceOrientation.portraitUp,
-                                  DeviceOrientation.portraitDown,
-                                ]);
-                                Get.to(
+                                Get.off(
                                   const Reminder(),
                                   transition: Transition.circularReveal,
                                   duration: const Duration(milliseconds: 800),

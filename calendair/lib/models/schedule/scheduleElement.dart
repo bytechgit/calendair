@@ -4,8 +4,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-import '../../classes/ExtButton.dart';
-
 class ScheduleElement {
   DateTime? date;
   String studentId;
@@ -16,8 +14,6 @@ class ScheduleElement {
   int time = 0;
   int index;
   final scheduleLists = Get.find<ScheduleLists>();
-  final breakday = Get.find<ExtButton>();
-
   late Color color;
   late int colorIndex;
   String get title_ {

@@ -8,10 +8,8 @@ import 'package:calendair/models/schedule/scheduleElementAssignmentMain.dart';
 import 'package:calendair/models/schedule/scheduleElementReminder.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:get/get.dart';
-import 'ExtButton.dart';
 
-class ScheduleCintroller extends GetxController {
-  final breakday = Get.find<ExtButton>();
+class ScheduleController extends GetxController {
   StreamSubscription? streamSubscription;
   final scheduleLists = Get.find<ScheduleLists>();
   Map<String, dynamic>? times;

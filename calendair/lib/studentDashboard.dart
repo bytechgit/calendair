@@ -9,6 +9,7 @@ import 'package:calendair/models/PopUpModel.dart';
 import 'package:calendair/settings.dart' as c;
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:sizer/sizer.dart';
@@ -29,6 +30,10 @@ class _StudentDashboardState extends State<StudentDashboard> {
 
   @override
   void initState() {
+    SystemChrome.setPreferredOrientations([
+      DeviceOrientation.portraitUp,
+      DeviceOrientation.portraitDown,
+    ]);
     super.initState();
   }
 

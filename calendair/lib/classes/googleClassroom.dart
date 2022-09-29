@@ -104,11 +104,9 @@ class GoogleClassroom extends GetxController {
       print("LOAD ASSIGNMENTS");
       for (var c
           in ((await cra.courses.courseWork.list(courseId)).courseWork ?? [])) {
-        print(c.title);
         MyAssignment mya = await Firestore().readMyAssignment(c);
-
-        print(c.title);
         mya.coursework = c;
+
         assignments.value.add(mya);
       }
 

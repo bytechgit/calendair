@@ -1,4 +1,5 @@
-import 'package:calendair/models/Reminder.dart';
+import 'package:calendair/classes/firestore.dart';
+import 'package:calendair/models/notificationSettingsModel.dart';
 import 'package:calendair/settings.dart';
 import 'package:expandable/expandable.dart';
 import 'package:flutter/material.dart';
@@ -20,12 +21,7 @@ class _NotificationsState extends State<Notifications> {
   ExpandableController reminderController = ExpandableController();
   ExpandableController updatesController = ExpandableController();
   ExpandableController assignmentsController = ExpandableController();
-  final reminders = [
-    Reminder(
-        'Remind to complete unfinished assignments the day before the due date',
-        false),
-    Reminder('Send inspirational quote to encourage studying', false),
-  ];
+
   @override
   Widget build(BuildContext context) {
     reminderController.addListener(() {
@@ -133,7 +129,9 @@ class _NotificationsState extends State<Notifications> {
                     collapsed: const SizedBox(),
                     expanded: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
-                        children: reminders
+                        children: Firestore()
+                            .firebaseUser!
+                            .remindersNotification
                             .map(
                               (e) => Row(
                                 children: [
@@ -159,6 +157,9 @@ class _NotificationsState extends State<Notifications> {
                                         onChanged: (inputValue) {
                                           setState(() {
                                             e.checked = inputValue;
+                                            Firestore()
+                                                .updateNotificationSettings(
+                                                    "remindersNotification", e);
                                             // print(value);
                                           });
                                         },
@@ -193,7 +194,9 @@ class _NotificationsState extends State<Notifications> {
                       collapsed: const SizedBox(),
                       expanded: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
-                          children: reminders
+                          children: Firestore()
+                              .firebaseUser!
+                              .updatesNotification
                               .map(
                                 (e) => Row(
                                   children: [
@@ -220,6 +223,9 @@ class _NotificationsState extends State<Notifications> {
                                           onChanged: (inputValue) {
                                             setState(() {
                                               e.checked = inputValue;
+                                              Firestore()
+                                                  .updateNotificationSettings(
+                                                      "updatesNotification", e);
                                               // print(value);
                                             });
                                           },
@@ -240,54 +246,62 @@ class _NotificationsState extends State<Notifications> {
                     borderRadius: const BorderRadius.all(Radius.circular(15))),
                 padding: const EdgeInsets.all(10),
                 child: ExpandablePanel(
-                    controller: assignmentsController,
-                    header: const FittedBox(
-                      alignment: Alignment.centerLeft,
-                      fit: BoxFit.scaleDown,
-                      child: Text(
-                        "Assignments",
-                        style: TextStyle(fontSize: 40),
-                      ),
+                  controller: assignmentsController,
+                  header: const FittedBox(
+                    alignment: Alignment.centerLeft,
+                    fit: BoxFit.scaleDown,
+                    child: Text(
+                      "Assignments",
+                      style: TextStyle(fontSize: 40),
                     ),
-                    collapsed: const SizedBox(),
-                    expanded: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: reminders
-                            .map(
-                              (e) => Row(
-                                children: [
-                                  Flexible(
-                                    flex: 6,
-                                    child: Padding(
-                                        padding:
-                                            const EdgeInsets.only(bottom: 10),
-                                        child: Text(
-                                          e.text,
-                                          style: const TextStyle(fontSize: 20),
-                                        )),
-                                  ),
-                                  Flexible(
-                                      flex: 1,
-                                      child: Checkbox(
-                                        activeColor: Colors.green,
-                                        shape: const RoundedRectangleBorder(
-                                            borderRadius: BorderRadius.all(
-                                                Radius.circular(
-                                                    5.0))), // Rounded Checkbox
-
-                                        onChanged: (inputValue) {
-                                          setState(() {
-                                            e.checked = inputValue;
-                                            // print(value);
-                                          });
-                                        },
-                                        value: e.checked,
-                                      )),
-                                ],
+                  ),
+                  collapsed: const SizedBox(),
+                  expanded: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: Firestore()
+                        .firebaseUser!
+                        .assignmentsNotification
+                        .map(
+                          (e) => Row(
+                            children: [
+                              Flexible(
+                                flex: 6,
+                                child: Padding(
+                                    padding: const EdgeInsets.only(bottom: 10),
+                                    child: Text(
+                                      e.text,
+                                      style: const TextStyle(fontSize: 20),
+                                    )),
                               ),
-                            )
-                            .toList())),
+                              Flexible(
+                                  flex: 1,
+                                  child: Checkbox(
+                                    activeColor: Colors.green,
+                                    shape: const RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.all(
+                                            Radius.circular(
+                                                5.0))), // Rounded Checkbox
+
+                                    onChanged: (inputValue) {
+                                      setState(() {
+                                        e.checked = inputValue;
+                                        Firestore().updateNotificationSettings(
+                                            "assignmentsNotification", e);
+                                        // print(value);
+                                      });
+                                    },
+                                    value: e.checked,
+                                  )),
+                            ],
+                          ),
+                        )
+                        .toList(),
+                  ),
+                ),
               ),
+              const SizedBox(
+                height: 30,
+              )
             ],
           ),
         ),

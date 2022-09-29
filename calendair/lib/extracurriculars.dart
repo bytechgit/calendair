@@ -134,16 +134,16 @@ class _ExtracurricularsState extends State<Extracurriculars> {
                                       height: 45,
                                       child: ElevatedButton(
                                         style: ElevatedButton.styleFrom(
-                                            shadowColor: const Color.fromRGBO(
-                                                247, 247, 247, 1),
-                                            backgroundColor:
-                                                const Color.fromRGBO(
-                                                    94, 159, 197, 1),
-                                            elevation: 0,
-                                            shape: RoundedRectangleBorder(
-                                              borderRadius:
-                                                  BorderRadius.circular(20.0),
-                                            )),
+                                          shadowColor: const Color.fromRGBO(
+                                              247, 247, 247, 1),
+                                          backgroundColor: const Color.fromRGBO(
+                                              94, 159, 197, 1),
+                                          elevation: 0,
+                                          shape: RoundedRectangleBorder(
+                                            borderRadius:
+                                                BorderRadius.circular(20.0),
+                                          ),
+                                        ),
                                         onPressed: () {
                                           Get.to(
                                             ExtracurricularsAdd(ext: ex),
