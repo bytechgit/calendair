@@ -112,277 +112,273 @@ class _CalendarState extends State<Calendar> {
   @override
   Widget build(BuildContext context) {
     final width = MediaQuery.of(context).size.width;
-    return SafeArea(
-      child: Scaffold(
-        resizeToAvoidBottomInset: false,
-        appBar: AppBar(
-          flexibleSpace: Center(
-            child: Column(
-              children: [
-                Expanded(
-                  child: FittedBox(
-                    fit: BoxFit.scaleDown,
-                    child: Text(
-                      "${DateFormat("MM/dd").format(startDate.add(Duration(days: dayOffset)))} - ${DateFormat("MM/dd").format(startDate.add(Duration(days: 6 + dayOffset)))}",
-                      style: const TextStyle(
-                          color: Colors.black,
-                          fontSize: 15,
-                          fontWeight: FontWeight.bold),
-                    ),
-                  ),
-                ),
-                SingleChildScrollView(
-                  physics: const ClampingScrollPhysics(),
-                  controller: appBarController,
-                  scrollDirection: Axis.horizontal,
-                  child: Row(
-                    children: [
-                      for (int i = 0; i < days.length; i++)
-                        InkWell(
-                          onTap: (() {
-                            Get.off(
-                              ToDo(
-                                index: i,
-                                day: days[i],
-                                fromCalendar: true,
-                              ),
-                              transition: Transition.circularReveal,
-                              duration: const Duration(milliseconds: 800),
-                            );
-                          }),
-                          child: SizedBox(
-                            width: width / 7,
-                            // constraints:
-                            //  BoxConstraints(maxWidth: width / 7),
-                            child: FittedBox(
-                              alignment: Alignment.center,
-                              fit: BoxFit.scaleDown,
-                              child: Text(
-                                days[i],
-                                style: const TextStyle(
-                                    color: Colors.black,
-                                    fontSize: 25,
-                                    fontWeight: FontWeight.bold),
-                              ),
-                            ),
-                          ),
-                        )
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          ),
-          elevation: 0,
-          backgroundColor: const Color.fromRGBO(94, 158, 197, 1),
-          leading: null,
-          automaticallyImplyLeading: false,
-        ),
-        body: SafeArea(
+    return Scaffold(
+      resizeToAvoidBottomInset: false,
+      appBar: AppBar(
+        flexibleSpace: Center(
           child: Column(
             children: [
               Expanded(
-                flex: 10,
-                child: Obx(
-                  () => Stack(
-                    children: [
-                      SingleChildScrollView(
-                        physics: const ClampingScrollPhysics(),
-                        scrollDirection: Axis.horizontal,
-                        controller: gridController,
-                        child: Row(
-                          children: days
-                              .map((e) => Container(
-                                    width: width / 7,
-                                    decoration: BoxDecoration(
-                                        border: Border.all(
-                                            color: const Color.fromRGBO(
-                                                94, 158, 197, 1),
-                                            width: 2)),
-                                  ))
-                              .toList(),
-                        ),
-                      ),
-                      Obx(
-                        () => DragAndDropLists(
-                          scrollController: calendarController,
-                          itemDragHandle: !gc.edit.value
-                              ? const DragHandle(child: SizedBox())
-                              : null,
-                          listDragHandle: !gc.edit.value
-                              ? const DragHandle(child: SizedBox())
-                              : null,
-
-                          lastListTargetSize: 0,
-                          lastItemTargetHeight: 100,
-                          //disableScrolling: true,
-                          children: [
-                            for (int i = 0;
-                                i < scheduleLists.scheduleElements.value.length;
-                                i++) ...{
-                              if (Firestore().firebaseUser!.breakday == -1 ||
-                                  Firestore().firebaseUser!.breakday != i &&
-                                      Firestore().firebaseUser!.breakday !=
-                                          i - 7) ...{
-                                DragAndDropList(
-                                    contentsWhenEmpty: const SizedBox(),
-                                    verticalAlignment:
-                                        CrossAxisAlignment.stretch,
-                                    children:
-                                        scheduleLists.scheduleElements.value[i]
-                                            .map(
-                                              (e) => DragAndDropItem(
-                                                child: CalendarAssignment(
-                                                  scheduleElement: e,
-                                                ),
-                                                canDrag: true,
-                                                // e.type == "reminder" ? false : true,
-                                              ),
-                                            )
-                                            .toList(),
-                                    canDrag: false),
-                              } else
-                                DragAndDropList(
-                                    contentsWhenEmpty: const SizedBox(),
-                                    verticalAlignment:
-                                        CrossAxisAlignment.stretch,
-                                    children: [
-                                      DragAndDropItem(
-                                          child: const Center(
-                                              child: Text(
-                                            'Break day',
-                                            textAlign: TextAlign.center,
-                                            style: TextStyle(
-                                                fontSize: 30,
-                                                fontWeight: FontWeight.bold),
-                                          )),
-                                          canDrag: false)
-                                    ],
-                                    canDrag: false),
-                            }
-                          ],
-
-                          // children: sc.scheduleElements.value.map((list) {
-                          //   return DragAndDropList(
-                          //       contentsWhenEmpty: const SizedBox(),
-                          //       verticalAlignment: CrossAxisAlignment.stretch,
-                          //       children: list
-                          //           .map(
-                          //             (e) => DragAndDropItem(
-                          //               child: CalendarAssignment(
-                          //                 scheduleElement: e,
-                          //               ),
-                          //               canDrag: true,
-                          //               // e.type == "reminder" ? false : true,
-                          //             ),
-                          //           )
-                          //           .toList(),
-                          //       canDrag: false);
-                          // }).toList(),
-                          onItemReorder: _onItemReorder,
-                          onListReorder: _onListReorder,
-                          axis: Axis.horizontal,
-                          listWidth: width / 7,
-                          listPadding:
-                              const EdgeInsets.symmetric(horizontal: 0),
-                        ),
-                      ),
-                      if (!gc.edit.value)
-                        Align(
-                          alignment: Alignment.bottomLeft,
-                          child: Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: InkWell(
-                              onTap: () {
-                                gc.edit.value = !gc.edit.value;
-                              },
-                              child: Image.asset(
-                                'assets/images/calendarhammer.png',
-                                width: 40,
-                              ),
-                            ),
-                          ),
-                        ),
-                      Align(
-                        alignment: Alignment.bottomRight,
-                        child: Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: InkWell(
-                            onTap: () async {
-                              if (gc.edit.value == true) {
-                                gc.edit.value = false;
-                              } else {
-                                Get.off(
-                                  const Reminder(),
-                                  transition: Transition.circularReveal,
-                                  duration: const Duration(milliseconds: 800),
-                                );
-                              }
-                            },
-                            child: Obx(
-                              () => Image.asset(
-                                gc.edit.value
-                                    ? 'assets/images/calendaredited.png'
-                                    : 'assets/images/calendarplus.png',
-                                width: 40,
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
+                child: FittedBox(
+                  fit: BoxFit.scaleDown,
+                  child: Text(
+                    "${DateFormat("MM/dd").format(startDate.add(Duration(days: dayOffset)))} - ${DateFormat("MM/dd").format(startDate.add(Duration(days: 6 + dayOffset)))}",
+                    style: const TextStyle(
+                        color: Colors.black,
+                        fontSize: 15,
+                        fontWeight: FontWeight.bold),
                   ),
                 ),
               ),
-              Expanded(
-                flex: 1,
-                child: SingleChildScrollView(
-                  physics: const ClampingScrollPhysics(),
-                  controller: avgController,
-                  scrollDirection: Axis.horizontal,
-                  child: Row(
-                    children: [
-                      for (int d = 0; d < 14; d++)
-                        Container(
+              SingleChildScrollView(
+                physics: const ClampingScrollPhysics(),
+                controller: appBarController,
+                scrollDirection: Axis.horizontal,
+                child: Row(
+                  children: [
+                    for (int i = 0; i < days.length; i++)
+                      InkWell(
+                        onTap: (() {
+                          Get.off(
+                            ToDo(
+                              index: i,
+                              day: days[i],
+                              fromCalendar: true,
+                            ),
+                            transition: Transition.circularReveal,
+                            duration: const Duration(milliseconds: 800),
+                          );
+                        }),
+                        child: SizedBox(
                           width: width / 7,
-                          decoration: const BoxDecoration(
-                            border: Border(
-                                left: BorderSide(
-                                    color: Color.fromRGBO(94, 158, 197, 1),
-                                    width: 2),
-                                right: BorderSide(
-                                    color: Color.fromRGBO(94, 158, 197, 1),
-                                    width: 2),
-                                top: BorderSide(
-                                    color: Color.fromRGBO(94, 158, 197, 1),
-                                    width: 2)),
+                          // constraints:
+                          //  BoxConstraints(maxWidth: width / 7),
+                          child: FittedBox(
+                            alignment: Alignment.center,
+                            fit: BoxFit.scaleDown,
+                            child: Text(
+                              days[i],
+                              style: const TextStyle(
+                                  color: Colors.black,
+                                  fontSize: 25,
+                                  fontWeight: FontWeight.bold),
+                            ),
                           ),
-                          child: Column(
-                            children: [
-                              Expanded(
-                                child: Center(
-                                  child: FittedBox(
-                                    child: Obx(
-                                      () => Text(
-                                        "${scheduleLists.totalTimes.value[d]} Minutes",
-                                        style: const TextStyle(
-                                            color: Color.fromRGBO(
-                                                144, 144, 144, 1)),
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              )
-                            ],
-                          ),
-                        )
-                    ],
-                  ),
+                        ),
+                      )
+                  ],
                 ),
-              )
+              ),
             ],
           ),
         ),
+        elevation: 0,
+        backgroundColor: const Color.fromRGBO(94, 158, 197, 1),
+        leading: null,
+        automaticallyImplyLeading: false,
+      ),
+      body: Column(
+        children: [
+          Expanded(
+            flex: 10,
+            child: Obx(
+              () => Stack(
+                children: [
+                  SingleChildScrollView(
+                    physics: const ClampingScrollPhysics(),
+                    scrollDirection: Axis.horizontal,
+                    controller: gridController,
+                    child: Row(
+                      children: days
+                          .map(
+                            (e) => Container(
+                              width: width / 7,
+                              decoration: BoxDecoration(
+                                  border: Border.all(
+                                      color:
+                                          const Color.fromRGBO(94, 158, 197, 1),
+                                      width: 2)),
+                            ),
+                          )
+                          .toList(),
+                    ),
+                  ),
+                  Obx(
+                    () => DragAndDropLists(
+                      removeTopPadding: true,
+                      scrollController: calendarController,
+                      itemDragHandle: !gc.edit.value
+                          ? const DragHandle(child: SizedBox())
+                          : null,
+                      listDragHandle: !gc.edit.value
+                          ? const DragHandle(child: SizedBox())
+                          : null,
+                      lastListTargetSize: 0,
+                      lastItemTargetHeight: 100,
+                      //disableScrolling: true,
+                      children: [
+                        for (int i = 0;
+                            i < scheduleLists.scheduleElements.value.length;
+                            i++) ...{
+                          if (Firestore().firebaseUser!.breakday == -1 ||
+                              Firestore().firebaseUser!.breakday != i &&
+                                  Firestore().firebaseUser!.breakday !=
+                                      i - 7) ...{
+                            DragAndDropList(
+                                contentsWhenEmpty: const SizedBox(),
+                                verticalAlignment: CrossAxisAlignment.stretch,
+                                children:
+                                    scheduleLists.scheduleElements.value[i]
+                                        .map(
+                                          (e) => DragAndDropItem(
+                                            child: CalendarAssignment(
+                                              scheduleElement: e,
+                                            ),
+                                            canDrag: true,
+                                            // e.type == "reminder" ? false : true,
+                                          ),
+                                        )
+                                        .toList(),
+                                canDrag: false),
+                          } else
+                            DragAndDropList(
+                                contentsWhenEmpty: const SizedBox(),
+                                verticalAlignment: CrossAxisAlignment.stretch,
+                                children: [
+                                  DragAndDropItem(
+                                      child: const Center(
+                                          child: Text(
+                                        'Break day',
+                                        textAlign: TextAlign.center,
+                                        style: TextStyle(
+                                            fontSize: 30,
+                                            fontWeight: FontWeight.bold),
+                                      )),
+                                      canDrag: false)
+                                ],
+                                canDrag: false),
+                        }
+                      ],
+
+                      // children: sc.scheduleElements.value.map((list) {
+                      //   return DragAndDropList(
+                      //       contentsWhenEmpty: const SizedBox(),
+                      //       verticalAlignment: CrossAxisAlignment.stretch,
+                      //       children: list
+                      //           .map(
+                      //             (e) => DragAndDropItem(
+                      //               child: CalendarAssignment(
+                      //                 scheduleElement: e,
+                      //               ),
+                      //               canDrag: true,
+                      //               // e.type == "reminder" ? false : true,
+                      //             ),
+                      //           )
+                      //           .toList(),
+                      //       canDrag: false);
+                      // }).toList(),
+                      onItemReorder: _onItemReorder,
+                      onListReorder: _onListReorder,
+                      axis: Axis.horizontal,
+                      listWidth: width / 7,
+                      listPadding: const EdgeInsets.symmetric(
+                          horizontal: 0, vertical: 0),
+                    ),
+                  ),
+                  if (!gc.edit.value)
+                    Align(
+                      alignment: Alignment.bottomLeft,
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: InkWell(
+                          onTap: () {
+                            gc.edit.value = !gc.edit.value;
+                          },
+                          child: Image.asset(
+                            'assets/images/calendarhammer.png',
+                            width: 40,
+                          ),
+                        ),
+                      ),
+                    ),
+                  Align(
+                    alignment: Alignment.bottomRight,
+                    child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: InkWell(
+                        onTap: () async {
+                          if (gc.edit.value == true) {
+                            gc.edit.value = false;
+                          } else {
+                            Get.off(
+                              const Reminder(),
+                              transition: Transition.circularReveal,
+                              duration: const Duration(milliseconds: 800),
+                            );
+                          }
+                        },
+                        child: Obx(
+                          () => Image.asset(
+                            gc.edit.value
+                                ? 'assets/images/calendaredited.png'
+                                : 'assets/images/calendarplus.png',
+                            width: 40,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          Expanded(
+            flex: 1,
+            child: SingleChildScrollView(
+              physics: const ClampingScrollPhysics(),
+              controller: avgController,
+              scrollDirection: Axis.horizontal,
+              child: Row(
+                children: [
+                  for (int d = 0; d < 14; d++)
+                    Container(
+                      width: width / 7,
+                      decoration: const BoxDecoration(
+                        border: Border(
+                            left: BorderSide(
+                                color: Color.fromRGBO(94, 158, 197, 1),
+                                width: 2),
+                            right: BorderSide(
+                                color: Color.fromRGBO(94, 158, 197, 1),
+                                width: 2),
+                            top: BorderSide(
+                                color: Color.fromRGBO(94, 158, 197, 1),
+                                width: 2)),
+                      ),
+                      child: Column(
+                        children: [
+                          Expanded(
+                            child: Center(
+                              child: FittedBox(
+                                child: Obx(
+                                  () => Text(
+                                    "${scheduleLists.totalTimes.value[d]} Minutes",
+                                    style: const TextStyle(
+                                        color:
+                                            Color.fromRGBO(144, 144, 144, 1)),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          )
+                        ],
+                      ),
+                    )
+                ],
+              ),
+            ),
+          )
+        ],
       ),
     );
   }

@@ -32,15 +32,17 @@ class _BottomNavBarState extends State<BottomNavBar> {
 
     navbar.index.value = widget.selected;
     return Container(
+      padding: const EdgeInsets.only(bottom: 16),
       color: const Color.fromRGBO(93, 159, 196, 1),
-      height: 60,
       child: Row(
         children: [
           for (int i = 0; i < widget.items.length; i++)
             Expanded(
                 child: SizedBox(
               child: Padding(
-                padding: const EdgeInsets.all(3.0),
+                padding: const EdgeInsets.only(
+                  top: 10.0,
+                ),
                 child: InkWell(
                   onTap: widget.items[i].onclick,
                   child: Container(
@@ -50,8 +52,11 @@ class _BottomNavBarState extends State<BottomNavBar> {
                             ? Colors.white
                             : const Color.fromRGBO(93, 159, 196, 1),
                         shape: BoxShape.circle),
-                    child: Image.asset(
-                        'assets/images/${widget.items[i].slika}.png'),
+                    child: SizedBox(
+                      height: 45,
+                      child: Image.asset(
+                          'assets/images/${widget.items[i].slika}.png'),
+                    ),
                   ),
                 ),
               ),
