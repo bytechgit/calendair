@@ -65,7 +65,7 @@ class Firestore {
           "type": user.type,
           'name': user.name,
           "picture": user.picture,
-          "times": {},
+          "times": <String, dynamic>{},
           if (user.type == "student") ...{
             "breakday": -1,
             "remindersNotification": [

@@ -66,9 +66,11 @@ class UserAuthentication extends GetxController {
 
   Future<String> signInwithGoogle() async {
     signout();
+
     try {
       final GoogleSignInAccount? googleSignInAccount =
           await googleSignIn.signIn();
+      print("ssss");
       if (googleSignInAccount != null) {
         final GoogleSignInAuthentication googleSignInAuthentication =
             await googleSignInAccount.authentication;
@@ -88,8 +90,10 @@ class UserAuthentication extends GetxController {
 
       return "error";
     } on FirebaseAuthException catch (e) {
+      print(e);
       return "error";
     } on Exception catch (e) {
+      print(e);
       return "error";
     }
   }
