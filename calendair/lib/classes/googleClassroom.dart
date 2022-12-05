@@ -1,7 +1,7 @@
 import 'dart:developer';
 import 'package:calendair/classes/Authentication.dart';
 import 'package:calendair/models/AssignmentModel.dart';
-import 'package:calendair/popUps.dart';
+import 'package:calendair/teacher/pop_ups.dart';
 import 'package:get/get.dart';
 import 'package:googleapis/classroom/v1.dart';
 import 'package:http/http.dart';
@@ -172,21 +172,21 @@ class GoogleClassroom extends GetxController {
 
   Future<String> enrolToCourse(String code) async {
     if (ua.googleSignIn.currentUser != null) {
+      String name = "";
       try {
         final c = await Firestore().getCourse(code: code);
         if (c.docs.isNotEmpty) {
           String docId = c.docs[0].id;
           String id = c.docs[0]["id"];
-          String name = c.docs[0]["name"];
+          name = c.docs[0]["name"];
           final baseClient = Client();
           final authenticateClient = AuthenticateClient(
               await ua.googleSignIn.currentUser!.authHeaders, baseClient);
           final cra = ClassroomApi(authenticateClient);
-
-          final cur = await cra.courses.students
-              .create(Student(userId: 'me'), id, enrollmentCode: code);
           Firestore().addCourseToUser(docId);
           Firestore().addUserToCourse(docId);
+          final cur = await cra.courses.students
+              .create(Student(userId: 'me'), id, enrollmentCode: code);
           return name;
         } else {
           Get.snackbar("", "The course does not exist");
@@ -194,6 +194,10 @@ class GoogleClassroom extends GetxController {
         }
       } on DetailedApiRequestError catch (e) {
         print(e);
+//itju6fn
+        if (e.status == 409) {
+          return name;
+        }
         Get.snackbar("Error", e.message ?? "");
       }
     }

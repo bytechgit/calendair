@@ -1,5 +1,4 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:googleapis/cloudsearch/v1.dart';
 
 class PopUpModel {
   String classId;

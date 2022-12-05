@@ -1,5 +1,3 @@
-import 'package:googleapis/mybusinessbusinessinformation/v1.dart';
-
 class NotificationSettingsModel {
   String text;
   bool? checked;

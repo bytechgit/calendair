@@ -10,7 +10,7 @@ import 'package:get/get.dart';
 import 'package:sizer/sizer.dart';
 import 'classes/googleClassroom.dart';
 import 'classes/background.dart';
-import 'loginRegister.dart';
+import 'student_teacher/login_register.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();

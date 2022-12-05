@@ -20,6 +20,16 @@ class ScheduleElementAssignmentMain extends ScheduleElement {
     if (scheduleLists.timesList == null) {
       print("null");
     }
+
+    final l = await FirebaseFirestore.instance
+        .collection('Users')
+        .doc(Firestore().ua.currentUser!.uid)
+        .get();
+    final List<int> extTimes =
+        ((l.data()?['extracurricularsTimes'] ?? []) as List<dynamic>)
+            .map((e) => e as int)
+            .toList();
+
     scheduleLists.timesList ??= await Firestore().getTimes();
 
     int time = this.time;
@@ -41,8 +51,9 @@ class ScheduleElementAssignmentMain extends ScheduleElement {
       while (date.compareTo(dueDate) <= 0) {
         if (date.weekday - 1 != Firestore().firebaseUser!.breakday) {
           curTime =
-              scheduleLists.timesList?[DateUtils.dateOnly(date).toString()] ??
-                  0;
+              (scheduleLists.timesList?[DateUtils.dateOnly(date).toString()] ??
+                      0) +
+                  extTimes[date.weekday - 1];
           if (curTime < minTime) {
             minTime = curTime;
             minDate = date;
@@ -50,6 +61,8 @@ class ScheduleElementAssignmentMain extends ScheduleElement {
         }
         date = date.add(const Duration(days: 1));
       }
+      inspect(minDate);
+      inspect(scheduleLists.timesList);
       dates.add(minDate);
       scheduleLists.timesList?[DateUtils.dateOnly(minDate).toString()] =
           (scheduleLists.timesList?[DateUtils.dateOnly(minDate).toString()] ??

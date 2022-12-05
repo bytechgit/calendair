@@ -66,6 +66,7 @@ class Firestore {
           'name': user.name,
           "picture": user.picture,
           "times": <String, dynamic>{},
+          'extracurricularsTimes': [0, 0, 0, 0, 0, 0, 0],
           if (user.type == "student") ...{
             "breakday": -1,
             "remindersNotification": [
@@ -307,12 +308,33 @@ class Firestore {
         .snapshots();
   }
 
-  void updateExtracurriculars(ExtracurricularsModel ex) {
+  void updateExtracurriculars(
+      ExtracurricularsModel ex, int prevIndex, int prevTime) {
     inspect(ex.toMap());
     FirebaseFirestore.instance
         .collection('Schedule')
         .doc(ex.id)
         .update(ex.toMap());
+
+    //TODO: UPDEJTUJ VREME TREBA DA SE PROSLEDI I STARI EXTRAC...
+
+    FirebaseFirestore.instance
+        .collection('Users')
+        .doc(ua.currentUser!.uid)
+        .get()
+        .then((value) {
+      inspect(value.data());
+      final List<int> times =
+          ((value.data()?['extracurricularsTimes'] ?? []) as List<dynamic>)
+              .map((e) => e as int)
+              .toList();
+      times[ex.dayIndex] += ex.time;
+      times[prevIndex] -= prevTime;
+      FirebaseFirestore.instance
+          .collection('Users')
+          .doc(ua.currentUser!.uid)
+          .update({"extracurricularsTimes": times});
+    });
   }
 
   void addBreakDay(int dayIndex) {
@@ -374,6 +396,23 @@ class Firestore {
       "type": "extracurricular",
       "index": 1000,
       "date": null
+    });
+
+    FirebaseFirestore.instance
+        .collection('Users')
+        .doc(ua.currentUser!.uid)
+        .get()
+        .then((value) {
+      inspect(value.data());
+      final List<int> times =
+          ((value.data()?['extracurricularsTimes'] ?? []) as List<dynamic>)
+              .map((e) => e as int)
+              .toList();
+      times[dayIndex] += time;
+      FirebaseFirestore.instance
+          .collection('Users')
+          .doc(ua.currentUser!.uid)
+          .update({"extracurricularsTimes": times});
     });
   }
 
@@ -605,12 +644,23 @@ class Firestore {
 
   void deleteExtracurriculars(ExtracurricularsModel ex) {
     FirebaseFirestore.instance.collection('Schedule').doc(ex.id).delete();
+    FirebaseFirestore.instance
+        .collection('Users')
+        .doc(ua.currentUser!.uid)
+        .get()
+        .then((value) {
+      inspect(value.data());
+      final List<int> times =
+          ((value.data()?['extracurricularsTimes'] ?? []) as List<dynamic>)
+              .map((e) => e as int)
+              .toList();
+      times[ex.dayIndex] -= ex.time;
+      FirebaseFirestore.instance
+          .collection('Users')
+          .doc(ua.currentUser!.uid)
+          .update({"extracurricularsTimes": times});
+    });
   }
-
-///////////////////////////kalendar
-
-///////////////////////////////////////////////////////////////////////////////////
-  ///
 
   Stream<QuerySnapshot<Map<String, dynamic>>> getStudentCourses() {
     return FirebaseFirestore.instance
