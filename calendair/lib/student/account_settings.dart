@@ -1,18 +1,14 @@
 import 'dart:io';
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:calendair/classes/authentication.dart';
-import 'package:calendair/models/nbar.dart';
-import 'package:calendair/student/settings.dart';
+import 'package:calendair/controllers/firebase_controller.dart';
+import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:sizer/sizer.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:firebase_storage/firebase_storage.dart';
-import 'package:flutter/material.dart';
-import 'package:get/get.dart';
-import 'package:provider/provider.dart';
-import '../student_teacher/bottom_nav_bar.dart';
-import 'dashboard.dart';
 
 class AccountSettings extends StatefulWidget {
-  const AccountSettings({Key? key}) : super(key: key);
+  const AccountSettings({super.key});
 
   @override
   State<AccountSettings> createState() => _AccountSettingsState();
@@ -22,19 +18,17 @@ class _AccountSettingsState extends State<AccountSettings> {
   String? imgUrl;
   final name = TextEditingController();
   bool uploading = false;
-  late final UserAuthentication userAuthentication;
+  late final FirebaseController firebaseController;
 
   @override
   void initState() {
-    userAuthentication = context.read<UserAuthentication>();
-    name.text = userAuthentication.currentUser?.name ?? " ";
+    firebaseController = context.read<FirebaseController>();
+    name.text = firebaseController.currentUser?.name ?? " ";
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
-    final width = MediaQuery.of(context).size.width;
-
     return Scaffold(
       appBar: AppBar(
         backgroundColor: const Color.fromRGBO(93, 159, 196, 1),
@@ -44,39 +38,34 @@ class _AccountSettingsState extends State<AccountSettings> {
             color: Colors.black,
           ),
           onPressed: () {
-            Get.back();
+            Navigator.of(context).pop();
           },
         ),
       ),
-      bottomNavigationBar: BottomNavBar(
-        items: [
-          NBar(
-              slika: 'calendar',
-              onclick: () {
-                Get.off(
-                  const Dashboard(),
-                  transition: Transition.circularReveal,
-                  duration: const Duration(milliseconds: 800),
-                );
-              }),
-          NBar(
-              slika: 'home',
-              onclick: () {
-                Get.until(
-                    (route) => route.settings.name == '/StudentDashboard');
-              }),
-          NBar(
-              slika: 'settings',
-              onclick: () {
-                Get.off(
-                  const Settings(),
-                  transition: Transition.circularReveal,
-                  duration: const Duration(milliseconds: 800),
-                );
-              })
-        ],
-        selected: 2,
-      ),
+      // bottomNavigationBar: NavBar(
+      //   navBarItems: [
+      //     NavBarItem(
+      //         image: 'calendar',
+      //         onclick: () {
+      //           Get.off(
+      //             const Dashboard(),
+      //           );
+      //         }),
+      //     NavBarItem(
+      //         image: 'home',
+      //         onclick: () {
+      //           Get.until((route) =>
+      //               (route as GetPageRoute).routeName == '/StudentDashboard');
+      //         }),
+      //     NavBarItem(
+      //         image: 'settings',
+      //         onclick: () {
+      //           Get.to(
+      //             const StudentSettings(),
+      //           );
+      //         })
+      //   ],
+      // ),
       body: SafeArea(
           child: Stack(
         children: [
@@ -86,7 +75,7 @@ class _AccountSettingsState extends State<AccountSettings> {
                 Padding(
                   padding: const EdgeInsets.only(top: 20.0),
                   child: SizedBox(
-                    width: width * 0.8,
+                    width: 80.w,
                     child: const FittedBox(
                       child: Text(
                         'Account Settings',
@@ -101,7 +90,7 @@ class _AccountSettingsState extends State<AccountSettings> {
                 ),
                 Expanded(child: Container()),
                 SizedBox(
-                  width: width * 0.13,
+                  width: 13.w,
                   child: const FittedBox(
                     child: Text(
                       'Icon',
@@ -130,7 +119,7 @@ class _AccountSettingsState extends State<AccountSettings> {
                                   height: 200,
                                   fit: BoxFit.cover,
                                   imageUrl:
-                                      userAuthentication.currentUser?.picture ??
+                                      firebaseController.currentUser?.picture ??
                                           "",
                                   placeholder: (context, url) => const Center(
                                       child: CircularProgressIndicator()),
@@ -180,7 +169,7 @@ class _AccountSettingsState extends State<AccountSettings> {
                 Padding(
                   padding: const EdgeInsets.only(top: 5.0, bottom: 30),
                   child: SizedBox(
-                    width: width * 0.7,
+                    width: 70.w,
                     //height: 40,
                     child: TextField(
                       controller: name,
@@ -211,7 +200,7 @@ class _AccountSettingsState extends State<AccountSettings> {
                 Padding(
                   padding: const EdgeInsets.only(bottom: 25),
                   child: SizedBox(
-                    width: width * 0.6,
+                    width: 60.w,
                     height: 80,
                     child: ElevatedButton(
                       style: ElevatedButton.styleFrom(
@@ -230,24 +219,23 @@ class _AccountSettingsState extends State<AccountSettings> {
                           final storageRef = FirebaseStorage.instance.ref();
                           File file = File(imgUrl!);
                           final mountainsRef = storageRef.child(
-                              "${userAuthentication.currentUser?.uid}.jpg");
+                              "${firebaseController.currentUser?.uid}.jpg");
                           try {
                             await mountainsRef.putFile(file);
                             final img = await mountainsRef.getDownloadURL();
-                            userAuthentication.updateUser(
+                            firebaseController.updateUser(
                                 name: name.text, img: img);
                             setState(() {});
-                          } on FirebaseException catch (e) {
-                            //   // ...
-                          }
-                        } else if (userAuthentication.currentUser?.name !=
+                          } on FirebaseException catch (e) {}
+                        } else if (firebaseController.currentUser?.name !=
                             name.text) {
-                          userAuthentication.updateUser(name: name.text);
+                          firebaseController.updateUser(name: name.text);
                         }
                         setState(() {
                           uploading = false;
                         });
-                        Get.back();
+                        // ignore: use_build_context_synchronously
+                        Navigator.of(context).pop();
                       },
 
                       child: const FittedBox(

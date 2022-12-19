@@ -1,67 +1,43 @@
 import 'package:calendair/student/account_settings.dart';
 import 'package:calendair/student/notification_settings.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
-import '../classes/google_classroom.dart';
-import '../student_teacher/bottom_nav_bar.dart';
-import 'dashboard.dart';
-import '../models/nbar.dart';
+import 'package:persistent_bottom_nav_bar/persistent_tab_view.dart';
+import 'package:sizer/sizer.dart';
 
-class Settings extends StatefulWidget {
-  const Settings({Key? key}) : super(key: key);
+class StudentSettings extends StatelessWidget {
+  const StudentSettings({super.key});
 
-  @override
-  State<Settings> createState() => _SettingsState();
-}
-
-class _SettingsState extends State<Settings> {
-  final gc = Get.find<GoogleClassroom>();
   @override
   Widget build(BuildContext context) {
-    final width = MediaQuery.of(context).size.width;
     return Scaffold(
       appBar: AppBar(
         backgroundColor: const Color.fromRGBO(93, 159, 196, 1),
-        leading: IconButton(
-          icon: const Icon(
-            Icons.arrow_back_ios,
-            color: Colors.black,
-          ),
-          onPressed: () {
-            Get.back();
-            //inspect(gc.courses);
-          },
-        ),
       ),
-      bottomNavigationBar: BottomNavBar(
-        items: [
-          NBar(
-              slika: 'calendar',
-              onclick: () {
-                Get.off(
-                  const Dashboard(),
-                  transition: Transition.circularReveal,
-                  duration: const Duration(milliseconds: 800),
-                );
-              }),
-          NBar(
-              slika: 'home',
-              onclick: () {
-                Get.until(
-                    (route) => route.settings.name == '/StudentDashboard');
-              }),
-          NBar(
-              slika: 'settings',
-              onclick: () {
-                Get.off(
-                  const Settings(),
-                  transition: Transition.circularReveal,
-                  duration: const Duration(milliseconds: 800),
-                );
-              })
-        ],
-        selected: 2,
-      ),
+      // bottomNavigationBar: NavBar(
+      //   navBarItems: [
+      //     NavBarItem(
+      //         image: 'calendar',
+      //         onclick: () {
+      //           Get.to(
+      //             const Dashboard(),
+      //           );
+      //         }),
+      //     NavBarItem(
+      //         image: 'home',
+      //         // widget: const studentDashboard(),
+      //         onclick: () {
+      //           Get.until((route) =>
+      //               (route as GetPageRoute).routeName == '/StudentDashboard');
+      //         }),
+      //     NavBarItem(
+      //         image: 'settings',
+      //         onclick: () {
+      //           Get.to(
+      //             const StudentSettings(),
+      //           );
+      //         })
+      //   ],
+      // ),
       body: SafeArea(
         child: Center(
           child: Column(
@@ -74,7 +50,7 @@ class _SettingsState extends State<Settings> {
                 child: Padding(
                   padding: const EdgeInsets.only(top: 10.0, bottom: 40),
                   child: SizedBox(
-                    width: width * 0.7,
+                    width: 70.w,
                     child: const FittedBox(
                       fit: BoxFit.scaleDown,
                       child: Text(
@@ -91,14 +67,15 @@ class _SettingsState extends State<Settings> {
               ),
               InkWell(
                 onTap: () {
-                  Get.to(
-                    const AccountSettings(),
-                    transition: Transition.circularReveal,
-                    duration: const Duration(milliseconds: 800),
+                  PersistentNavBarNavigator.pushNewScreen(
+                    context,
+                    screen: const AccountSettings(),
+                    withNavBar: true,
+                    pageTransitionAnimation: PageTransitionAnimation.fade,
                   );
                 },
                 child: Container(
-                  width: width * 0.75,
+                  width: 75.w,
                   decoration: const BoxDecoration(
                       color: Color.fromRGBO(93, 159, 196, 1),
                       borderRadius: BorderRadius.only(
@@ -126,14 +103,15 @@ class _SettingsState extends State<Settings> {
               ),
               InkWell(
                 onTap: () {
-                  Get.to(
-                    const NotificationSettings(),
-                    transition: Transition.circularReveal,
-                    duration: const Duration(milliseconds: 800),
+                  PersistentNavBarNavigator.pushNewScreen(
+                    context,
+                    screen: const NotificationSettings(),
+                    withNavBar: true,
+                    pageTransitionAnimation: PageTransitionAnimation.fade,
                   );
                 },
                 child: Container(
-                  width: width * 0.75,
+                  width: 75.w,
                   decoration: const BoxDecoration(
                       color: Color.fromRGBO(93, 159, 196, 1),
                       borderRadius: BorderRadius.only(
@@ -159,7 +137,7 @@ class _SettingsState extends State<Settings> {
               const Expanded(child: SizedBox()),
               Image.asset(
                 'assets/images/logoSettings.png',
-                width: width * 0.5,
+                width: 50.w,
               )
             ],
           ),

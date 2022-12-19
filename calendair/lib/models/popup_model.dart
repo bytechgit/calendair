@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class PopUpModel {
+  String docId;
   String classId;
   Timestamp dueDate;
   String question;
@@ -11,7 +12,7 @@ class PopUpModel {
 
   Map<String, dynamic> toMap() {
     return {
-      'id': classId,
+      'classId': classId,
       'dueDate': dueDate,
       'question': question,
       'numRate': numRate,
@@ -21,8 +22,8 @@ class PopUpModel {
     };
   }
 
-  PopUpModel.fromMap(Map<String, dynamic> map)
-      : classId = map["id"] ?? " ",
+  PopUpModel.fromMap(Map<String, dynamic> map, this.docId)
+      : classId = map["classId"] ?? " ",
         dueDate = map["dueDate"] ?? " ",
         question = map["question"] ?? " no question",
         numRate = map["numRate"] ?? " ",

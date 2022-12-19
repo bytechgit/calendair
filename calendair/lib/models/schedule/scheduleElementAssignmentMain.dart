@@ -1,5 +1,6 @@
 import 'dart:developer';
-import 'package:calendair/classes/authentication.dart';
+import 'package:calendair/controllers/firebase_controller.dart';
+import 'package:calendair/controllers/pom.dart';
 import 'package:calendair/models/schedule/scheduleElement.dart';
 import 'package:calendair/models/schedule/scheduleElementAssignment.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -15,59 +16,80 @@ class ScheduleElementAssignmentMain extends ScheduleElement {
   List<int> indexes;
   String note;
 
-  Future<void> addDates(UserAuthentication ua) async {
-    if (scheduleLists.timesList == null) {
-      print("null");
-    }
+  Future<void> addDates(FirebaseController ua) async {
+    List<int> extratimes = ua.currentUser!.extracurricularsTimes;
+    Map<String, int> assignmenttimes = ua.currentUser!.times;
+    print(assignmenttimes);
 
-    final l = await FirebaseFirestore.instance
-        .collection('Users')
-        .doc(ua.currentUser!.uid)
-        .get();
-    final List<int> extTimes =
-        ((l.data()?['extracurricularsTimes'] ?? []) as List<dynamic>)
-            .map((e) => e as int)
-            .toList();
-
-    scheduleLists.timesList ??= ua.currentUser?.times;
-
-    int time = this.time;
     DateTime date = DateUtils.dateOnly(DateTime.now());
-    DateTime minDate = DateUtils.dateOnly(DateTime.now());
-    int minTime = 10000;
-    int curTime = 0;
-    while (time > 0) {
-      int decrTime = time > 45 ? 30 : time;
-      times.add(decrTime);
-      remainingTimes.add(decrTime * 60);
-      time -= decrTime;
-      minTime = 10000;
-      minDate = DateUtils.dateOnly(DateTime.now());
-      date = DateUtils.dateOnly(DateTime.now());
-      finishedList.add(false);
-      indexes.add(1000);
-      //inicijalno na 1000 jer se stavlj na kraj dana
-      while (date.compareTo(dueDate) <= 0) {
-        if (date.weekday - 1 != ua.currentUser!.breakday) {
-          curTime =
-              (scheduleLists.timesList?[DateUtils.dateOnly(date).toString()] ??
-                      0) +
-                  extTimes[date.weekday - 1];
-          if (curTime < minTime) {
-            minTime = curTime;
-            minDate = date;
-          }
-        }
-        date = date.add(const Duration(days: 1));
+    DateTime dtn = DateUtils.dateOnly(DateTime.now());
+    List<int> gentimes =
+        List.generate(dueDate.difference(date).inDays, (index) => 0);
+
+    for (int i = 0; i < gentimes.length; i++) {
+      gentimes[i] = (assignmenttimes[
+                  DateUtils.dateOnly(date.add(Duration(days: i))).toString()] ??
+              0) +
+          extratimes[(date.add(Duration(days: i)).weekday - 1)];
+      if ((date.add(Duration(days: i)).weekday - 1) ==
+          ua.currentUser!.breakday) {
+        gentimes[i] = 100000;
       }
-      inspect(minDate);
-      inspect(scheduleLists.timesList);
-      dates.add(minDate);
-      scheduleLists.timesList?[DateUtils.dateOnly(minDate).toString()] =
-          (scheduleLists.timesList?[DateUtils.dateOnly(minDate).toString()] ??
-                  0) +
-              decrTime;
     }
+    final st = Scheduletime().startScheduling(gentimes, time);
+
+    for (int i = 0; i < st.length; i++) {
+      if (st[i] != 0) {
+        dates.add(dtn.add(Duration(days: i)));
+        finishedList.add(false);
+        times.add(st[i]);
+        remainingTimes.add(st[i] * 60);
+        indexes.add(1000);
+        assignmenttimes[
+                DateUtils.dateOnly(dtn.add(Duration(days: i))).toString()] =
+            (assignmenttimes[DateUtils.dateOnly(dtn.add(Duration(days: i)))
+                        .toString()] ??
+                    0) +
+                st[i];
+      }
+    }
+    print(assignmenttimes);
+
+    // int minTime = 10000;
+    // int curTime = 0;
+    // while (time > 0) {
+    //   int decrTime = time > 45 ? 30 : time;
+    //   times.add(decrTime);
+    //   remainingTimes.add(decrTime * 60);
+    //   time -= decrTime;
+    //   minTime = 10000;
+    //   minDate = DateUtils.dateOnly(DateTime.now());
+    //   date = DateUtils.dateOnly(DateTime.now());
+    //   finishedList.add(false);
+    //   indexes.add(1000);
+    //   //inicijalno na 1000 jer se stavlj na kraj dana
+    //   while (date.compareTo(dueDate) <= 0) {
+    //     if (date.weekday - 1 != ua.currentUser!.breakday) {
+    //       curTime =
+    //           (scheduleLists.timesList?[DateUtils.dateOnly(date).toString()] ??
+    //                   0) +
+    //               extTimes[date.weekday - 1];
+    //       if (curTime < minTime) {
+    //         minTime = curTime;
+    //         minDate = date;
+    //       }
+    //     }
+    //     date = date.add(const Duration(days: 1));
+    //   }
+    //   inspect(minDate);
+    //   inspect(scheduleLists.timesList);
+    //   dates.add(minDate);
+    //   scheduleLists.timesList?[DateUtils.dateOnly(minDate).toString()] =
+    //       (scheduleLists.timesList?[DateUtils.dateOnly(minDate).toString()] ??
+    //               0) +
+    //           decrTime;
+    // }
+    ua.currentUser!.times = assignmenttimes;
     FirebaseFirestore.instance.collection("Schedule").doc(docId).update({
       "dates": dates,
       "indexes": indexes,
@@ -75,7 +97,7 @@ class ScheduleElementAssignmentMain extends ScheduleElement {
       "times": times,
       "remainingTimes": remainingTimes
     });
-    await ua.setTimes(scheduleLists.timesList!);
+    await ua.setTimes(assignmenttimes);
   }
 
   ScheduleElementAssignmentMain(
@@ -113,7 +135,7 @@ class ScheduleElementAssignmentMain extends ScheduleElement {
 
   @override
   Future<void> addInSchedule(
-      {int? listIndex, int? index, UserAuthentication? ua}) async {
+      {int? listIndex, int? index, FirebaseController? ua}) async {
     if (dates.isEmpty) {
       await addDates(ua!);
     }

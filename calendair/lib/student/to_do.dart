@@ -1,15 +1,8 @@
-import 'package:calendair/classes/schedule_controller.dart';
-import 'package:calendair/models/schedule/scheduleElementAssignment.dart';
-import 'package:calendair/student/settings.dart';
-import 'package:calendair/student/to_do_check.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 // ignore: depend_on_referenced_packages
 import 'package:intl/intl.dart';
-import 'package:provider/provider.dart';
-import '../student_teacher/bottom_nav_bar.dart';
-import '../models/nbar.dart';
 
 class ToDo extends StatefulWidget {
   final bool fromCalendar;
@@ -27,10 +20,10 @@ class ToDo extends StatefulWidget {
 }
 
 class _ToDoState extends State<ToDo> {
-  late final ScheduleController scheduleController;
+  //late final ScheduleController scheduleController;
   @override
   void initState() {
-    scheduleController = context.read<ScheduleController>();
+    // scheduleController = context.read<ScheduleController>();
     SystemChrome.setPreferredOrientations([
       DeviceOrientation.portraitUp,
       DeviceOrientation.portraitDown,
@@ -53,35 +46,6 @@ class _ToDoState extends State<ToDo> {
             Get.back();
           },
         ),
-      ),
-      bottomNavigationBar: BottomNavBar(
-        items: [
-          NBar(
-              slika: 'calendar',
-              onclick: () {
-                Get.until((route) =>
-                    (route as GetPageRoute).routeName == '/Dashboard');
-              }),
-          NBar(
-              slika: 'home',
-              onclick: () {
-                Get.until((route) =>
-                    (route as GetPageRoute).routeName == '/StudentDashboard');
-              }),
-          NBar(
-              slika: 'settings',
-              onclick: () {
-                if (widget.fromCalendar) {
-                  Get.back();
-                }
-                Get.off(
-                  const Settings(),
-                  transition: Transition.circularReveal,
-                  duration: const Duration(milliseconds: 800),
-                );
-              })
-        ],
-        selected: 0,
       ),
       body: SafeArea(
         child: Center(
@@ -128,14 +92,14 @@ class _ToDoState extends State<ToDo> {
                   child: SingleChildScrollView(
                     child: Column(
                       children: [
-                        ...scheduleController.scheduleElements[widget.index]
-                            .map((el) {
-                          if (el is ScheduleElementAssignment) {
-                            return ToDoCheck(el: el);
-                          } else {
-                            return const SizedBox.shrink();
-                          }
-                        }).toList(),
+                        // ...scheduleController.scheduleElements[widget.index]
+                        //     .map((el) {
+                        //   if (el is ScheduleElementAssignment) {
+                        //     return ToDoCheck(el: el);
+                        //   } else {
+                        //     return const SizedBox.shrink();
+                        //   }
+                        // }).toList(),
                         const SizedBox(
                           height: 20,
                         ),

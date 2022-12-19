@@ -1,27 +1,20 @@
-import 'package:calendair/models/custom_course.dart';
-import 'package:calendair/models/PopUpModel.dart';
-import 'package:calendair/teacher/pop_up_average_results.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:calendair/models/course_model.dart';
+import 'package:calendair/models/popup_model.dart';
+import 'package:calendair/student_teacher/bottom_nav_bar.dart';
+import 'package:calendair/teacher/popup_average_result.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 // ignore: depend_on_referenced_packages
 import 'package:intl/intl.dart';
-import '../student_teacher/bottom_nav_bar.dart';
-import '../models/nbar.dart';
+import 'package:sizer/sizer.dart';
 
-class PopUpResults extends StatefulWidget {
-  final CustomCourse course;
-  final List<QueryDocumentSnapshot<Object?>> list;
-  const PopUpResults({Key? key, required this.course, required this.list})
-      : super(key: key);
-  @override
-  State<PopUpResults> createState() => _PopUpResultsState();
-}
+class PopUpResults extends StatelessWidget {
+  final CourseModel course;
+  final List<PopUpModel> popups;
+  const PopUpResults({super.key, required this.course, required this.popups});
 
-class _PopUpResultsState extends State<PopUpResults> {
   @override
   Widget build(BuildContext context) {
-    final width = MediaQuery.of(context).size.width;
     return Scaffold(
       resizeToAvoidBottomInset: false,
       appBar: AppBar(
@@ -36,16 +29,15 @@ class _PopUpResultsState extends State<PopUpResults> {
           },
         ),
       ),
-      bottomNavigationBar: BottomNavBar(
-        items: [
-          NBar(
-              slika: 'home',
+      bottomNavigationBar: NavBar(
+        navBarItems: [
+          NavBarItem(
+              image: 'home',
               onclick: () {
                 Get.until((route) =>
                     (route as GetPageRoute).routeName == '/TeacherDashboard');
               }),
         ],
-        selected: 0,
       ),
       body: Center(
         child: Column(
@@ -53,11 +45,11 @@ class _PopUpResultsState extends State<PopUpResults> {
             Padding(
               padding: const EdgeInsets.only(top: 10.0),
               child: SizedBox(
-                width: width * 0.5,
+                width: 50.w,
                 child: FittedBox(
                   fit: BoxFit.scaleDown,
                   child: Text(
-                    widget.course.name,
+                    course.name,
                     style: const TextStyle(
                       color: Colors.black,
                       fontSize: 40,
@@ -68,7 +60,7 @@ class _PopUpResultsState extends State<PopUpResults> {
               ),
             ),
             SizedBox(
-              width: width * 0.8,
+              width: 80.w,
               child: const Divider(
                 thickness: 10,
                 height: 15,
@@ -76,7 +68,7 @@ class _PopUpResultsState extends State<PopUpResults> {
               ),
             ),
             SizedBox(
-              width: width * 0.8,
+              width: 80.w,
               child: const Text(
                 "Pop-Up Results",
                 textAlign: TextAlign.center,
@@ -93,15 +85,12 @@ class _PopUpResultsState extends State<PopUpResults> {
                 child: SingleChildScrollView(
                   child: Column(
                     children: [
-                      ...widget.list.map((d) {
-                        final pu = PopUpModel.fromMap(
-                          d.data() as Map<String, dynamic>,
-                        );
+                      ...popups.map((p) {
                         return Padding(
                           padding: const EdgeInsets.only(
                               left: 20.0, right: 20, bottom: 15),
                           child: SizedBox(
-                            width: width * 0.80,
+                            width: 80.w,
                             child: ElevatedButton(
                               style: ElevatedButton.styleFrom(
                                   shadowColor:
@@ -113,12 +102,10 @@ class _PopUpResultsState extends State<PopUpResults> {
                                     borderRadius: BorderRadius.circular(10.0),
                                   )),
                               onPressed: () {
-                                double a = (pu.sumRate);
-                                int b = pu.numRate;
+                                double a = (p.sumRate);
+                                int b = p.numRate;
                                 Get.to(
                                   PopUpAverageResult(rez: a / (b == 0 ? 1 : b)),
-                                  transition: Transition.circularReveal,
-                                  duration: const Duration(milliseconds: 800),
                                 );
                               },
                               child: Padding(
@@ -135,7 +122,7 @@ class _PopUpResultsState extends State<PopUpResults> {
                                     ),
                                     TextSpan(
                                       text:
-                                          "${DateFormat("MM/dd/yy").format(pu.dueDate.toDate())} ${pu.title}",
+                                          "${DateFormat("MM/dd/yy").format(p.dueDate.toDate())} ${p.title}",
                                       style: const TextStyle(
                                         color: Color.fromRGBO(75, 77, 76, 1),
                                         fontSize: 25,

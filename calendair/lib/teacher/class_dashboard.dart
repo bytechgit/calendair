@@ -1,25 +1,20 @@
-import 'package:calendair/teacher/assignments.dart';
-import 'package:calendair/models/custom_course.dart';
+import 'package:calendair/models/course_model.dart';
+import 'package:calendair/student_teacher/bottom_nav_bar.dart';
 import 'package:calendair/teacher/pop_ups.dart';
 import 'package:calendair/teacher/reminders.dart';
 import 'package:calendair/teacher/students.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import '../student_teacher/bottom_nav_bar.dart';
-import '../models/nbar.dart';
+import 'package:sizer/sizer.dart';
 
-class ClassDashboard extends StatefulWidget {
-  final CustomCourse course;
-  const ClassDashboard({Key? key, required this.course}) : super(key: key);
+import 'assignments.dart';
 
-  @override
-  State<ClassDashboard> createState() => _ClassDashboardState();
-}
+class ClassDashboar extends StatelessWidget {
+  final CourseModel course;
+  const ClassDashboar({super.key, required this.course});
 
-class _ClassDashboardState extends State<ClassDashboard> {
   @override
   Widget build(BuildContext context) {
-    final width = MediaQuery.of(context).size.width;
     return Scaffold(
       resizeToAvoidBottomInset: false,
       appBar: AppBar(
@@ -34,16 +29,15 @@ class _ClassDashboardState extends State<ClassDashboard> {
           },
         ),
       ),
-      bottomNavigationBar: BottomNavBar(
-        items: [
-          NBar(
-              slika: 'home',
+      bottomNavigationBar: NavBar(
+        navBarItems: [
+          NavBarItem(
+              image: 'home',
               onclick: () {
                 Get.until((route) =>
                     (route as GetPageRoute).routeName == '/TeacherDashboard');
               }),
         ],
-        selected: 0,
       ),
       body: SafeArea(
         child: Center(
@@ -52,11 +46,11 @@ class _ClassDashboardState extends State<ClassDashboard> {
               Padding(
                 padding: const EdgeInsets.only(top: 10.0),
                 child: SizedBox(
-                  width: width * 0.8,
+                  width: 80.w,
                   child: FittedBox(
                     fit: BoxFit.scaleDown,
                     child: Text(
-                      widget.course.name,
+                      course.name,
                       style: const TextStyle(
                         color: Colors.black,
                         fontSize: 35,
@@ -67,7 +61,7 @@ class _ClassDashboardState extends State<ClassDashboard> {
                 ),
               ),
               SizedBox(
-                width: width * 0.8,
+                width: 80.w,
                 child: const Divider(
                   thickness: 10,
                   height: 15,
@@ -75,7 +69,7 @@ class _ClassDashboardState extends State<ClassDashboard> {
                 ),
               ),
               Text(
-                'JOIN CODE: ${widget.course.code}',
+                'JOIN CODE: ${course.code}',
                 style: const TextStyle(
                   color: Colors.black,
                   fontSize: 22,
@@ -93,14 +87,12 @@ class _ClassDashboardState extends State<ClassDashboard> {
                     child: InkWell(
                       onTap: (() {
                         Get.to(
-                          Students(courseId: widget.course.docid),
-                          transition: Transition.circularReveal,
-                          duration: const Duration(milliseconds: 800),
+                          Students(courseId: course.docid),
                         );
                       }),
                       child: SizedBox(
                         height: 60,
-                        width: width * 0.8,
+                        width: 80.w,
                         child: Stack(
                           children: [
                             const Align(
@@ -137,15 +129,13 @@ class _ClassDashboardState extends State<ClassDashboard> {
                       onTap: (() {
                         Get.to(
                           Assignments(
-                            course: widget.course,
+                            course: course,
                           ),
-                          transition: Transition.circularReveal,
-                          duration: const Duration(milliseconds: 800),
                         );
                       }),
                       child: SizedBox(
                         height: 60,
-                        width: width * 0.8,
+                        width: 80.w,
                         child: Stack(
                           children: [
                             const Align(
@@ -181,14 +171,12 @@ class _ClassDashboardState extends State<ClassDashboard> {
                     child: InkWell(
                       onTap: (() {
                         Get.to(
-                          Reminders(course: widget.course),
-                          transition: Transition.circularReveal,
-                          duration: const Duration(milliseconds: 800),
+                          Reminders(course: course),
                         );
                       }),
                       child: SizedBox(
                         height: 60,
-                        width: width * 0.8,
+                        width: 180.w,
                         child: Stack(
                           children: [
                             const Align(
@@ -224,14 +212,12 @@ class _ClassDashboardState extends State<ClassDashboard> {
                     child: InkWell(
                       onTap: (() {
                         Get.to(
-                          PopUps(course: widget.course),
-                          transition: Transition.circularReveal,
-                          duration: const Duration(milliseconds: 800),
+                          PopUps(course: course),
                         );
                       }),
                       child: SizedBox(
                         height: 60,
-                        width: width * 0.8,
+                        width: 80.w,
                         child: Stack(
                           children: [
                             const Align(

@@ -1,36 +1,19 @@
-import 'package:calendair/classes/authentication.dart';
+import 'package:calendair/controllers/firebase_controller.dart';
+import 'package:calendair/models/course_model.dart';
+import 'package:calendair/student_teacher/bottom_nav_bar.dart';
 import 'package:calendair/teacher/class_dashboard.dart';
 import 'package:calendair/teacher/make_class.dart';
-import 'package:calendair/models/custom_course.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 import 'package:provider/provider.dart';
 import 'package:sizer/sizer.dart';
-import '../student_teacher/bottom_nav_bar.dart';
-import '../models/nbar.dart';
+import 'package:get/get.dart';
 
-class TeacherDashboard extends StatefulWidget {
+class TeacherDashboard extends StatelessWidget {
   const TeacherDashboard({Key? key}) : super(key: key);
-
-  @override
-  State<TeacherDashboard> createState() => _TeacherDashboardState();
-}
-
-class _TeacherDashboardState extends State<TeacherDashboard> {
-  late final UserAuthentication userAuthentication;
-  // late final GoogleClassroom googleClassroom;
-  @override
-  void initState() {
-    userAuthentication = context.read<UserAuthentication>();
-    //  googleClassroom = context.read<GoogleClassroom>();
-    super.initState();
-  }
-
-  changeTabIndex(int i) {}
-  int tabIndex = 0;
   @override
   Widget build(BuildContext context) {
+    final firebaseController = context.read<FirebaseController>();
     return Scaffold(
       resizeToAvoidBottomInset: false,
       appBar: AppBar(
@@ -38,16 +21,16 @@ class _TeacherDashboardState extends State<TeacherDashboard> {
         leading: null,
         automaticallyImplyLeading: false,
       ),
-      bottomNavigationBar: BottomNavBar(
-        items: [
-          NBar(
-              slika: 'home',
-              onclick: () {
-                Get.until((route) =>
-                    (route as GetPageRoute).routeName == '/TeacherDashboard');
-              }),
+      bottomNavigationBar: NavBar(
+        navBarItems: [
+          NavBarItem(
+            image: 'home',
+            onclick: () {
+              Get.until((route) =>
+                  (route as GetPageRoute).routeName == '/TeacherDashboard');
+            },
+          ),
         ],
-        selected: 0,
       ),
       body: SafeArea(
         child: Center(
@@ -83,70 +66,66 @@ class _TeacherDashboardState extends State<TeacherDashboard> {
                     child: Stack(
                       children: [
                         StreamBuilder(
-                            stream: userAuthentication.getTeacherCourses(),
-                            builder: (context,
-                                AsyncSnapshot<QuerySnapshot> snapshot) {
-                              if (snapshot.hasData) {
-                                return SingleChildScrollView(
-                                  child: Column(children: [
-                                    ...snapshot.data!.docs.map((e) {
-                                      final cc = CustomCourse.fromMap(
-                                          e.data() as Map<String, dynamic>,
-                                          e.id);
-                                      return Padding(
-                                        padding: const EdgeInsets.symmetric(
-                                            horizontal: 20, vertical: 10),
-                                        child: InkWell(
-                                          onTap: (() {
-                                            Get.to(
-                                              ClassDashboard(
-                                                course: cc,
-                                              ),
-                                              transition:
-                                                  Transition.circularReveal,
-                                              duration: const Duration(
-                                                  milliseconds: 800),
-                                            );
-                                          }),
-                                          child: Container(
-                                            padding: const EdgeInsets.all(10),
-                                            decoration: const BoxDecoration(
-                                                color: Color.fromRGBO(
-                                                    94, 159, 197, 1),
-                                                borderRadius: BorderRadius.all(
-                                                    Radius.circular(10))),
-                                            height: 65,
-                                            child: Center(
-                                              child: FittedBox(
-                                                child: Text(
-                                                  cc.name,
-                                                  textAlign: TextAlign.center,
-                                                  style: const TextStyle(
-                                                    color: Color.fromRGBO(
-                                                        38, 65, 78, 1),
-                                                    fontSize: 36,
-                                                  ),
+                          stream: firebaseController.getTeacherCourses(),
+                          builder:
+                              (context, AsyncSnapshot<QuerySnapshot> snapshot) {
+                            if (snapshot.hasData) {
+                              return SingleChildScrollView(
+                                child: Column(children: [
+                                  ...snapshot.data!.docs.map((e) {
+                                    final course = CourseModel.fromMap(
+                                        e.data() as Map<String, dynamic>, e.id);
+                                    return Padding(
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 20, vertical: 10),
+                                      child: InkWell(
+                                        onTap: (() {
+                                          Get.to(ClassDashboar(
+                                            course: course,
+                                          ));
+                                        }),
+                                        child: Container(
+                                          padding: const EdgeInsets.all(10),
+                                          decoration: const BoxDecoration(
+                                            color:
+                                                Color.fromRGBO(94, 159, 197, 1),
+                                            borderRadius: BorderRadius.all(
+                                              Radius.circular(10),
+                                            ),
+                                          ),
+                                          height: 65,
+                                          child: Center(
+                                            child: FittedBox(
+                                              child: Text(
+                                                course.name,
+                                                textAlign: TextAlign.center,
+                                                style: const TextStyle(
+                                                  color: Color.fromRGBO(
+                                                      38, 65, 78, 1),
+                                                  fontSize: 36,
                                                 ),
                                               ),
                                             ),
                                           ),
                                         ),
-                                      );
-                                    }).toList(),
-                                    Padding(
-                                      padding: const EdgeInsets.all(8.0),
-                                      child: Container(
-                                        height: 100,
                                       ),
+                                    );
+                                  }).toList(),
+                                  Padding(
+                                    padding: const EdgeInsets.all(8.0),
+                                    child: Container(
+                                      height: 100,
                                     ),
-                                  ]),
-                                );
-                              } else {
-                                return const Center(
-                                  child: CircularProgressIndicator(),
-                                );
-                              }
-                            }),
+                                  ),
+                                ]),
+                              );
+                            } else {
+                              return const Center(
+                                child: CircularProgressIndicator(),
+                              );
+                            }
+                          },
+                        ),
                         Align(
                           alignment: Alignment.bottomRight,
                           child: Padding(
@@ -165,11 +144,7 @@ class _TeacherDashboardState extends State<TeacherDashboard> {
                                       borderRadius: BorderRadius.circular(10.0),
                                     )),
                                 onPressed: () {
-                                  Get.to(
-                                    const MakeClass(),
-                                    transition: Transition.circularReveal,
-                                    duration: const Duration(milliseconds: 800),
-                                  );
+                                  Get.to(const MakeClass());
                                 },
                                 child: const Text(
                                   'Make a class',
@@ -189,9 +164,10 @@ class _TeacherDashboardState extends State<TeacherDashboard> {
                           child: Align(
                             alignment: Alignment.bottomLeft,
                             child: SizedBox(
-                                width: 40.w,
-                                child: Image.asset(
-                                    'assets/images/teacherDashboard.png')),
+                              width: 40.w,
+                              child: Image.asset(
+                                  'assets/images/teacherDashboard.png'),
+                            ),
                           ),
                         ),
                       ],

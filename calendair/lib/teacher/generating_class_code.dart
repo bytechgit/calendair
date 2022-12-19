@@ -1,21 +1,13 @@
+import 'package:calendair/student_teacher/bottom_nav_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:progress_indicators/progress_indicators.dart';
 import 'package:sizer/sizer.dart';
-import '../student_teacher/bottom_nav_bar.dart';
-import '../models/nbar.dart';
+import 'package:progress_indicators/progress_indicators.dart';
 
-class GeneratingClassCode extends StatefulWidget {
-  final Future<String>? futureCode;
+class GeneratingClassCode extends StatelessWidget {
+  final Future<String>? code;
+  const GeneratingClassCode({super.key, required this.code});
 
-  const GeneratingClassCode({Key? key, this.futureCode}) : super(key: key);
-
-  @override
-  State<GeneratingClassCode> createState() => _GeneratingClassCodeState();
-}
-
-class _GeneratingClassCodeState extends State<GeneratingClassCode> {
-  String? code;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -24,27 +16,17 @@ class _GeneratingClassCodeState extends State<GeneratingClassCode> {
         automaticallyImplyLeading: false,
         leading: null,
         backgroundColor: const Color.fromRGBO(93, 159, 196, 1),
-
-        // leading: IconButton(
-        //   icon: const Icon(
-        //     Icons.arrow_back_ios,
-        //     color: Colors.black,
-        //   ),
-        //   onPressed: () {
-        //     Get.back();
-        //   },
-        // ),
       ),
-      bottomNavigationBar: BottomNavBar(
-        items: [
-          NBar(
-              slika: 'home',
-              onclick: () {
-                Get.until((route) =>
-                    (route as GetPageRoute).routeName == '/TeacherDashboard');
-              }),
+      bottomNavigationBar: NavBar(
+        navBarItems: [
+          NavBarItem(
+            image: 'home',
+            onclick: () {
+              Get.until((route) =>
+                  (route as GetPageRoute).routeName == '/TeacherDashboard');
+            },
+          ),
         ],
-        selected: 0,
       ),
       body: SafeArea(
         child: Stack(
@@ -79,11 +61,9 @@ class _GeneratingClassCodeState extends State<GeneratingClassCode> {
                                 fontSize: 20),
                           ),
                           FutureBuilder<String>(
-                              future: widget.futureCode,
+                              future: code,
                               builder: (context, snapshot) {
                                 if (snapshot.hasData) {
-                                  code = snapshot.data;
-
                                   return const Text(
                                     "...",
                                     style: TextStyle(
@@ -116,65 +96,31 @@ class _GeneratingClassCodeState extends State<GeneratingClassCode> {
                     padding: const EdgeInsets.only(top: 5.0, bottom: 20),
                     child: SizedBox(
                       width: 70.w,
-                      //height: 40,
                       child: FutureBuilder<String>(
-                          future: widget.futureCode,
+                          future: code,
                           builder: (context, snapshot) {
-                            if (snapshot.hasData) {
-                              return TextField(
-                                enabled: false,
-                                maxLines: 3,
-                                minLines: 1,
-                                keyboardType: TextInputType.multiline,
-                                style: const TextStyle(
+                            return TextField(
+                              enabled: false,
+                              style: const TextStyle(
+                                  color: Color.fromRGBO(38, 64, 78, 1),
+                                  fontSize: 25),
+                              textAlign: TextAlign.center,
+                              decoration: InputDecoration(
+                                contentPadding: const EdgeInsets.symmetric(
+                                    horizontal: 10.0),
+                                border: OutlineInputBorder(
+                                  borderSide: BorderSide.none,
+                                  borderRadius: BorderRadius.circular(15.0),
+                                ),
+                                filled: true,
+                                hintStyle: const TextStyle(
                                     color: Color.fromRGBO(38, 64, 78, 1),
                                     fontSize: 25),
-                                textAlignVertical: TextAlignVertical.center,
-                                textAlign: TextAlign.center,
-                                decoration: InputDecoration(
-                                  contentPadding: const EdgeInsets.symmetric(
-                                      horizontal: 10.0),
-                                  border: OutlineInputBorder(
-                                    borderSide: BorderSide.none,
-                                    borderRadius: BorderRadius.circular(15.0),
-                                  ),
-                                  filled: true,
-                                  hintStyle: const TextStyle(
-                                      color: Color.fromRGBO(38, 64, 78, 1),
-                                      fontSize: 25),
-                                  hintText: snapshot.data,
-                                  fillColor:
-                                      const Color.fromRGBO(94, 159, 197, 1),
-                                ),
-                              );
-                            } else {
-                              return TextField(
-                                enabled: false,
-                                maxLines: 3,
-                                minLines: 1,
-                                keyboardType: TextInputType.multiline,
-                                style: const TextStyle(
-                                    color: Color.fromRGBO(38, 64, 78, 1),
-                                    fontSize: 25),
-                                textAlignVertical: TextAlignVertical.center,
-                                textAlign: TextAlign.center,
-                                decoration: InputDecoration(
-                                  contentPadding: const EdgeInsets.symmetric(
-                                      horizontal: 10.0),
-                                  border: OutlineInputBorder(
-                                    borderSide: BorderSide.none,
-                                    borderRadius: BorderRadius.circular(15.0),
-                                  ),
-                                  filled: true,
-                                  hintStyle: const TextStyle(
-                                      color: Color.fromRGBO(38, 64, 78, 1),
-                                      fontSize: 25),
-                                  hintText: "",
-                                  fillColor:
-                                      const Color.fromRGBO(94, 159, 197, 1),
-                                ),
-                              );
-                            }
+                                hintText: snapshot.data ?? "",
+                                fillColor:
+                                    const Color.fromRGBO(94, 159, 197, 1),
+                              ),
+                            );
                           }),
                     ),
                   ),

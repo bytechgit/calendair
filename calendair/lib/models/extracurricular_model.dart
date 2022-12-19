@@ -1,5 +1,5 @@
-class ExtracurricularsModel {
-  String id;
+class ExtracurricularModel {
+  String docId;
   String studentId;
   String title;
   int time;
@@ -17,9 +17,8 @@ class ExtracurricularsModel {
     };
   }
 
-  ExtracurricularsModel.fromMap(Map<String, dynamic> map, String docId)
-      : id = docId,
-        studentId = map["studentId"] ?? " ",
+  ExtracurricularModel.fromMap(Map<String, dynamic> map, this.docId)
+      : studentId = map["studentId"] ?? " ",
         time = map["time"] ?? 0,
         dayIndex = map["dayIndex"] ?? 0,
         index = map["index"] ?? 1000,

@@ -1,23 +1,18 @@
-import 'dart:developer';
-import 'package:calendair/classes/authentication.dart';
-import 'package:calendair/classes/firestore.dart';
-import 'package:calendair/student_teacher/bottom_nav_bar.dart';
-import 'package:calendair/student/break_day.dart';
-import 'package:calendair/student/classes.dart';
-import 'package:calendair/student/confidence_meter.dart';
-import 'package:calendair/student/extracurriculars.dart';
-import 'package:calendair/models/PopUpModel.dart';
-import 'package:calendair/student/settings.dart' as c;
-import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:calendair/controllers/firebase_controller.dart';
+import 'package:calendair/controllers/schedule_controller.dart';
+import 'package:calendair/models/popup_model.dart';
+import 'package:calendair/student/add_edit_breakday.dart';
+import 'package:calendair/student/confidence_merer.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
-// ignore: depend_on_referenced_packages
-import 'package:intl/intl.dart';
+import 'package:persistent_bottom_nav_bar/persistent_tab_view.dart';
 import 'package:provider/provider.dart';
 import 'package:sizer/sizer.dart';
-import 'dashboard.dart';
-import '../models/nbar.dart';
+// ignore: depend_on_referenced_packages
+import 'package:intl/intl.dart';
+import 'classes.dart';
+import 'extracurriculars.dart';
 
 class StudentDashboard extends StatefulWidget {
   const StudentDashboard({Key? key}) : super(key: key);
@@ -28,16 +23,33 @@ class StudentDashboard extends StatefulWidget {
 
 class _StudentDashboardState extends State<StudentDashboard> {
   bool open = true;
-  late final UserAuthentication userAuthentication;
-
+  late final FirebaseController firebaseController;
+  List<PopUpModel> popups = [];
   @override
   void initState() {
-    userAuthentication = context.read<UserAuthentication>();
+    firebaseController = context.read<FirebaseController>();
+    Get.put(ScheduleController(firebaseController));
+    final sc = Get.find<ScheduleController>();
+    sc.listen(firebaseController.currentUser!.uid);
+    firebaseController.getStudentPopUps().listen((event) {
+      setState(() {
+        popups =
+            event.docs.map((e) => PopUpModel.fromMap(e.data(), e.id)).toList();
+        open = true;
+      });
+    });
     SystemChrome.setPreferredOrientations([
       DeviceOrientation.portraitUp,
       DeviceOrientation.portraitDown,
     ]);
     super.initState();
+  }
+
+  @override
+  void dispose() {
+    final sc = Get.find<ScheduleController>();
+    sc.streamSubscription?.cancel();
+    super.dispose();
   }
 
   @override
@@ -48,37 +60,31 @@ class _StudentDashboardState extends State<StudentDashboard> {
         leading: null,
         automaticallyImplyLeading: false,
       ),
-      bottomNavigationBar: BottomNavBar(
-        items: [
-          NBar(
-              slika: 'calendar',
-              onclick: () {
-                Get.to(
-                  const Dashboard(),
-                  transition: Transition.circularReveal,
-                  duration: const Duration(milliseconds: 800),
-                );
-              }),
-          NBar(
-              slika: 'home',
-              // widget: const studentDashboard(),
-              onclick: () {
-                setState(() {
-                  open = true;
-                });
-              }),
-          NBar(
-              slika: 'settings',
-              onclick: () {
-                Get.to(
-                  const c.Settings(),
-                  transition: Transition.circularReveal,
-                  duration: const Duration(milliseconds: 800),
-                );
-              })
-        ],
-        selected: 1,
-      ),
+      // bottomNavigationBar: NavBar(
+      //   navBarItems: [
+      //     NavBarItem(
+      //         image: 'calendar',
+      //         onclick: () {
+      //           Get.to(
+      //             const Dashboard(),
+      //           );
+      //         }),
+      //     NavBarItem(
+      //         image: 'home',
+      //         onclick: () {
+      //           setState(() {
+      //             open = true;
+      //           });
+      //         }),
+      //     NavBarItem(
+      //         image: 'settings',
+      //         onclick: () {
+      //           Get.to(
+      //             const StudentSettings(),
+      //           );
+      //         })
+      //   ],
+      // ),
       body: SafeArea(
         child: SizedBox(
           child: Stack(
@@ -119,13 +125,14 @@ class _StudentDashboardState extends State<StudentDashboard> {
                                 borderRadius: BorderRadius.circular(10.0),
                               )),
                           onPressed: () {
-                            Get.to(
-                              const Classes(),
-                              transition: Transition.circularReveal,
-                              duration: const Duration(milliseconds: 800),
+                            PersistentNavBarNavigator.pushNewScreen(
+                              context,
+                              screen: const Classes(),
+                              withNavBar: true,
+                              pageTransitionAnimation:
+                                  PageTransitionAnimation.fade,
                             );
                           },
-
                           child: const FittedBox(
                             fit: BoxFit.scaleDown,
                             child: Text(
@@ -157,13 +164,14 @@ class _StudentDashboardState extends State<StudentDashboard> {
                                 borderRadius: BorderRadius.circular(10.0),
                               )),
                           onPressed: () {
-                            Get.to(
-                              const Extracurriculars(),
-                              transition: Transition.circularReveal,
-                              duration: const Duration(milliseconds: 800),
+                            PersistentNavBarNavigator.pushNewScreen(
+                              context,
+                              screen: const Extracurriculars(),
+                              withNavBar: true,
+                              pageTransitionAnimation:
+                                  PageTransitionAnimation.fade,
                             );
                           },
-
                           child: const FittedBox(
                             fit: BoxFit.scaleDown,
                             child: Text(
@@ -195,13 +203,14 @@ class _StudentDashboardState extends State<StudentDashboard> {
                                 borderRadius: BorderRadius.circular(10.0),
                               )),
                           onPressed: () {
-                            Get.to(
-                              const BreakDay(),
-                              transition: Transition.circularReveal,
-                              duration: const Duration(milliseconds: 800),
+                            PersistentNavBarNavigator.pushNewScreen(
+                              context,
+                              screen: const AddEditBreakday(),
+                              withNavBar: true,
+                              pageTransitionAnimation:
+                                  PageTransitionAnimation.fade,
                             );
                           },
-
                           child: const FittedBox(
                             fit: BoxFit.scaleDown,
                             child: Text(
@@ -225,7 +234,7 @@ class _StudentDashboardState extends State<StudentDashboard> {
                   alignment: Alignment.center,
                   child: Container(
                     width: 90.w,
-                    height: 77.h,
+                    height: 75.h,
                     decoration: const BoxDecoration(
                         color: Color.fromRGBO(26, 71, 97, 0.9),
                         borderRadius: BorderRadius.all(Radius.circular(10))),
@@ -259,82 +268,60 @@ class _StudentDashboardState extends State<StudentDashboard> {
                             ),
                           ),
                           Expanded(
-                            child: StreamBuilder(
-                                stream: userAuthentication.getStudentPopUps(),
-                                builder: (context,
-                                    AsyncSnapshot<QuerySnapshot> snapshot) {
-                                  if (snapshot.hasData) {
-                                    inspect(snapshot.data);
-                                    return SingleChildScrollView(
-                                      child: Column(
-                                        children: [
-                                          ...snapshot.data!.docs.map((e) {
-                                            final pu = PopUpModel.fromMap(
-                                              e.data() as Map<String, dynamic>,
-                                            );
-                                            return InkWell(
-                                              onTap: () {
-                                                Get.to(
-                                                  ConfidenceMeter(
-                                                      id: e.id,
-                                                      question:
-                                                          "${DateFormat("MM/dd/yy").format(pu.dueDate.toDate())} ${pu.title}",
-                                                      message: pu.question),
-                                                  transition:
-                                                      Transition.circularReveal,
-                                                  duration: const Duration(
-                                                      milliseconds: 800),
-                                                );
-                                              },
-                                              child: Padding(
-                                                padding: const EdgeInsets.only(
-                                                    top: 15),
-                                                child: SizedBox(
-                                                  child: Row(
-                                                    mainAxisSize:
-                                                        MainAxisSize.min,
-                                                    crossAxisAlignment:
-                                                        CrossAxisAlignment
-                                                            .center,
-                                                    children: [
-                                                      Padding(
-                                                        padding:
-                                                            const EdgeInsets
-                                                                .all(8.0),
-                                                        child: Image.asset(
-                                                          'assets/images/triangle.png',
-                                                          width: 15,
-                                                          height: 15,
-                                                        ),
-                                                      ),
-                                                      SizedBox(
-                                                        width: 65.w,
-                                                        child: Text(
-                                                          "${DateFormat("MM/dd/yy").format(pu.dueDate.toDate())} ${pu.title}",
-                                                          style:
-                                                              const TextStyle(
-                                                            color: Colors.white,
-                                                            fontSize: 18,
-                                                            fontWeight:
-                                                                FontWeight.bold,
-                                                          ),
-                                                        ),
-                                                      ),
-                                                    ],
+                            child: SingleChildScrollView(
+                              child: Column(
+                                children: [
+                                  ...popups.map((e) {
+                                    return InkWell(
+                                      onTap: () {
+                                        Get.to(
+                                          ConfidenceMeter(
+                                              id: e.docId,
+                                              question:
+                                                  "${DateFormat("MM/dd/yy").format(e.dueDate.toDate())} ${e.title}",
+                                              message: e.question),
+                                          transition: Transition.circularReveal,
+                                          duration:
+                                              const Duration(milliseconds: 800),
+                                        );
+                                      },
+                                      child: Padding(
+                                        padding: const EdgeInsets.only(top: 15),
+                                        child: SizedBox(
+                                          child: Row(
+                                            mainAxisSize: MainAxisSize.min,
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.center,
+                                            children: [
+                                              Padding(
+                                                padding:
+                                                    const EdgeInsets.all(8.0),
+                                                child: Image.asset(
+                                                  'assets/images/triangle.png',
+                                                  width: 15,
+                                                  height: 15,
+                                                ),
+                                              ),
+                                              SizedBox(
+                                                width: 65.w,
+                                                child: Text(
+                                                  "${DateFormat("MM/dd/yy").format(e.dueDate.toDate())} ${e.title}",
+                                                  style: const TextStyle(
+                                                    color: Colors.white,
+                                                    fontSize: 18,
+                                                    fontWeight: FontWeight.bold,
                                                   ),
                                                 ),
                                               ),
-                                            );
-                                          }).toList()
-                                        ],
+                                            ],
+                                          ),
+                                        ),
                                       ),
                                     );
-                                  } else {
-                                    return const Center(
-                                      child: CircularProgressIndicator(),
-                                    );
-                                  }
-                                }),
+                                  }).toList()
+                                ],
+                              ),
+                            ),
                           ),
                         ],
                       ),

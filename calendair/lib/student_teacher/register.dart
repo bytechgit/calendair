@@ -1,16 +1,20 @@
-import 'package:calendair/classes/authentication.dart';
+// ignore_for_file: use_build_context_synchronously
+import 'package:calendair/controllers/firebase_controller.dart';
+import 'package:calendair/student/navigation.dart';
+import 'package:calendair/student/student_dashboard.dart';
 import 'package:calendair/student_teacher/choose_user_type.dart';
+import 'package:calendair/teacher/teacher_dashboard.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:provider/provider.dart';
+import 'package:sizer/sizer.dart';
 
 class Register extends StatelessWidget {
   const Register({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    final userAuthentication = context.read<UserAuthentication>();
-    final width = MediaQuery.of(context).size.width;
+    final firebaseController = context.read<FirebaseController>();
     return Scaffold(
       resizeToAvoidBottomInset: false,
       body: Container(
@@ -48,7 +52,7 @@ class Register extends StatelessWidget {
               mainAxisSize: MainAxisSize.min,
               children: [
                 SizedBox(
-                  width: width * 0.5,
+                  width: 50.w,
                   child: Image.asset('assets/images/logo.png'),
                 ),
                 const Text(
@@ -61,7 +65,7 @@ class Register extends StatelessWidget {
                 Padding(
                   padding: const EdgeInsets.only(top: 20.0, bottom: 15),
                   child: SizedBox(
-                    width: width * 0.7,
+                    width: 70.w,
                     height: 60,
                     child: ElevatedButton.icon(
                       style: ElevatedButton.styleFrom(
@@ -72,7 +76,7 @@ class Register extends StatelessWidget {
                             borderRadius: BorderRadius.circular(25.0),
                           )),
                       onPressed: () async {
-                        await userAuthentication.signInwithGoogle();
+                        await firebaseController.signInwithGoogle();
                         // gc.getCourseListTeacher();
                       },
                       icon: Image.asset(
@@ -89,7 +93,7 @@ class Register extends StatelessWidget {
                   ),
                 ),
                 SizedBox(
-                  width: width * 0.35,
+                  width: 35.w,
                   height: 50,
                   child: ElevatedButton(
                     style: ElevatedButton.styleFrom(
@@ -99,15 +103,26 @@ class Register extends StatelessWidget {
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(18.0),
                         )),
-                    onPressed: () {
-                      if (userAuthentication.googleSignIn.currentUser != null) {
-                        Get.to(
-                          const ChooseUserType(),
-                          transition: Transition.circularReveal,
-                          duration: const Duration(milliseconds: 800),
-                        );
+                    onPressed: () async {
+                      if (firebaseController.auth.currentUser != null) {
+                        final rez = await firebaseController
+                            .register(firebaseController.auth.currentUser!.uid);
+                        if (rez == null) {
+                          //ne postoji user
+                          Get.to(const ChooseUserType());
+                        } else {
+                          if (rez.type == 'student') {
+                            Get.to(const Navigation());
+                          } else {
+                            Get.to(const TeacherDashboard());
+                          }
+                        }
                       } else {
-                        Get.snackbar('Sign in', 'Please sign in first');
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text("Please sign in first"),
+                          ),
+                        );
                       }
                     },
 

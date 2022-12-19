@@ -1,6 +1,7 @@
 import 'package:calendair/student_teacher/register.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:sizer/sizer.dart';
 
 class EnterSchoolCode extends StatefulWidget {
   const EnterSchoolCode({Key? key}) : super(key: key);
@@ -12,7 +13,6 @@ class EnterSchoolCode extends StatefulWidget {
 class _EnterSchoolCodeState extends State<EnterSchoolCode> {
   @override
   Widget build(BuildContext context) {
-    final width = MediaQuery.of(context).size.width;
     return Scaffold(
       resizeToAvoidBottomInset: false,
       body: Container(
@@ -62,14 +62,14 @@ class _EnterSchoolCodeState extends State<EnterSchoolCode> {
                     padding: const EdgeInsets.symmetric(vertical: 10.0),
                     child: Container(
                       height: 6,
-                      width: width * 0.7,
+                      width: 70.w,
                       decoration: const BoxDecoration(
                           color: Color.fromRGBO(94, 159, 196, 1),
                           borderRadius: BorderRadius.all(Radius.circular(13))),
                     ),
                   ),
                   SizedBox(
-                    width: width * 0.7,
+                    width: 70.w,
                     child: const FittedBox(
                       child: Text(
                         "Enter Your School Code",
@@ -84,8 +84,7 @@ class _EnterSchoolCodeState extends State<EnterSchoolCode> {
                   Padding(
                     padding: const EdgeInsets.only(top: 5.0),
                     child: SizedBox(
-                      width: width * 0.7,
-                      //height: 40,
+                      width: 70.w,
                       child: TextField(
                         style: const TextStyle(
                             color: Color.fromRGBO(38, 64, 78, 1), fontSize: 25),
@@ -110,7 +109,7 @@ class _EnterSchoolCodeState extends State<EnterSchoolCode> {
                   Padding(
                     padding: const EdgeInsets.symmetric(vertical: 10.0),
                     child: SizedBox(
-                      width: width * 0.5,
+                      width: 50.w,
                       child: const Text(
                         "Each school is given a unique code!",
                         textAlign: TextAlign.center,
@@ -122,7 +121,7 @@ class _EnterSchoolCodeState extends State<EnterSchoolCode> {
                     ),
                   ),
                   SizedBox(
-                    width: width * 0.35,
+                    width: 35.w,
                     height: 50,
                     child: ElevatedButton(
                       style: ElevatedButton.styleFrom(
@@ -134,13 +133,8 @@ class _EnterSchoolCodeState extends State<EnterSchoolCode> {
                             borderRadius: BorderRadius.circular(18.0),
                           )),
                       onPressed: () {
-                        Get.to(
-                          const Register(),
-                          transition: Transition.circularReveal,
-                          duration: const Duration(milliseconds: 800),
-                        );
+                        Get.to(const Register());
                       },
-
                       child: const Text(
                         'Enter',
                         style: TextStyle(

@@ -2,18 +2,13 @@ import 'package:calendair/student_teacher/login.dart';
 import 'package:calendair/student_teacher/enter_school_code.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:sizer/sizer.dart';
 
-class LoginRegister extends StatefulWidget {
+class LoginRegister extends StatelessWidget {
   const LoginRegister({Key? key}) : super(key: key);
 
   @override
-  State<LoginRegister> createState() => _LoginRegisterState();
-}
-
-class _LoginRegisterState extends State<LoginRegister> {
-  @override
   Widget build(BuildContext context) {
-    final width = MediaQuery.of(context).size.width;
     return Scaffold(
       resizeToAvoidBottomInset: false,
       body: Container(
@@ -35,7 +30,7 @@ class _LoginRegisterState extends State<LoginRegister> {
                 Padding(
                   padding: const EdgeInsets.only(top: 25.0),
                   child: SizedBox(
-                    width: width * 0.55,
+                    width: 55.w,
                     height: 60,
                     child: ElevatedButton(
                       style: ElevatedButton.styleFrom(
@@ -47,11 +42,7 @@ class _LoginRegisterState extends State<LoginRegister> {
                             borderRadius: BorderRadius.circular(12.0),
                           )),
                       onPressed: () {
-                        Get.to(
-                          const Login(),
-                          transition: Transition.circularReveal,
-                          duration: const Duration(milliseconds: 800),
-                        );
+                        Get.to(const Login());
                       },
                       child: const Text(
                         'Login',
@@ -67,7 +58,7 @@ class _LoginRegisterState extends State<LoginRegister> {
                 Padding(
                   padding: const EdgeInsets.only(top: 25.0),
                   child: SizedBox(
-                    width: width * 0.55,
+                    width: 55.w,
                     height: 60,
                     child: ElevatedButton(
                       style: ElevatedButton.styleFrom(
@@ -79,11 +70,7 @@ class _LoginRegisterState extends State<LoginRegister> {
                             borderRadius: BorderRadius.circular(12.0),
                           )),
                       onPressed: () {
-                        Get.to(
-                          const EnterSchoolCode(),
-                          transition: Transition.circularReveal,
-                          duration: const Duration(milliseconds: 800),
-                        );
+                        Get.to(const EnterSchoolCode());
                       },
                       child: const Text(
                         'Register',

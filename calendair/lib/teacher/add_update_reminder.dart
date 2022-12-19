@@ -1,76 +1,84 @@
 import 'package:calendair/controllers/firebase_controller.dart';
-import 'package:calendair/student/calendar.dart';
+import 'package:calendair/controllers/teacher_state.dart';
+import 'package:calendair/models/course_model.dart';
+import 'package:calendair/models/remider_model.dart';
+import 'package:calendair/student_teacher/bottom_nav_bar.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';
 import 'package:get/get.dart';
-// ignore: depend_on_referenced_packages
-import 'package:intl/intl.dart';
-import 'package:persistent_bottom_nav_bar/persistent_tab_view.dart';
 import 'package:provider/provider.dart';
 import 'package:sizer/sizer.dart';
+import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';
+// ignore: depend_on_referenced_packages
+import 'package:intl/intl.dart';
 
-class Reminder extends StatefulWidget {
-  const Reminder({Key? key}) : super(key: key);
+class AddUpdateReminder extends StatefulWidget {
+  final CourseModel course;
+  final ReminderModel? reminder;
+  const AddUpdateReminder({super.key, required this.course, this.reminder});
 
   @override
-  State<Reminder> createState() => _ReminderState();
+  State<AddUpdateReminder> createState() => _AddUpdateReminderState();
 }
 
-class _ReminderState extends State<Reminder> {
-  late final FirebaseController firebaseController;
+class _AddUpdateReminderState extends State<AddUpdateReminder> {
+  late FirebaseController firebaseController;
+  late TeacherState teacherState;
+  final titleController = TextEditingController();
+  DateTime date = DateTime.now();
   @override
   void initState() {
     firebaseController = context.read<FirebaseController>();
-    SystemChrome.setPreferredOrientations([
-      DeviceOrientation.portraitUp,
-      DeviceOrientation.portraitDown,
-    ]);
+    teacherState = context.read<TeacherState>();
+    if (widget.reminder != null) {
+      titleController.text = widget.reminder!.title;
+      date = widget.reminder!.date.toDate();
+    }
     super.initState();
   }
 
-  DateTime date = DateTime.now();
-  final titleController = TextEditingController();
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        backgroundColor: const Color.fromRGBO(93, 159, 196, 1),
-        leading: IconButton(
-          icon: const Icon(
-            Icons.arrow_back_ios,
-            color: Colors.black,
+    return GestureDetector(
+   onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
+      child: Scaffold(
+        appBar: AppBar(
+          backgroundColor: const Color.fromRGBO(93, 159, 196, 1),
+          leading: IconButton(
+            icon: const Icon(
+              Icons.arrow_back_ios,
+              color: Colors.black,
+            ),
+            onPressed: () {
+              Get.back();
+            },
           ),
-          onPressed: () async {
-            Navigator.of(context).pop();
-          },
         ),
-      ),
-      body: WillPopScope(
-        onWillPop: () async {
-          Navigator.of(context).pop();
-          PersistentNavBarNavigator.pushNewScreen(
-            context,
-            screen: const Calendar(),
-            withNavBar: true,
-            pageTransitionAnimation: PageTransitionAnimation.fade,
-          );
-          return false;
-        },
-        child: SafeArea(
+        bottomNavigationBar: NavBar(
+          navBarItems: [
+            NavBarItem(
+                image: 'home',
+                onclick: () {
+                  Get.until((route) =>
+                      (route as GetPageRoute).routeName == '/TeacherDashboard');
+                }),
+          ],
+        ),
+        body: SafeArea(
           child: Center(
             child: Column(
               children: [
                 Padding(
                   padding: const EdgeInsets.only(top: 10.0),
                   child: SizedBox(
-                    width: 50.w,
-                    child: const FittedBox(
+                    width: 80.w,
+                    child: FittedBox(
+                      fit: BoxFit.scaleDown,
                       child: Text(
-                        'Reminder',
-                        style: TextStyle(
+                        widget.course.name,
+                        style: const TextStyle(
                           color: Colors.black,
-                          fontSize: 22,
+                          fontSize: 35,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
@@ -149,8 +157,7 @@ class _ReminderState extends State<Reminder> {
                       DatePicker.showDatePicker(context,
                           showTitleActions: true,
                           minTime: DateTime.now(),
-                          maxTime:
-                              DateTime.now().add(const Duration(days: 600)),
+                          maxTime: DateTime.now().add(const Duration(days: 600)),
                           theme: const DatePickerTheme(
                               headerColor: Color.fromARGB(255, 176, 176, 176),
                               backgroundColor: Color.fromRGBO(94, 159, 197, 1),
@@ -177,8 +184,7 @@ class _ReminderState extends State<Reminder> {
                         child: Text(
                           DateFormat("MM/dd/yy").format(date),
                           style: const TextStyle(
-                              color: Color.fromRGBO(38, 64, 78, 1),
-                              fontSize: 25),
+                              color: Color.fromRGBO(38, 64, 78, 1), fontSize: 25),
                         ),
                       ),
                     ),
@@ -193,34 +199,43 @@ class _ReminderState extends State<Reminder> {
                     child: ElevatedButton(
                       style: ElevatedButton.styleFrom(
                           shadowColor: const Color.fromRGBO(247, 247, 247, 1),
-                          backgroundColor:
-                              const Color.fromRGBO(94, 159, 197, 1),
+                          backgroundColor: const Color.fromRGBO(94, 159, 197, 1),
                           elevation: 0,
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(10.0),
                           )),
                       onPressed: () {
-                        if (date.weekday - 1 ==
-                            firebaseController.currentUser?.breakday) {
-                          Get.snackbar("Breakday", 'Select another day');
+                        if (titleController.text.isEmpty) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text("Enter reminder title"),
+                            ),
+                          );
                           return;
                         }
-                        firebaseController.addReminderStudent(
-                            date: date, title: titleController.text);
-                        Navigator.of(context).pop();
-                        PersistentNavBarNavigator.pushNewScreen(
-                          context,
-                          screen: const Calendar(),
-                          withNavBar: false,
-                          pageTransitionAnimation: PageTransitionAnimation.fade,
-                        );
+                        if (widget.reminder == null) {
+                          firebaseController
+                              .addReminder(
+                                  classId: widget.course.docid,
+                                  date: date,
+                                  title: titleController.text)
+                              .then((value) {
+                            teacherState.addReminder(value, widget.course.docid);
+                          });
+                        } else {
+                          widget.reminder!.date = Timestamp.fromDate(date);
+                          widget.reminder!.title = titleController.text;
+                          firebaseController.updateReminder(r: widget.reminder!);
+                          teacherState.update();
+                        }
+                        Get.back();
                       },
-                      child: const FittedBox(
+                      child: FittedBox(
                         fit: BoxFit.scaleDown,
                         child: Text(
-                          'Add',
+                          widget.reminder == null ? 'Send' : 'Update',
                           textAlign: TextAlign.center,
-                          style: TextStyle(
+                          style: const TextStyle(
                             color: Colors.black,
                             fontSize: 35,
                             fontWeight: FontWeight.bold,

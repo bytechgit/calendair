@@ -1,30 +1,20 @@
-import 'package:calendair/classes/authentication.dart';
-import 'package:calendair/models/UserModel.dart';
+// ignore_for_file: use_build_context_synchronously
+
+import 'package:calendair/controllers/firebase_controller.dart';
+import 'package:calendair/models/user_model.dart';
+import 'package:calendair/student/navigation.dart';
 import 'package:calendair/student/student_dashboard.dart';
 import 'package:calendair/teacher/teacher_dashboard.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:provider/provider.dart';
+import 'package:sizer/sizer.dart';
 
-class ChooseUserType extends StatefulWidget {
+class ChooseUserType extends StatelessWidget {
   const ChooseUserType({Key? key}) : super(key: key);
-
-  @override
-  State<ChooseUserType> createState() => _ChooseUserTypeState();
-}
-
-class _ChooseUserTypeState extends State<ChooseUserType> {
-  late final UserAuthentication userAuthentication;
-
-  @override
-  void initState() {
-    userAuthentication = context.read<UserAuthentication>();
-    super.initState();
-  }
-
   @override
   Widget build(BuildContext context) {
-    final width = MediaQuery.of(context).size.width;
+    final firebaseController = context.read<FirebaseController>();
     return Scaffold(
       resizeToAvoidBottomInset: false,
       body: Container(
@@ -57,7 +47,7 @@ class _ChooseUserTypeState extends State<ChooseUserType> {
                       padding: const EdgeInsets.symmetric(vertical: 10.0),
                       child: Container(
                         height: 6,
-                        width: width * 0.7,
+                        width: 70.w,
                         decoration: const BoxDecoration(
                             color: Color.fromRGBO(94, 159, 196, 1),
                             borderRadius:
@@ -75,28 +65,23 @@ class _ChooseUserTypeState extends State<ChooseUserType> {
                       ),
                     ),
                     InkWell(
-                      onTap: (() {
-                        userAuthentication.addUserIfNotExist(
+                      onTap: (() async {
+                        final rez = await firebaseController.addUser(
                             user: UserModel(
-                                uid: userAuthentication.auth.currentUser!.uid,
-                                name: userAuthentication
-                                        .auth.currentUser!.displayName ??
-                                    "no name",
-                                picture: userAuthentication
-                                        .auth.currentUser?.photoURL ??
-                                    "",
-                                type: "student",
-                                breakday: -1,
-                                courses: [],
-                                times: {}));
-                        Get.to(
-                          const StudentDashboard(),
-                          transition: Transition.circularReveal,
-                          duration: const Duration(milliseconds: 800),
-                        );
+                          uid: firebaseController.auth.currentUser!.uid,
+                          name: firebaseController
+                                  .auth.currentUser!.displayName ??
+                              "no name",
+                          picture:
+                              firebaseController.auth.currentUser?.photoURL ??
+                                  "",
+                          type: "student",
+                          breakday: -1,
+                        ));
+                        Get.to(const Navigation());
                       }),
                       child: Container(
-                        width: width * 0.7,
+                        width: 70.w,
                         height: 45,
                         decoration: const BoxDecoration(
                           color: Color.fromRGBO(94, 159, 197, 1),
@@ -122,28 +107,27 @@ class _ChooseUserTypeState extends State<ChooseUserType> {
                     ),
                     InkWell(
                       onTap: () {
-                        userAuthentication.addUserIfNotExist(
+                        firebaseController.addUser(
                             user: UserModel(
-                                uid: userAuthentication.auth.currentUser!.uid,
-                                name: userAuthentication
+                                uid: firebaseController.auth.currentUser!.uid,
+                                name: firebaseController
                                         .auth.currentUser!.displayName ??
                                     "no name",
-                                picture: userAuthentication
+                                picture: firebaseController
                                         .auth.currentUser!.photoURL ??
-                                    "",
+                                    " ",
                                 type: "teacher",
-                                breakday: -1,
-                                courses: [],
-                                times: {}));
+                                breakday: -1));
                         //gc.getCourseListTeacher();
-                        Get.to(
-                          const TeacherDashboard(),
-                          transition: Transition.circularReveal,
-                          duration: const Duration(milliseconds: 800),
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const TeacherDashboard(),
+                          ),
                         );
                       },
                       child: Container(
-                        width: width * 0.7,
+                        width: 70.w,
                         height: 45,
                         decoration: const BoxDecoration(
                           color: Color.fromRGBO(94, 159, 197, 1),

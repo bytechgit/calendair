@@ -1,38 +1,45 @@
-import 'package:calendair/classes/authentication.dart';
-import 'package:calendair/models/custom_course.dart';
-import 'package:calendair/models/PopUpModel.dart';
-import 'package:calendair/teacher/pop_up_add.dart';
-import 'package:calendair/teacher/pop_up_results.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
+import 'dart:developer';
+
+import 'package:calendair/controllers/firebase_controller.dart';
+import 'package:calendair/controllers/teacher_state.dart';
+import 'package:calendair/models/course_model.dart';
+import 'package:calendair/student_teacher/bottom_nav_bar.dart';
+import 'package:calendair/teacher/add_popup.dart';
+import 'package:calendair/teacher/popup_results.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:provider/provider.dart';
 import 'package:sizer/sizer.dart';
-import '../classes/google_classroom.dart';
-import '../student_teacher/bottom_nav_bar.dart';
-import '../models/nbar.dart';
 // ignore: depend_on_referenced_packages
 import 'package:intl/intl.dart';
 
 class PopUps extends StatefulWidget {
-  final CustomCourse course;
-  const PopUps({Key? key, required this.course}) : super(key: key);
+  final CourseModel course;
+  const PopUps({super.key, required this.course});
 
   @override
   State<PopUps> createState() => _PopUpsState();
 }
 
 class _PopUpsState extends State<PopUps> {
-  late final UserAuthentication userAuthentication;
+  late FirebaseController firebaseController;
   @override
   void initState() {
-    userAuthentication = context.read<UserAuthentication>();
+    firebaseController = context.read<FirebaseController>();
+    final state = context.read<TeacherState>();
+    inspect(state);
+    inspect(widget.course);
+    if (!state.popupsExist(widget.course.docid)) {
+      firebaseController.getTeacherPopUps(widget.course.docid).then((value) {
+        state.addPopUps(value, widget.course.docid);
+      });
+    }
     super.initState();
   }
 
-  List<QueryDocumentSnapshot<Object?>> popupsLis = [];
   @override
   Widget build(BuildContext context) {
+    final state = context.watch<TeacherState>();
     return Scaffold(
       resizeToAvoidBottomInset: false,
       appBar: AppBar(
@@ -47,16 +54,15 @@ class _PopUpsState extends State<PopUps> {
           },
         ),
       ),
-      bottomNavigationBar: BottomNavBar(
-        items: [
-          NBar(
-              slika: 'home',
+      bottomNavigationBar: NavBar(
+        navBarItems: [
+          NavBarItem(
+              image: 'home',
               onclick: () {
                 Get.until((route) =>
                     (route as GetPageRoute).routeName == '/TeacherDashboard');
               }),
         ],
-        selected: 0,
       ),
       body: Center(
         child: Column(
@@ -71,7 +77,7 @@ class _PopUpsState extends State<PopUps> {
                     widget.course.name,
                     style: const TextStyle(
                       color: Colors.black,
-                      fontSize: 40,
+                      fontSize: 35,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
@@ -99,62 +105,48 @@ class _PopUpsState extends State<PopUps> {
             const SizedBox(
               height: 10,
             ),
-            Expanded(
-              child: StreamBuilder(
-                  stream:
-                      userAuthentication.getTeacherPopUps(widget.course.docid),
-                  builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
-                    if (snapshot.hasData) {
-                      popupsLis = snapshot.data!.docs;
-                      return SingleChildScrollView(
-                        child: Column(
-                          children: [
-                            ...snapshot.data!.docs.map((d) {
-                              final pu = PopUpModel.fromMap(
-                                d.data() as Map<String, dynamic>,
-                              );
-                              return Padding(
+            if (state.popupsExist(widget.course.docid))
+              Expanded(
+                  child: SingleChildScrollView(
+                child: Column(
+                  children: [
+                    ...state.popups[widget.course.docid]!.map((pu) {
+                      return Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: SizedBox(
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              Padding(
                                 padding: const EdgeInsets.all(8.0),
-                                child: SizedBox(
-                                  child: Row(
-                                    mainAxisSize: MainAxisSize.min,
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.center,
-                                    children: [
-                                      Padding(
-                                        padding: const EdgeInsets.all(8.0),
-                                        child: Image.asset(
-                                          'assets/images/triangle.png',
-                                          width: 20,
-                                          height: 20,
-                                        ),
-                                      ),
-                                      SizedBox(
-                                        width: 55.w,
-                                        child: Text(
-                                          "${DateFormat("MM/dd/yy").format(pu.dueDate.toDate())} ${pu.title}",
-                                          style: const TextStyle(
-                                            color: Colors.black,
-                                            fontSize: 18,
-                                            fontWeight: FontWeight.bold,
-                                          ),
-                                        ),
-                                      ),
-                                    ],
+                                child: Image.asset(
+                                  'assets/images/triangle.png',
+                                  width: 20,
+                                  height: 20,
+                                ),
+                              ),
+                              SizedBox(
+                                width: 55.w,
+                                child: Text(
+                                  "${DateFormat("MM/dd/yy").format(pu.dueDate.toDate())} ${pu.title}",
+                                  style: const TextStyle(
+                                    color: Colors.black,
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.bold,
                                   ),
                                 ),
-                              );
-                            }).toList()
-                          ],
+                              ),
+                            ],
+                          ),
                         ),
                       );
-                    } else {
-                      return const Center(
-                        child: CircularProgressIndicator(),
-                      );
-                    }
-                  }),
-            ),
+                    }).toList()
+                  ],
+                ),
+              )),
+            if (!state.popupsExist(widget.course.docid))
+              const Expanded(child: Center(child: CircularProgressIndicator())),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
@@ -175,9 +167,10 @@ class _PopUpsState extends State<PopUps> {
                           )),
                       onPressed: () {
                         Get.to(
-                          PopUpResults(course: widget.course, list: popupsLis),
-                          transition: Transition.circularReveal,
-                          duration: const Duration(milliseconds: 800),
+                          PopUpResults(
+                            popups: state.popups[widget.course.docid] ?? [],
+                            course: widget.course,
+                          ),
                         );
                       },
                       child: const Text(
@@ -209,9 +202,7 @@ class _PopUpsState extends State<PopUps> {
                           )),
                       onPressed: () {
                         Get.to(
-                          PopUpsAdd(course: widget.course),
-                          transition: Transition.circularReveal,
-                          duration: const Duration(milliseconds: 800),
+                          AddPopUp(course: widget.course),
                         );
                       },
                       child: const Text(

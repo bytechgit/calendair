@@ -1,18 +1,20 @@
-import 'package:calendair/classes/authentication.dart';
-import 'package:calendair/classes/schedule_controller.dart';
+// ignore_for_file: use_build_context_synchronously
+
+import 'package:calendair/controllers/firebase_controller.dart';
+import 'package:calendair/student/navigation.dart';
 import 'package:calendair/student/student_dashboard.dart';
 import 'package:calendair/teacher/teacher_dashboard.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:provider/provider.dart';
+import 'package:sizer/sizer.dart';
 
 class Login extends StatelessWidget {
   const Login({Key? key}) : super(key: key);
   @override
   Widget build(BuildContext context) {
-    final userAuthentication = context.read<UserAuthentication>();
-    final scheduleController = context.read<ScheduleController>();
-    final width = MediaQuery.of(context).size.width;
+    final firebaseController = context.read<FirebaseController>();
+
     return Scaffold(
       resizeToAvoidBottomInset: false,
       body: Container(
@@ -50,7 +52,7 @@ class Login extends StatelessWidget {
               mainAxisSize: MainAxisSize.min,
               children: [
                 SizedBox(
-                  width: width * 0.5,
+                  width: 50.w,
                   child: Image.asset('assets/images/logo.png'),
                 ),
                 const Text(
@@ -63,7 +65,7 @@ class Login extends StatelessWidget {
                 Padding(
                   padding: const EdgeInsets.only(top: 20.0),
                   child: SizedBox(
-                    width: width * 0.7,
+                    width: 70.w,
                     height: 60,
                     child: ElevatedButton.icon(
                       style: ElevatedButton.styleFrom(
@@ -75,28 +77,19 @@ class Login extends StatelessWidget {
                           )),
                       onPressed: () async {
                         final result =
-                            await userAuthentication.signInwithGoogle();
+                            await firebaseController.signInwithGoogle();
                         if (result == null) {
-                          scheduleController.streamSubscription?.cancel();
-                          Get.snackbar('Register', 'Please register');
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text("Please register"),
+                            ),
+                          );
                           return;
                         }
                         if (result.type == "student") {
-                          //!treba da se izmeni
-                          scheduleController
-                              .listen(userAuthentication.currentUser!.uid);
-                          Get.to(
-                            const StudentDashboard(),
-                            transition: Transition.circularReveal,
-                            duration: const Duration(milliseconds: 800),
-                          );
+                          Get.to(const Navigation());
                         } else if (result.type == "teacher") {
-                          scheduleController.streamSubscription?.cancel();
-                          Get.to(
-                            const TeacherDashboard(),
-                            transition: Transition.circularReveal,
-                            duration: const Duration(milliseconds: 800),
-                          );
+                          Get.to(const TeacherDashboard());
                         }
                       },
                       icon: Image.asset(

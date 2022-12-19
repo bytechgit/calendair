@@ -3,8 +3,6 @@ import 'package:calendair/models/schedule/scheduleElementReminder.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-import '../classes/google_classroom.dart';
-
 class CalendarScheduleElement extends StatefulWidget {
   final ScheduleElement scheduleElement;
   final bool edit;
@@ -18,7 +16,6 @@ class CalendarScheduleElement extends StatefulWidget {
 }
 
 class _CalendarScheduleElementState extends State<CalendarScheduleElement> {
-  final gc = Get.find<GoogleClassroom>();
   bool? value = false;
   @override
   void initState() {
@@ -56,31 +53,29 @@ class _CalendarScheduleElementState extends State<CalendarScheduleElement> {
               )
             : Row(children: [
                 Expanded(
-                    flex: 1,
-                    child: Obx(
-                      () => Padding(
-                        padding: const EdgeInsets.only(right: 3.0),
-                        child: !widget.edit
-                            ? Checkbox(
-                                activeColor: Colors.green,
-                                shape: const RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.all(
-                                        Radius.circular(
-                                            5.0))), // Rounded Checkbox
+                  flex: 1,
+                  child: Padding(
+                    padding: const EdgeInsets.only(right: 3.0),
+                    child: !widget.edit
+                        ? Checkbox(
+                            activeColor: Colors.green,
+                            shape: const RoundedRectangleBorder(
+                                borderRadius: BorderRadius.all(
+                                    Radius.circular(5.0))), // Rounded Checkbox
 
-                                onChanged: (inputValue) {
-                                  setState(() {
-                                    widget.scheduleElement.finished =
-                                        inputValue ?? false;
-                                    widget.scheduleElement
-                                        .finish(inputValue ?? false);
-                                  });
-                                },
-                                value: widget.scheduleElement.finished,
-                              )
-                            : Image.asset('assets/images/3line.png'),
-                      ),
-                    )),
+                            onChanged: (inputValue) {
+                              setState(() {
+                                widget.scheduleElement.finished =
+                                    inputValue ?? false;
+                                widget.scheduleElement
+                                    .finish(inputValue ?? false);
+                              });
+                            },
+                            value: widget.scheduleElement.finished,
+                          )
+                        : Image.asset('assets/images/3line.png'),
+                  ),
+                ),
                 Expanded(
                   flex: 3,
                   child: Column(

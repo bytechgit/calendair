@@ -1,51 +1,31 @@
-import 'package:calendair/classes/authentication.dart';
+import 'package:calendair/controllers/firebase_controller.dart';
+import 'package:calendair/models/assignment_model.dart';
+import 'package:calendair/models/course_model.dart';
+import 'package:calendair/student_teacher/bottom_nav_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:provider/provider.dart';
-import '../classes/google_classroom.dart';
-import '../student_teacher/bottom_nav_bar.dart';
-import '../models/nbar.dart';
+import 'package:sizer/sizer.dart';
 
-class AssignmentUpdate extends StatefulWidget {
-  final int assignmentIndex;
-  final String courseId;
+class AssignmentUpdate extends StatelessWidget {
+  final CourseModel course;
+  final AssignmentModel assignmet;
+  final VoidCallback update;
   const AssignmentUpdate(
-      {Key? key, required this.assignmentIndex, required this.courseId})
-      : super(key: key);
-
-  @override
-  State<AssignmentUpdate> createState() => _AssignmentUpdateState();
-}
-
-class _AssignmentUpdateState extends State<AssignmentUpdate> {
-  final minscontroller = TextEditingController();
-  final noteController = TextEditingController();
-  late final UserAuthentication userAuthentication;
-  late final GoogleClassroom googleClassroom;
-
-  @override
-  void initState() {
-    userAuthentication = context.read<UserAuthentication>();
-    googleClassroom = context.read<GoogleClassroom>();
-    super.initState();
-  }
+      {super.key,
+      required this.course,
+      required this.assignmet,
+      required this.update});
 
   @override
   Widget build(BuildContext context) {
-    final width = MediaQuery.of(context).size.width;
-
-    if (minscontroller.text.isEmpty) {
-      minscontroller.text = googleClassroom
-          .assignments[widget.assignmentIndex].duration
-          .toString();
-      noteController.text =
-          googleClassroom.assignments[widget.assignmentIndex].note ?? "";
-    }
-
+    final minscontroller = TextEditingController();
+    final noteController = TextEditingController();
+    final firebaseController = context.read<FirebaseController>();
+    minscontroller.text = assignmet.duration.toString();
+    noteController.text = assignmet.note ?? '';
     return GestureDetector(
-      onTap: () {
-        FocusManager.instance.primaryFocus?.unfocus();
-      },
+      onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
       child: Scaffold(
         resizeToAvoidBottomInset: false,
         appBar: AppBar(
@@ -60,16 +40,15 @@ class _AssignmentUpdateState extends State<AssignmentUpdate> {
             },
           ),
         ),
-        bottomNavigationBar: BottomNavBar(
-          items: [
-            NBar(
-                slika: 'home',
+        bottomNavigationBar: NavBar(
+          navBarItems: [
+            NavBarItem(
+                image: 'home',
                 onclick: () {
                   Get.until((route) =>
                       (route as GetPageRoute).routeName == '/TeacherDashboard');
                 }),
           ],
-          selected: 0,
         ),
         body: Center(
           child: Column(
@@ -77,14 +56,14 @@ class _AssignmentUpdateState extends State<AssignmentUpdate> {
               Padding(
                 padding: const EdgeInsets.only(top: 10.0),
                 child: SizedBox(
-                  width: width * 0.5,
-                  child: const FittedBox(
+                  width: 80.w,
+                  child: FittedBox(
                     fit: BoxFit.scaleDown,
                     child: Text(
-                      'Period1',
-                      style: TextStyle(
+                      course.name,
+                      style: const TextStyle(
                         color: Colors.black,
-                        fontSize: 38,
+                        fontSize: 35,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
@@ -92,7 +71,7 @@ class _AssignmentUpdateState extends State<AssignmentUpdate> {
                 ),
               ),
               SizedBox(
-                width: width * 0.8,
+                width: 80.w,
                 child: const Divider(
                   thickness: 10,
                   height: 15,
@@ -101,9 +80,7 @@ class _AssignmentUpdateState extends State<AssignmentUpdate> {
               ),
               FittedBox(
                 child: Text(
-                  googleClassroom.assignments[widget.assignmentIndex].coursework
-                          ?.title ??
-                      "no name",
+                  assignmet.title,
                   style: const TextStyle(
                     color: Color.fromRGBO(93, 159, 196, 1),
                     fontSize: 50,
@@ -145,10 +122,11 @@ class _AssignmentUpdateState extends State<AssignmentUpdate> {
               Padding(
                 padding: const EdgeInsets.only(top: 15.0, bottom: 35),
                 child: SizedBox(
-                  width: width * 0.7,
+                  width: 70.w,
                   //height: 40,
                   child: TextField(
-                    keyboardType: TextInputType.number,
+                    keyboardType:
+                        const TextInputType.numberWithOptions(signed: true),
                     controller: minscontroller,
                     style: const TextStyle(
                         color: Color.fromRGBO(38, 64, 78, 1), fontSize: 25),
@@ -181,13 +159,13 @@ class _AssignmentUpdateState extends State<AssignmentUpdate> {
               Padding(
                 padding: const EdgeInsets.only(top: 5.0),
                 child: SizedBox(
-                  width: width * 0.7,
+                  width: 70.w,
                   //height: 40,
                   child: TextField(
                     controller: noteController,
-                    maxLines: 3,
-                    minLines: 1,
-                    keyboardType: TextInputType.multiline,
+                    // maxLines: 3,
+                    // minLines: 1,
+                    // keyboardType: TextInputType.multiline,
                     style: const TextStyle(
                         color: Color.fromRGBO(38, 64, 78, 1), fontSize: 25),
                     textAlignVertical: TextAlignVertical.center,
@@ -212,7 +190,7 @@ class _AssignmentUpdateState extends State<AssignmentUpdate> {
               Padding(
                 padding: const EdgeInsets.all(20.0),
                 child: SizedBox(
-                  width: width * 0.60,
+                  width: 60.w,
                   height: 70,
                   child: ElevatedButton(
                     style: ElevatedButton.styleFrom(
@@ -223,14 +201,21 @@ class _AssignmentUpdateState extends State<AssignmentUpdate> {
                           borderRadius: BorderRadius.circular(10.0),
                         )),
                     onPressed: () {
-                      googleClassroom.updateAssignment(
-                          index: widget.assignmentIndex,
-                          note: noteController.text,
-                          min: minscontroller.text,
-                          courseId: widget.courseId);
+                      if (int.tryParse(minscontroller.text) == null) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text("Enter valid duration"),
+                          ),
+                        );
+                        return;
+                      }
+                      assignmet.note = noteController.text;
+                      assignmet.duration = int.parse(minscontroller.text);
+                      update();
+                      firebaseController.updateAssignment(
+                          assignment: assignmet, course: course);
                       Get.back();
                     },
-
                     child: const Text(
                       'Update',
                       textAlign: TextAlign.center,

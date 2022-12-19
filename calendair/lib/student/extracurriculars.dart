@@ -1,35 +1,35 @@
-import 'package:calendair/classes/authentication.dart';
-import 'package:calendair/student/extracurriculars_add.dart';
-import 'package:calendair/models/extracurriculars_model.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:calendair/controllers/firebase_controller.dart';
+import 'package:calendair/controllers/student_state.dart';
+import 'package:calendair/student/add_edit_extracurriculars.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
+import 'package:persistent_bottom_nav_bar/persistent_tab_view.dart';
 import 'package:provider/provider.dart';
 import 'package:sizer/sizer.dart';
-import '../classes/google_classroom.dart';
-import '../student_teacher/bottom_nav_bar.dart';
-import 'dashboard.dart';
-import '../models/nbar.dart';
-import 'settings.dart' as s;
 
 class Extracurriculars extends StatefulWidget {
-  const Extracurriculars({Key? key}) : super(key: key);
+  const Extracurriculars({super.key});
 
   @override
   State<Extracurriculars> createState() => _ExtracurricularsState();
 }
 
 class _ExtracurricularsState extends State<Extracurriculars> {
-  late final UserAuthentication userAuthentication;
-
+  late FirebaseController firebaseController;
   @override
   void initState() {
-    userAuthentication = context.read<UserAuthentication>();
+    final state = context.read<StudentState>();
+    firebaseController = context.read<FirebaseController>();
+    if (state.extracurriculars == null) {
+      firebaseController.getExtracurriculars().then((value) {
+        state.addExtracurriculars(value);
+      });
+    }
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
+    final state = context.watch<StudentState>();
     return Scaffold(
       appBar: AppBar(
         backgroundColor: const Color.fromRGBO(93, 159, 196, 1),
@@ -39,40 +39,34 @@ class _ExtracurricularsState extends State<Extracurriculars> {
             color: Colors.black,
           ),
           onPressed: () {
-            Get.back();
-            //inspect(gc.courses);
+            Navigator.of(context).pop();
           },
         ),
       ),
-      bottomNavigationBar: BottomNavBar(
-        items: [
-          NBar(
-              slika: 'calendar',
-              onclick: () {
-                Get.off(
-                  const Dashboard(),
-                  transition: Transition.circularReveal,
-                  duration: const Duration(milliseconds: 800),
-                );
-              }),
-          NBar(
-              slika: 'home',
-              onclick: () {
-                Get.until((route) =>
-                    (route as GetPageRoute).routeName == '/StudentDashboard');
-              }),
-          NBar(
-              slika: 'settings',
-              onclick: () {
-                Get.off(
-                  const s.Settings(),
-                  transition: Transition.circularReveal,
-                  duration: const Duration(milliseconds: 800),
-                );
-              })
-        ],
-        selected: 1,
-      ),
+      // bottomNavigationBar: NavBar(
+      //   navBarItems: [
+      //     NavBarItem(
+      //         image: 'calendar',
+      //         onclick: () {
+      //           Get.off(
+      //             const Dashboard(),
+      //           );
+      //         }),
+      //     NavBarItem(
+      //         image: 'home',
+      //         onclick: () {
+      //           Get.until((route) =>
+      //               (route as GetPageRoute).routeName == '/StudentDashboard');
+      //         }),
+      //     NavBarItem(
+      //         image: 'settings',
+      //         onclick: () {
+      //           Get.to(
+      //             const StudentSettings(),
+      //           );
+      //         })
+      //   ],
+      // ),
       body: SafeArea(
         child: Center(
           child: Column(
@@ -93,115 +87,105 @@ class _ExtracurricularsState extends State<Extracurriculars> {
                   ),
                 ),
               ),
-              Expanded(
-                flex: 8,
-                child: StreamBuilder(
-                    stream: userAuthentication.getExtracurriculars(),
-                    builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
-                      if (snapshot.hasData) {
-                        return SingleChildScrollView(
-                          child: Column(
-                            children: [
-                              ...snapshot.data!.docs.map((e) {
-                                final ex = ExtracurricularsModel.fromMap(
-                                    e.data() as Map<String, dynamic>, e.id);
-                                return Container(
-                                  width: double.infinity,
-                                  decoration: BoxDecoration(
-                                    color:
-                                        const Color.fromRGBO(217, 217, 217, 1),
-                                    border: Border.all(
-                                        color: Colors.black, width: 1),
+              if (state.extracurriculars != null)
+                Expanded(
+                  flex: 8,
+                  child: SingleChildScrollView(
+                    child: Column(
+                      children: [
+                        ...state.extracurriculars!.map((ex) {
+                          return Container(
+                            width: double.infinity,
+                            decoration: BoxDecoration(
+                              color: const Color.fromRGBO(217, 217, 217, 1),
+                              border: Border.all(color: Colors.black, width: 1),
+                            ),
+                            height: 65,
+                            child: Row(children: [
+                              SizedBox(
+                                width: 50.w,
+                                child: FittedBox(
+                                  alignment: Alignment.centerLeft,
+                                  fit: BoxFit.scaleDown,
+                                  child: Padding(
+                                    padding: const EdgeInsets.only(
+                                        left: 10, right: 10),
+                                    child: Text(
+                                      ex.title,
+                                      style: const TextStyle(
+                                        color: Colors.black,
+                                        fontSize: 25,
+                                      ),
+                                    ),
                                   ),
-                                  height: 65,
-                                  child: Row(children: [
-                                    SizedBox(
-                                      width: 50.w,
-                                      child: FittedBox(
-                                        alignment: Alignment.centerLeft,
-                                        fit: BoxFit.scaleDown,
-                                        child: Padding(
-                                          padding: const EdgeInsets.only(
-                                              left: 10, right: 10),
-                                          child: Text(
-                                            ex.title,
-                                            style: const TextStyle(
-                                              color: Colors.black,
-                                              fontSize: 25,
-                                            ),
-                                          ),
-                                        ),
-                                      ),
+                                ),
+                              ),
+                              const Expanded(
+                                flex: 2,
+                                child: SizedBox(),
+                              ),
+                              SizedBox(
+                                width: 30.w,
+                                height: 45,
+                                child: ElevatedButton(
+                                  style: ElevatedButton.styleFrom(
+                                    shadowColor:
+                                        const Color.fromRGBO(247, 247, 247, 1),
+                                    backgroundColor:
+                                        const Color.fromRGBO(94, 159, 197, 1),
+                                    elevation: 0,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(20.0),
                                     ),
-                                    const Expanded(
-                                      flex: 2,
-                                      child: SizedBox(),
+                                  ),
+                                  onPressed: () {
+                                    PersistentNavBarNavigator.pushNewScreen(
+                                      context,
+                                      screen: AddEditExtracurriculars(
+                                          extracurricular: ex),
+                                      withNavBar: true,
+                                      pageTransitionAnimation:
+                                          PageTransitionAnimation.fade,
+                                    );
+                                  },
+                                  child: const Text(
+                                    'Edit',
+                                    textAlign: TextAlign.center,
+                                    style: TextStyle(
+                                      color: Colors.black,
+                                      fontSize: 26,
                                     ),
-                                    SizedBox(
-                                      width: 30.w,
-                                      height: 45,
-                                      child: ElevatedButton(
-                                        style: ElevatedButton.styleFrom(
-                                          shadowColor: const Color.fromRGBO(
-                                              247, 247, 247, 1),
-                                          backgroundColor: const Color.fromRGBO(
-                                              94, 159, 197, 1),
-                                          elevation: 0,
-                                          shape: RoundedRectangleBorder(
-                                            borderRadius:
-                                                BorderRadius.circular(20.0),
-                                          ),
-                                        ),
-                                        onPressed: () {
-                                          Get.to(
-                                            ExtracurricularsAdd(ext: ex),
-                                            transition:
-                                                Transition.circularReveal,
-                                            duration: const Duration(
-                                                milliseconds: 800),
-                                          );
-                                        },
-
-                                        child: const Text(
-                                          'Edit',
-                                          textAlign: TextAlign.center,
-                                          style: TextStyle(
-                                            color: Colors.black,
-                                            fontSize: 26,
-                                          ),
-                                        ), // <-- Text
-                                      ),
-                                    ),
-                                    const Expanded(
-                                      flex: 1,
-                                      child: SizedBox(),
-                                    ),
-                                    Padding(
-                                      padding: const EdgeInsets.all(8.0),
-                                      child: InkWell(
-                                        onTap: () {
-                                          userAuthentication
-                                              .deleteExtracurriculars(ex);
-                                        },
-                                        child: Image.asset(
-                                          'assets/images/remove.png',
-                                          height: 35,
-                                        ),
-                                      ),
-                                    )
-                                  ]),
-                                );
-                              }).toList()
-                            ],
-                          ),
-                        );
-                      } else {
-                        return const Center(
-                          child: CircularProgressIndicator(),
-                        );
-                      }
-                    }),
-              ),
+                                  ),
+                                ),
+                              ),
+                              const Expanded(
+                                flex: 1,
+                                child: SizedBox(),
+                              ),
+                              Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: InkWell(
+                                  onTap: () {
+                                    firebaseController
+                                        .deleteExtracurriculars(ex);
+                                    state.deleteExtracurricular(ex);
+                                  },
+                                  child: Image.asset(
+                                    'assets/images/remove.png',
+                                    height: 35,
+                                  ),
+                                ),
+                              )
+                            ]),
+                          );
+                        }).toList()
+                      ],
+                    ),
+                  ),
+                ),
+              if (state.extracurriculars == null)
+                const Expanded(
+                    flex: 8, child: Center(child: CircularProgressIndicator())),
               Padding(
                 padding: const EdgeInsets.only(top: 15.0),
                 child: SizedBox(
@@ -216,13 +200,13 @@ class _ExtracurricularsState extends State<Extracurriculars> {
                           borderRadius: BorderRadius.circular(20.0),
                         )),
                     onPressed: () {
-                      Get.to(
-                        const ExtracurricularsAdd(),
-                        transition: Transition.circularReveal,
-                        duration: const Duration(milliseconds: 800),
+                      PersistentNavBarNavigator.pushNewScreen(
+                        context,
+                        screen: const AddEditExtracurriculars(),
+                        withNavBar: true,
+                        pageTransitionAnimation: PageTransitionAnimation.fade,
                       );
                     },
-
                     child: const Text(
                       'Add Programs/Extracurriculars',
                       textAlign: TextAlign.center,
@@ -230,7 +214,7 @@ class _ExtracurricularsState extends State<Extracurriculars> {
                         color: Colors.black,
                         fontSize: 26,
                       ),
-                    ), // <-- Text
+                    ),
                   ),
                 ),
               ),

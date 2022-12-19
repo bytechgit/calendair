@@ -1,33 +1,36 @@
-import 'package:calendair/classes/authentication.dart';
+import 'package:calendair/controllers/firebase_controller.dart';
+import 'package:calendair/controllers/student_state.dart';
 import 'package:calendair/student/add_class.dart';
-import 'package:calendair/models/custom_course.dart';
 import 'package:calendair/student/rate_class_strength.dart';
-import 'package:calendair/student/settings.dart' as s;
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
+import 'package:persistent_bottom_nav_bar/persistent_tab_view.dart';
 import 'package:provider/provider.dart';
 import 'package:sizer/sizer.dart';
-import '../student_teacher/bottom_nav_bar.dart';
-import 'dashboard.dart';
-import '../models/nbar.dart';
 
 class Classes extends StatefulWidget {
-  const Classes({Key? key}) : super(key: key);
+  const Classes({super.key});
+
   @override
   State<Classes> createState() => _ClassesState();
 }
 
 class _ClassesState extends State<Classes> {
-  late final UserAuthentication userAuthentication;
+  late FirebaseController firebaseController;
   @override
   void initState() {
-    userAuthentication = context.read<UserAuthentication>();
+    firebaseController = context.read<FirebaseController>();
+    final state = context.read<StudentState>();
+    if (state.courses == null) {
+      firebaseController.getStudentCourses().then((value) {
+        state.addCourses(value);
+      });
+    }
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
+    final studentState = context.watch<StudentState>();
     return Scaffold(
       appBar: AppBar(
         backgroundColor: const Color.fromRGBO(93, 159, 196, 1),
@@ -37,39 +40,34 @@ class _ClassesState extends State<Classes> {
             color: Colors.black,
           ),
           onPressed: () {
-            Get.back();
+            Navigator.of(context).pop();
           },
         ),
       ),
-      bottomNavigationBar: BottomNavBar(
-        items: [
-          NBar(
-              slika: 'calendar',
-              onclick: () {
-                Get.off(
-                  const Dashboard(),
-                  transition: Transition.circularReveal,
-                  duration: const Duration(milliseconds: 800),
-                );
-              }),
-          NBar(
-              slika: 'home',
-              onclick: () {
-                Get.until((route) =>
-                    (route as GetPageRoute).routeName == '/StudentDashboard');
-              }),
-          NBar(
-              slika: 'settings',
-              onclick: () {
-                Get.off(
-                  const s.Settings(),
-                  transition: Transition.circularReveal,
-                  duration: const Duration(milliseconds: 800),
-                );
-              })
-        ],
-        selected: 1,
-      ),
+      // bottomNavigationBar: NavBar(
+      //   navBarItems: [
+      //     NavBarItem(
+      //         image: 'calendar',
+      //         onclick: () {
+      //           Get.off(
+      //             const Dashboard(),
+      //           );
+      //         }),
+      //     NavBarItem(
+      //         image: 'home',
+      //         onclick: () {
+      //           Get.until((route) =>
+      //               (route as GetPageRoute).routeName == '/StudentDashboard');
+      //         }),
+      //     NavBarItem(
+      //         image: 'settings',
+      //         onclick: () {
+      //           Get.to(
+      //             const StudentSettings(),
+      //           );
+      //         })
+      //   ],
+      // ),
       body: SafeArea(
         child: Center(
           child: Column(
@@ -103,102 +101,88 @@ class _ClassesState extends State<Classes> {
                     ),
                     child: Stack(
                       children: [
-                        StreamBuilder(
-                            stream: userAuthentication.getStudentCourses(),
-                            builder: (context,
-                                AsyncSnapshot<QuerySnapshot> snapshot) {
-                              if (snapshot.hasData) {
-                                return SingleChildScrollView(
-                                  child: Column(children: [
-                                    ...snapshot.data!.docs.map((e) {
-                                      final cc = CustomCourse.fromMap(
-                                          e.data() as Map<String, dynamic>,
-                                          e.id);
-                                      return Padding(
-                                        padding: const EdgeInsets.symmetric(
-                                            horizontal: 20, vertical: 10),
-                                        child: InkWell(
-                                          onTap: (() {}),
-                                          child: Container(
-                                            padding: const EdgeInsets.all(10),
-                                            decoration: const BoxDecoration(
-                                                color: Color.fromRGBO(
-                                                    94, 159, 197, 1),
-                                                borderRadius: BorderRadius.all(
-                                                    Radius.circular(10))),
-                                            height: 65,
-                                            child: Row(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment
-                                                      .spaceBetween,
-                                              children: [
-                                                SizedBox(
-                                                  width: 50.w,
-                                                  child: Padding(
-                                                    padding:
-                                                        const EdgeInsets.only(
-                                                            left: 10),
-                                                    child: FittedBox(
-                                                      fit: BoxFit.scaleDown,
-                                                      alignment:
-                                                          Alignment.centerLeft,
-                                                      child: Text(
-                                                        cc.name,
-                                                        textAlign:
-                                                            TextAlign.left,
-                                                        style: const TextStyle(
-                                                          color: Color.fromRGBO(
-                                                              38, 65, 78, 1),
-                                                          fontSize: 30,
-                                                        ),
-                                                      ),
-                                                    ),
+                        if (studentState.courses != null)
+                          SingleChildScrollView(
+                            child: Column(children: [
+                              ...studentState.courses!.map((c) {
+                                return Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 20, vertical: 10),
+                                  child: InkWell(
+                                    onTap: (() {}),
+                                    child: Container(
+                                      padding: const EdgeInsets.all(10),
+                                      decoration: const BoxDecoration(
+                                          color:
+                                              Color.fromRGBO(94, 159, 197, 1),
+                                          borderRadius: BorderRadius.all(
+                                              Radius.circular(10))),
+                                      height: 65,
+                                      child: Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          SizedBox(
+                                            width: 50.w,
+                                            child: Padding(
+                                              padding: const EdgeInsets.only(
+                                                  left: 10),
+                                              child: FittedBox(
+                                                fit: BoxFit.scaleDown,
+                                                alignment: Alignment.centerLeft,
+                                                child: Text(
+                                                  c.name,
+                                                  textAlign: TextAlign.left,
+                                                  style: const TextStyle(
+                                                    color: Color.fromRGBO(
+                                                        38, 65, 78, 1),
+                                                    fontSize: 30,
                                                   ),
                                                 ),
-                                                Expanded(child: Container()),
-                                                GestureDetector(
-                                                  child: Padding(
-                                                    padding:
-                                                        const EdgeInsets.only(
-                                                            right: 5),
-                                                    child: Image.asset(
-                                                      'assets/images/settings.png',
-                                                      width: 30,
-                                                    ),
-                                                  ),
-                                                  onTap: () {
-                                                    Get.to(
-                                                      RateClassStrength(
-                                                        name: cc.name,
-                                                        back3: false,
-                                                      ),
-                                                      transition: Transition
-                                                          .circularReveal,
-                                                      duration: const Duration(
-                                                          milliseconds: 800),
-                                                    );
-                                                  },
-                                                )
-                                              ],
+                                              ),
                                             ),
                                           ),
-                                        ),
-                                      );
-                                    }).toList(),
-                                    Padding(
-                                      padding: const EdgeInsets.all(8.0),
-                                      child: Container(
-                                        height: 100,
+                                          Expanded(child: Container()),
+                                          GestureDetector(
+                                            child: Padding(
+                                              padding: const EdgeInsets.only(
+                                                  right: 5),
+                                              child: Image.asset(
+                                                'assets/images/settings.png',
+                                                width: 30,
+                                              ),
+                                            ),
+                                            onTap: () {
+                                              PersistentNavBarNavigator
+                                                  .pushNewScreen(
+                                                context,
+                                                screen: RateClassStrength(
+                                                  name: c.name,
+                                                  //back3: false,
+                                                ),
+                                                withNavBar: false,
+                                                pageTransitionAnimation:
+                                                    PageTransitionAnimation
+                                                        .fade,
+                                              );
+                                            },
+                                          )
+                                        ],
                                       ),
                                     ),
-                                  ]),
+                                  ),
                                 );
-                              } else {
-                                return const Center(
-                                  child: CircularProgressIndicator(),
-                                );
-                              }
-                            }),
+                              }).toList(),
+                              Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Container(
+                                  height: 100,
+                                ),
+                              ),
+                            ]),
+                          ),
+                        if (studentState.courses == null)
+                          const Center(child: CircularProgressIndicator()),
                         Align(
                           alignment: Alignment.bottomRight,
                           child: Padding(
@@ -217,13 +201,14 @@ class _ClassesState extends State<Classes> {
                                       borderRadius: BorderRadius.circular(10.0),
                                     )),
                                 onPressed: () {
-                                  Get.to(
-                                    const AddClass(),
-                                    transition: Transition.circularReveal,
-                                    duration: const Duration(milliseconds: 800),
+                                  PersistentNavBarNavigator.pushNewScreen(
+                                    context,
+                                    screen: const AddClass(),
+                                    withNavBar: false,
+                                    pageTransitionAnimation:
+                                        PageTransitionAnimation.fade,
                                   );
                                 },
-
                                 child: const Text(
                                   'Make a class',
                                   textAlign: TextAlign.center,
@@ -259,10 +244,3 @@ class _ClassesState extends State<Classes> {
     );
   }
 }
-
-
-
-
-
-/////
-///

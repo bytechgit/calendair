@@ -1,6 +1,6 @@
 import 'dart:math';
-import 'package:calendair/classes/authentication.dart';
-import 'package:calendair/classes/schedule_lists.dart';
+import 'package:calendair/controllers/firebase_controller.dart';
+import 'package:calendair/controllers/schedule_lists.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -42,7 +42,7 @@ class ScheduleElement {
     return false;
   }
 
-  void addInSchedule({int? listIndex, int? index, UserAuthentication? ua}) {}
+  void addInSchedule({int? listIndex, int? index, FirebaseController? ua}) {}
   void removeFromSchedule({int? listIndex, int? index}) {}
   void modifieSchdeuleElement() {}
 

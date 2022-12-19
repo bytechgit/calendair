@@ -1,29 +1,19 @@
-import 'package:calendair/classes/google_classroom.dart';
-import 'package:calendair/student/joined_class_notification.dart';
+import 'package:calendair/controllers/firebase_controller.dart';
+import 'package:calendair/student/join_class_notification.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:persistent_bottom_nav_bar/persistent_tab_view.dart';
 import 'package:provider/provider.dart';
+import 'package:sizer/sizer.dart';
 
-class AddClass extends StatefulWidget {
-  const AddClass({Key? key}) : super(key: key);
-
-  @override
-  State<AddClass> createState() => _AddClassState();
-}
-
-class _AddClassState extends State<AddClass> {
-  final codeController = TextEditingController();
-  late final GoogleClassroom googleClassroom;
-  @override
-  void initState() {
-    googleClassroom = context.read<GoogleClassroom>();
-    super.initState();
-  }
+class AddClass extends StatelessWidget {
+  const AddClass({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final width = MediaQuery.of(context).size.width;
+    final codeController = TextEditingController();
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       body: Container(
         color: const Color.fromRGBO(247, 247, 247, 1),
         child: Stack(children: [
@@ -35,7 +25,7 @@ class _AddClassState extends State<AddClass> {
                   child: IconButton(
                     icon: const Icon(Icons.arrow_back_ios),
                     onPressed: () {
-                      Get.back();
+                      Navigator.of(context).pop();
                     },
                   )),
             ),
@@ -70,7 +60,7 @@ class _AddClassState extends State<AddClass> {
                     padding: const EdgeInsets.symmetric(vertical: 10.0),
                     child: Container(
                       height: 6,
-                      width: width * 0.7,
+                      width: 70.w,
                       decoration: const BoxDecoration(
                           color: Color.fromRGBO(94, 159, 196, 1),
                           borderRadius: BorderRadius.all(Radius.circular(13))),
@@ -80,7 +70,7 @@ class _AddClassState extends State<AddClass> {
                   Padding(
                     padding: const EdgeInsets.only(top: 5.0),
                     child: SizedBox(
-                      width: width * 0.7,
+                      width: 70.w,
                       //height: 40,
                       child: TextField(
                         controller: codeController,
@@ -108,7 +98,7 @@ class _AddClassState extends State<AddClass> {
                   Padding(
                     padding: const EdgeInsets.symmetric(vertical: 10.0),
                     child: SizedBox(
-                      width: width * 0.5,
+                      width: 50.w,
                       child: const Text(
                         "This code will be given by your teacher!",
                         textAlign: TextAlign.center,
@@ -129,16 +119,22 @@ class _AddClassState extends State<AddClass> {
                         shape: const CircleBorder(),
                       ),
                       onPressed: () async {
-                        String name = await googleClassroom
+                        String name = await context
+                            .read<FirebaseController>()
                             .enrolToCourse(codeController.text);
+
                         if (name != "" && name != "Error") {
-                          Get.to(
-                            JoinedClassNotification(name: name),
-                            transition: Transition.circularReveal,
-                            duration: const Duration(milliseconds: 800),
+                          // ignore: use_build_context_synchronously
+                          PersistentNavBarNavigator.pushNewScreen(
+                            context,
+                            screen: JoinClassNotification(name: name),
+                            withNavBar: false,
+                            pageTransitionAnimation:
+                                PageTransitionAnimation.fade,
                           );
+                        } else {
+                          Get.snackbar("Error", "Class does not exist");
                         }
-                        print(name);
                       },
                       child: const Icon(
                         Icons.arrow_forward_ios_rounded,

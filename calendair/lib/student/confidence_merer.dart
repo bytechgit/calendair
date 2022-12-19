@@ -1,11 +1,11 @@
-import 'package:calendair/classes/authentication.dart';
-import 'package:calendair/classes/firestore.dart';
+import 'package:calendair/controllers/firebase_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:provider/provider.dart';
-import 'package:syncfusion_flutter_core/theme.dart';
 import 'package:syncfusion_flutter_sliders/sliders.dart';
+// ignore: depend_on_referenced_packages
+import 'package:syncfusion_flutter_core/theme.dart';
 
 class ConfidenceMeter extends StatefulWidget {
   final String id;
@@ -24,10 +24,10 @@ class ConfidenceMeter extends StatefulWidget {
 }
 
 class _ConfidenceMeterState extends State<ConfidenceMeter> {
-  late final UserAuthentication userAuthentication;
+  late FirebaseController firebaseController;
   @override
   void initState() {
-    userAuthentication = context.read<UserAuthentication>();
+    firebaseController = context.read<FirebaseController>();
     SystemChrome.setPreferredOrientations([
       DeviceOrientation.landscapeRight,
       DeviceOrientation.landscapeLeft,
@@ -128,7 +128,7 @@ class _ConfidenceMeterState extends State<ConfidenceMeter> {
                               activeTrackHeight: 12,
                               inactiveTrackHeight: 12,
                               inactiveTrackColor:
-                                  Color.fromARGB(255, 147, 192, 220)),
+                                  const Color.fromARGB(255, 147, 192, 220)),
                           child: SfSlider(
                             min: 0.0,
                             max: 100.0,
@@ -167,12 +167,10 @@ class _ConfidenceMeterState extends State<ConfidenceMeter> {
                             borderRadius: BorderRadius.circular(10.0),
                           )),
                       onPressed: () {
-                        userAuthentication.addPopUpRate(
+                        firebaseController.addPopUpRate(
                             widget.id, _value.round());
-                        //posalji value
                         Get.back();
                       },
-
                       child: const FittedBox(
                         fit: BoxFit.scaleDown,
                         child: Text(

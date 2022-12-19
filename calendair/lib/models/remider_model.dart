@@ -1,23 +1,28 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class ReminderModel {
-  String id;
+  String docId;
   String classId;
   Timestamp date;
   String title;
   List<DocumentReference> studentsCopy;
   Map<String, dynamic> toMap() {
     return {
-      'id': classId,
+      'classId': classId,
       'date': date,
       'title': title,
-      'students': studentsCopy
+      'studentsCopy': studentsCopy
     };
   }
 
-  ReminderModel.fromMap(Map<String, dynamic> map, String docId)
-      : id = docId,
-        classId = map["id"] ?? " ",
+  ReminderModel(
+      {required this.classId,
+      required this.date,
+      required this.docId,
+      required this.studentsCopy,
+      required this.title});
+  ReminderModel.fromMap(Map<String, dynamic> map, this.docId)
+      : classId = map["classId"] ?? " ",
         date = map["date"] ?? Timestamp(0, 0),
         title = map["title"] ?? " ",
         studentsCopy = ((map["studentsCopy"] ?? []) as List<dynamic>)

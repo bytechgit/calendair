@@ -1,38 +1,56 @@
-import 'package:calendair/classes/authentication.dart';
-import 'package:calendair/classes/firestore.dart';
-import 'package:calendair/student/settings.dart';
-import 'package:expandable/expandable.dart';
+import 'package:calendair/controllers/firebase_controller.dart';
+import 'package:calendair/models/notification_settings_model.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 import 'package:provider/provider.dart';
-import '../classes/google_classroom.dart';
-import '../student_teacher/bottom_nav_bar.dart';
-import 'dashboard.dart';
-import '../models/nbar.dart';
+import 'package:sizer/sizer.dart';
+import 'package:expandable/expandable.dart';
 
 class NotificationSettings extends StatefulWidget {
-  const NotificationSettings({Key? key}) : super(key: key);
+  const NotificationSettings({super.key});
 
   @override
   State<NotificationSettings> createState() => _NotificationSettingsState();
 }
 
 class _NotificationSettingsState extends State<NotificationSettings> {
-  late final UserAuthentication userAuthentication;
-
+  final reminderController = ExpandableController();
+  final updatesController = ExpandableController();
+  final assignmentsController = ExpandableController();
+  late FirebaseController firebaseController;
+  Map<String, NotificationSettingsModel> notification = {
+    "1": NotificationSettingsModel(
+        "1",
+        "Remind to complete unfinished assignments the day before the due date",
+        'reminder'),
+    "2": NotificationSettingsModel(
+        "2", "Send inspirational quote to encourage studying", 'reminder'),
+    "3": NotificationSettingsModel(
+        "3", "Update on teacher announcements", 'updates'),
+    "4": NotificationSettingsModel(
+        "4", "Update on confidence meter popups", 'updates'),
+    "5": NotificationSettingsModel(
+        "5", "Update on TOS and app  development updates", 'updates'),
+    "6": NotificationSettingsModel(
+        "6", "Send when a new assignment is posted", 'assignments'),
+    "7": NotificationSettingsModel(
+        "7", "Send when a new exam is posted", 'assignments'),
+    "8": NotificationSettingsModel(
+        "8",
+        "Send notification when assignment is done (via timer) ",
+        'assignments'),
+    "9": NotificationSettingsModel(
+        "9",
+        "Keep notification pinned with an ongoing assignment timer",
+        'assignments'),
+    "10": NotificationSettingsModel(
+        "10", "Notify when teacher edits an assignment", 'assignments'),
+  };
   @override
   void initState() {
-    userAuthentication = context.read<UserAuthentication>();
-    super.initState();
-  }
-
-  final gc = Get.find<GoogleClassroom>();
-  ExpandableController reminderController = ExpandableController();
-  ExpandableController updatesController = ExpandableController();
-  ExpandableController assignmentsController = ExpandableController();
-
-  @override
-  Widget build(BuildContext context) {
+    firebaseController = context.read<FirebaseController>();
+    for (var element in firebaseController.currentUser!.notifications.entries) {
+      notification[element.key]?.checked = element.value;
+    }
     reminderController.addListener(() {
       setState(() {});
     });
@@ -42,7 +60,11 @@ class _NotificationSettingsState extends State<NotificationSettings> {
     assignmentsController.addListener(() {
       setState(() {});
     });
-    final width = MediaQuery.of(context).size.width;
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
@@ -53,40 +75,35 @@ class _NotificationSettingsState extends State<NotificationSettings> {
             color: Colors.black,
           ),
           onPressed: () {
-            Get.back();
+            Navigator.of(context).pop();
             //inspect(gc.courses);
           },
         ),
       ),
-      bottomNavigationBar: BottomNavBar(
-        items: [
-          NBar(
-              slika: 'calendar',
-              onclick: () {
-                Get.off(
-                  const Dashboard(),
-                  transition: Transition.circularReveal,
-                  duration: const Duration(milliseconds: 800),
-                );
-              }),
-          NBar(
-              slika: 'home',
-              onclick: () {
-                Get.until((route) =>
-                    (route as GetPageRoute).routeName == '/StudentDashboard');
-              }),
-          NBar(
-              slika: 'settings',
-              onclick: () {
-                Get.off(
-                  const Settings(),
-                  transition: Transition.circularReveal,
-                  duration: const Duration(milliseconds: 800),
-                );
-              })
-        ],
-        selected: 2,
-      ),
+      // bottomNavigationBar: NavBar(
+      //   navBarItems: [
+      //     NavBarItem(
+      //         image: 'calendar',
+      //         onclick: () {
+      //           Get.off(
+      //             const Dashboard(),
+      //           );
+      //         }),
+      //     NavBarItem(
+      //         image: 'home',
+      //         onclick: () {
+      //           Get.until((route) =>
+      //               (route as GetPageRoute).routeName == '/StudentDashboard');
+      //         }),
+      //     NavBarItem(
+      //         image: 'settings',
+      //         onclick: () {
+      //           Get.to(
+      //             const StudentSettings(),
+      //           );
+      //         })
+      //   ],
+      // ),
       body: SafeArea(
         child: SingleChildScrollView(
           child: Column(
@@ -102,7 +119,7 @@ class _NotificationSettingsState extends State<NotificationSettings> {
                 child: Padding(
                   padding: const EdgeInsets.only(top: 10.0, bottom: 40),
                   child: SizedBox(
-                    width: width * 0.7,
+                    width: 70.w,
                     child: const FittedBox(
                       fit: BoxFit.scaleDown,
                       child: Text(
@@ -118,7 +135,7 @@ class _NotificationSettingsState extends State<NotificationSettings> {
                 ),
               ),
               Container(
-                width: width * 0.7,
+                width: 70.w,
                 decoration: BoxDecoration(
                     color: reminderController.expanded
                         ? const Color.fromRGBO(93, 159, 196, 1)
@@ -138,8 +155,9 @@ class _NotificationSettingsState extends State<NotificationSettings> {
                     collapsed: const SizedBox(),
                     expanded: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
-                        children: userAuthentication
-                            .currentUser!.remindersNotification
+                        children: notification.entries
+                            .where(
+                                (element) => element.value.type == "reminder")
                             .map(
                               (e) => Row(
                                 children: [
@@ -149,7 +167,7 @@ class _NotificationSettingsState extends State<NotificationSettings> {
                                         padding:
                                             const EdgeInsets.only(bottom: 10),
                                         child: Text(
-                                          e.text,
+                                          e.value.text,
                                           style: const TextStyle(fontSize: 20),
                                         )),
                                   ),
@@ -164,14 +182,14 @@ class _NotificationSettingsState extends State<NotificationSettings> {
 
                                         onChanged: (inputValue) {
                                           setState(() {
-                                            e.checked = inputValue;
-                                            userAuthentication
+                                            e.value.checked =
+                                                inputValue ?? false;
+                                            firebaseController
                                                 .updateNotificationSettings(
-                                                    "remindersNotification", e);
-                                            // print(value);
+                                                    e.value);
                                           });
                                         },
-                                        value: e.checked,
+                                        value: e.value.checked,
                                       )),
                                 ],
                               ),
@@ -181,7 +199,7 @@ class _NotificationSettingsState extends State<NotificationSettings> {
               Padding(
                 padding: const EdgeInsets.symmetric(vertical: 30),
                 child: Container(
-                  width: width * 0.7,
+                  width: 70.w,
                   decoration: BoxDecoration(
                       color: updatesController.expanded
                           ? const Color.fromRGBO(93, 159, 196, 1)
@@ -202,8 +220,9 @@ class _NotificationSettingsState extends State<NotificationSettings> {
                       collapsed: const SizedBox(),
                       expanded: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
-                          children: userAuthentication
-                              .currentUser!.updatesNotification
+                          children: notification.entries
+                              .where(
+                                  (element) => element.value.type == "updates")
                               .map(
                                 (e) => Row(
                                   children: [
@@ -213,7 +232,7 @@ class _NotificationSettingsState extends State<NotificationSettings> {
                                           padding:
                                               const EdgeInsets.only(bottom: 10),
                                           child: Text(
-                                            e.text,
+                                            e.value.text,
                                             style:
                                                 const TextStyle(fontSize: 20),
                                           )),
@@ -229,14 +248,14 @@ class _NotificationSettingsState extends State<NotificationSettings> {
 
                                           onChanged: (inputValue) {
                                             setState(() {
-                                              e.checked = inputValue;
-                                              userAuthentication
+                                              e.value.checked =
+                                                  inputValue ?? false;
+                                              firebaseController
                                                   .updateNotificationSettings(
-                                                      "updatesNotification", e);
-                                              // print(value);
+                                                      e.value);
                                             });
                                           },
-                                          value: e.checked,
+                                          value: e.value.checked,
                                         )),
                                   ],
                                 ),
@@ -245,7 +264,7 @@ class _NotificationSettingsState extends State<NotificationSettings> {
                 ),
               ),
               Container(
-                width: width * 0.7,
+                width: 70.w,
                 decoration: BoxDecoration(
                     color: assignmentsController.expanded
                         ? const Color.fromRGBO(93, 159, 196, 1)
@@ -265,8 +284,8 @@ class _NotificationSettingsState extends State<NotificationSettings> {
                   collapsed: const SizedBox(),
                   expanded: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
-                    children: userAuthentication
-                        .currentUser!.assignmentsNotification
+                    children: notification.entries
+                        .where((element) => element.value.type == "assignments")
                         .map(
                           (e) => Row(
                             children: [
@@ -275,7 +294,7 @@ class _NotificationSettingsState extends State<NotificationSettings> {
                                 child: Padding(
                                     padding: const EdgeInsets.only(bottom: 10),
                                     child: Text(
-                                      e.text,
+                                      e.value.text,
                                       style: const TextStyle(fontSize: 20),
                                     )),
                               ),
@@ -290,14 +309,13 @@ class _NotificationSettingsState extends State<NotificationSettings> {
 
                                     onChanged: (inputValue) {
                                       setState(() {
-                                        e.checked = inputValue;
-                                        userAuthentication
+                                        e.value.checked = inputValue ?? false;
+                                        firebaseController
                                             .updateNotificationSettings(
-                                                "assignmentsNotification", e);
-                                        // print(value);
+                                                e.value);
                                       });
                                     },
-                                    value: e.checked,
+                                    value: e.value.checked,
                                   )),
                             ],
                           ),

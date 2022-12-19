@@ -1,46 +1,42 @@
-import 'package:calendair/classes/authentication.dart';
-import 'package:calendair/student/break_day.dart';
-import 'package:calendair/models/extracurriculars_model.dart';
-import 'package:calendair/student/settings.dart';
+import 'package:calendair/controllers/firebase_controller.dart';
+import 'package:calendair/controllers/student_state.dart';
+import 'package:calendair/models/extracurricular_model.dart';
+import 'package:calendair/student/add_edit_breakday.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:provider/provider.dart';
-import '../student_teacher/bottom_nav_bar.dart';
-import 'dashboard.dart';
-import '../models/nbar.dart';
+import 'package:sizer/sizer.dart';
 
-class ExtracurricularsAdd extends StatefulWidget {
-  final ExtracurricularsModel? ext;
-  const ExtracurricularsAdd({Key? key, this.ext}) : super(key: key);
+class AddEditExtracurriculars extends StatefulWidget {
+  final ExtracurricularModel? extracurricular;
+  const AddEditExtracurriculars({super.key, this.extracurricular});
 
   @override
-  State<ExtracurricularsAdd> createState() => _ExtracurricularsAddState();
+  State<AddEditExtracurriculars> createState() =>
+      _AddEditExtracurricularsState();
 }
 
-class _ExtracurricularsAddState extends State<ExtracurricularsAdd> {
+class _AddEditExtracurricularsState extends State<AddEditExtracurriculars> {
   final titleController = TextEditingController();
   final minutesController = TextEditingController();
   int selectedIndex = -1;
-  late final UserAuthentication userAuthentication;
-
+  final days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+  late FirebaseController firebaseController;
+  late StudentState studentState;
   @override
   void initState() {
-    userAuthentication = context.read<UserAuthentication>();
-    if (widget.ext != null) {
-      titleController.text = widget.ext!.title;
-      minutesController.text = widget.ext!.time.toString();
-      setState(() {
-        selectedIndex = widget.ext!.dayIndex;
-      });
-      super.initState();
+    firebaseController = context.read<FirebaseController>();
+    if (widget.extracurricular != null) {
+      titleController.text = widget.extracurricular!.title;
+      minutesController.text = widget.extracurricular!.time.toString();
+      selectedIndex = widget.extracurricular!.dayIndex;
     }
+    studentState = context.read<StudentState>();
+    super.initState();
   }
-
-  final days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 
   @override
   Widget build(BuildContext context) {
-    final width = MediaQuery.of(context).size.width;
     return Scaffold(
       appBar: AppBar(
         backgroundColor: const Color.fromRGBO(93, 159, 196, 1),
@@ -50,39 +46,34 @@ class _ExtracurricularsAddState extends State<ExtracurricularsAdd> {
             color: Colors.black,
           ),
           onPressed: () {
-            Get.back(closeOverlays: true);
+            Navigator.of(context).pop();
           },
         ),
       ),
-      bottomNavigationBar: BottomNavBar(
-        items: [
-          NBar(
-              slika: 'calendar',
-              onclick: () {
-                Get.off(
-                  const Dashboard(),
-                  transition: Transition.circularReveal,
-                  duration: const Duration(milliseconds: 800),
-                );
-              }),
-          NBar(
-              slika: 'home',
-              onclick: () {
-                Get.until((route) =>
-                    (route as GetPageRoute).routeName == '/StudentDashboard');
-              }),
-          NBar(
-              slika: 'settings',
-              onclick: () {
-                Get.off(
-                  const Settings(),
-                  transition: Transition.circularReveal,
-                  duration: const Duration(milliseconds: 800),
-                );
-              })
-        ],
-        selected: 2,
-      ),
+      // bottomNavigationBar: NavBar(
+      //   navBarItems: [
+      //     NavBarItem(
+      //         image: 'calendar',
+      //         onclick: () {
+      //           Get.off(
+      //             const Dashboard(),
+      //           );
+      //         }),
+      //     NavBarItem(
+      //         image: 'home',
+      //         onclick: () {
+      //           Get.until((route) =>
+      //               (route as GetPageRoute).routeName == '/StudentDashboard');
+      //         }),
+      //     NavBarItem(
+      //         image: 'settings',
+      //         onclick: () {
+      //           Get.to(
+      //             const StudentSettings(),
+      //           );
+      //         })
+      //   ],
+      // ),
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(8.0),
@@ -95,9 +86,9 @@ class _ExtracurricularsAddState extends State<ExtracurricularsAdd> {
                 Padding(
                   padding: const EdgeInsets.only(top: 10.0, bottom: 10),
                   child: SizedBox(
-                    width: width * 0.85,
+                    width: 85.w,
                     child: Text(
-                      widget.ext == null
+                      widget.extracurricular == null
                           ? 'Add an Extracurricular'
                           : 'Edit Extracurricular',
                       textAlign: TextAlign.center,
@@ -110,7 +101,7 @@ class _ExtracurricularsAddState extends State<ExtracurricularsAdd> {
                   ),
                 ),
                 SizedBox(
-                  width: width * 0.85,
+                  width: 85.w,
                   child: TextField(
                     controller: titleController,
                     maxLines: 4,
@@ -138,26 +129,27 @@ class _ExtracurricularsAddState extends State<ExtracurricularsAdd> {
                 Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: SizedBox(
-                    width: width * 0.6,
+                    width: 60.w,
                     child: Wrap(
                       alignment: WrapAlignment.center,
                       children: [
                         for (int i = 0; i < days.length; i++)
                           Dugme(
-                              day: days[i],
-                              index: i,
-                              selectedIndex: selectedIndex,
-                              ontap: () {
-                                setState(() {
-                                  selectedIndex = i;
-                                });
-                              }),
+                            day: days[i],
+                            index: i,
+                            selectedIndex: selectedIndex,
+                            ontap: () {
+                              setState(() {
+                                selectedIndex = i;
+                              });
+                            },
+                          ),
                       ],
                     ),
                   ),
                 ),
                 SizedBox(
-                  width: width * 0.6,
+                  width: 60.w,
                   child: const Text(
                     'How long will this activity take?',
                     textAlign: TextAlign.center,
@@ -169,7 +161,7 @@ class _ExtracurricularsAddState extends State<ExtracurricularsAdd> {
                   ),
                 ),
                 SizedBox(
-                  width: width * 0.7,
+                  width: 70.w,
                   child: TextField(
                     controller: minutesController,
                     keyboardType: TextInputType.number,
@@ -195,7 +187,7 @@ class _ExtracurricularsAddState extends State<ExtracurricularsAdd> {
                 Padding(
                   padding: const EdgeInsets.only(top: 15.0),
                   child: SizedBox(
-                    width: width * 0.40,
+                    width: 40.w,
                     height: 55,
                     child: ElevatedButton(
                       style: ElevatedButton.styleFrom(
@@ -223,29 +215,35 @@ class _ExtracurricularsAddState extends State<ExtracurricularsAdd> {
                               'Please enter time');
                           return;
                         }
-                        if (userAuthentication.currentUser?.breakday ==
+                        if (firebaseController.currentUser?.breakday ==
                             selectedIndex) {
                           Get.snackbar("Breakday", 'Please select another day');
                           return;
                         }
-                        if (widget.ext != null) {
-                          if (widget.ext!.dayIndex != selectedIndex) {
-                            widget.ext!.index = 1000;
+                        if (widget.extracurricular != null) {
+                          if (widget.extracurricular!.dayIndex !=
+                              selectedIndex) {
+                            widget.extracurricular!.index = 1000;
                           }
-                          final prevIndex = widget.ext!.dayIndex;
-                          final prevTime = widget.ext!.time;
-                          widget.ext!.dayIndex = selectedIndex;
-                          widget.ext!.time = int.parse(minutesController.text);
-                          widget.ext!.title = titleController.text;
-                          userAuthentication.updateExtracurriculars(
-                              widget.ext!, prevIndex, prevTime);
+                          final prevIndex = widget.extracurricular!.dayIndex;
+                          final prevTime = widget.extracurricular!.time;
+                          widget.extracurricular!.dayIndex = selectedIndex;
+                          widget.extracurricular!.time =
+                              int.parse(minutesController.text);
+                          widget.extracurricular!.title = titleController.text;
+                          firebaseController.updateExtracurriculars(
+                              widget.extracurricular!, prevIndex, prevTime);
                         } else {
-                          userAuthentication.addExtracurriculars(
-                              int.parse(minutesController.text),
-                              titleController.text,
-                              selectedIndex);
+                          firebaseController
+                              .addExtracurricular(
+                                  title: titleController.text,
+                                  time: int.parse(minutesController.text),
+                                  day: selectedIndex)
+                              .then((value) {
+                            studentState.addExtracurricular(value);
+                          });
                         }
-                        Get.back(closeOverlays: true);
+                        Navigator.of(context).pop();
                       },
                       child: const Text(
                         'Save',

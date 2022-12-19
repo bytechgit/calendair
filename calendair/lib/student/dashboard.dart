@@ -1,90 +1,29 @@
-import 'package:calendair/student/settings.dart';
 import 'package:calendair/student/to_do.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:get/get.dart';
-
-import '../student_teacher/bottom_nav_bar.dart';
+import 'package:persistent_bottom_nav_bar/persistent_tab_view.dart';
+import 'package:sizer/sizer.dart';
 import 'calendar.dart';
-import '../models/nbar.dart';
 
-class Dashboard extends StatefulWidget {
-  const Dashboard({Key? key}) : super(key: key);
+class Dashboard extends StatelessWidget {
+  const Dashboard({super.key});
 
-  @override
-  State<Dashboard> createState() => _DashboardState();
-}
-
-class _DashboardState extends State<Dashboard> {
-  @override
-  void initState() {
-    SystemChrome.setPreferredOrientations([
-      DeviceOrientation.portraitUp,
-      DeviceOrientation.portraitDown,
-    ]);
-    super.initState();
-  }
-
-  final days = [
-    "Monday",
-    "Tuesday",
-    "Wednesday",
-    "Thursday",
-    "Friday",
-    "Saturday",
-    "Sunday"
-  ];
   @override
   Widget build(BuildContext context) {
-    final width = MediaQuery.of(context).size.width;
+    final days = [
+      "Monday",
+      "Tuesday",
+      "Wednesday",
+      "Thursday",
+      "Friday",
+      "Saturday",
+      "Sunday"
+    ];
     return Scaffold(
       body: Stack(
         children: [
           Scaffold(
             appBar: AppBar(
               backgroundColor: const Color.fromRGBO(93, 159, 196, 1),
-              leading: IconButton(
-                icon: const Icon(
-                  Icons.arrow_back_ios,
-                  color: Colors.black,
-                ),
-                onPressed: () {
-                  Get.back();
-                  //inspect(gc.courses);
-                },
-              ),
-            ),
-            //const Color.fromRGBO(93, 159, 196, 1),
-
-            bottomNavigationBar: BottomNavBar(
-              items: [
-                NBar(
-                    slika: 'calendar',
-                    onclick: () {
-                      Get.off(
-                        const Dashboard(),
-                        transition: Transition.circularReveal,
-                        duration: const Duration(milliseconds: 800),
-                      );
-                    }),
-                NBar(
-                    slika: 'home',
-                    onclick: () {
-                      Get.until((route) =>
-                          (route as GetPageRoute).routeName ==
-                          '/StudentDashboard');
-                    }),
-                NBar(
-                    slika: 'settings',
-                    onclick: () {
-                      Get.off(
-                        const Settings(),
-                        transition: Transition.circularReveal,
-                        duration: const Duration(milliseconds: 800),
-                      );
-                    })
-              ],
-              selected: 0,
             ),
             body: Column(
               children: [
@@ -102,18 +41,20 @@ class _DashboardState extends State<Dashboard> {
                             padding: const EdgeInsets.only(bottom: 20, top: 0),
                             child: InkWell(
                               onTap: (() {
-                                Get.to(
-                                  ToDo(
+                                PersistentNavBarNavigator.pushNewScreen(
+                                  context,
+                                  screen: ToDo(
                                     index: i,
                                     day: days[i],
                                   ),
-                                  transition: Transition.circularReveal,
-                                  duration: const Duration(milliseconds: 800),
+                                  withNavBar: false,
+                                  pageTransitionAnimation:
+                                      PageTransitionAnimation.fade,
                                 );
                               }),
                               child: SizedBox(
                                 height: 60,
-                                width: width * 0.8,
+                                width: 80.w,
                                 child: Stack(
                                   children: [
                                     Align(
@@ -156,10 +97,11 @@ class _DashboardState extends State<Dashboard> {
             alignment: Alignment.topRight,
             child: InkWell(
               onTap: () {
-                Get.to(
-                  const Calendar(),
-                  transition: Transition.circularReveal,
-                  duration: const Duration(milliseconds: 800),
+                PersistentNavBarNavigator.pushNewScreen(
+                  context,
+                  screen: const Calendar(),
+                  withNavBar: false,
+                  pageTransitionAnimation: PageTransitionAnimation.fade,
                 );
               },
               child: Padding(

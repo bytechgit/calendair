@@ -2,26 +2,20 @@ import 'dart:async';
 
 import 'package:calendair/student/rate_class_strength.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
+import 'package:persistent_bottom_nav_bar/persistent_tab_view.dart';
 
-class JoinedClassNotification extends StatefulWidget {
+class JoinClassNotification extends StatelessWidget {
   final String name;
-  const JoinedClassNotification({Key? key, required this.name})
-      : super(key: key);
+  const JoinClassNotification({super.key, required this.name});
 
-  @override
-  State<JoinedClassNotification> createState() =>
-      _JoinedClassNotificationState();
-}
-
-class _JoinedClassNotificationState extends State<JoinedClassNotification> {
   @override
   Widget build(BuildContext context) {
     Timer(const Duration(seconds: 2), () {
-      Get.to(
-        RateClassStrength(name: widget.name == "" ? "Course" : widget.name),
-        transition: Transition.circularReveal,
-        duration: const Duration(milliseconds: 800),
+      PersistentNavBarNavigator.pushNewScreen(
+        context,
+        screen: RateClassStrength(name: name == "" ? "Course" : name),
+        withNavBar: false,
+        pageTransitionAnimation: PageTransitionAnimation.fade,
       );
     });
     return Scaffold(
@@ -41,9 +35,6 @@ class _JoinedClassNotificationState extends State<JoinedClassNotification> {
                 child: Image.asset('assets/images/backgroundBottom.png'),
               ),
             ),
-            ///////images
-            ///
-            ///
             Align(
               alignment: Alignment.center,
               child: Padding(
@@ -69,7 +60,7 @@ class _JoinedClassNotificationState extends State<JoinedClassNotification> {
                       child: Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 10),
                         child: Text(
-                          "${widget.name} Class",
+                          "$name Class",
                           textAlign: TextAlign.center,
                           style: const TextStyle(
                               color: Color.fromRGBO(93, 159, 196, 1),

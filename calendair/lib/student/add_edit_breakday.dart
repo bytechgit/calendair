@@ -1,35 +1,30 @@
-import 'package:calendair/classes/authentication.dart';
-import 'package:calendair/student/settings.dart';
+import 'package:calendair/controllers/firebase_controller.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 import 'package:provider/provider.dart';
-import '../student_teacher/bottom_nav_bar.dart';
-import 'dashboard.dart';
-import '../models/nbar.dart';
+import 'package:sizer/sizer.dart';
 
-class BreakDay extends StatefulWidget {
-  const BreakDay({Key? key}) : super(key: key);
+class AddEditBreakday extends StatefulWidget {
+  const AddEditBreakday({super.key});
 
   @override
-  State<BreakDay> createState() => _BreakDayState();
+  State<AddEditBreakday> createState() => _AddEditBreakdayState();
 }
 
-class _BreakDayState extends State<BreakDay> {
+class _AddEditBreakdayState extends State<AddEditBreakday> {
   final days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
   int selectedIndex = -1;
-  late final UserAuthentication userAuthentication;
+  late FirebaseController firebaseController;
   @override
   void initState() {
-    userAuthentication = context.read<UserAuthentication>();
+    firebaseController = context.read<FirebaseController>();
     setState(() {
-      selectedIndex = userAuthentication.currentUser?.breakday ?? -1;
+      selectedIndex = firebaseController.currentUser?.breakday ?? -1;
     });
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
-    final width = MediaQuery.of(context).size.width;
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
@@ -40,39 +35,34 @@ class _BreakDayState extends State<BreakDay> {
             color: Colors.black,
           ),
           onPressed: () {
-            Get.back(closeOverlays: true);
+            Navigator.of(context).pop();
           },
         ),
       ),
-      bottomNavigationBar: BottomNavBar(
-        items: [
-          NBar(
-              slika: 'calendar',
-              onclick: () {
-                Get.off(
-                  const Dashboard(),
-                  transition: Transition.circularReveal,
-                  duration: const Duration(milliseconds: 800),
-                );
-              }),
-          NBar(
-              slika: 'home',
-              onclick: () {
-                Get.until((route) =>
-                    (route as GetPageRoute).routeName == '/StudentDashboard');
-              }),
-          NBar(
-              slika: 'settings',
-              onclick: () {
-                Get.off(
-                  const Settings(),
-                  transition: Transition.circularReveal,
-                  duration: const Duration(milliseconds: 800),
-                );
-              })
-        ],
-        selected: 1,
-      ),
+      // bottomNavigationBar: NavBar(
+      //   navBarItems: [
+      //     NavBarItem(
+      //         image: 'calendar',
+      //         onclick: () {
+      //           Get.off(
+      //             const Dashboard(),
+      //           );
+      //         }),
+      //     NavBarItem(
+      //         image: 'home',
+      //         onclick: () {
+      //           Get.until((route) =>
+      //               (route as GetPageRoute).routeName == '/StudentDashboard');
+      //         }),
+      //     NavBarItem(
+      //         image: 'settings',
+      //         onclick: () {
+      //           Get.to(
+      //             const StudentSettings(),
+      //           );
+      //         })
+      //   ],
+      // ),
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(8.0),
@@ -86,7 +76,7 @@ class _BreakDayState extends State<BreakDay> {
                 Padding(
                   padding: const EdgeInsets.only(top: 10.0, bottom: 10),
                   child: SizedBox(
-                    width: width * 0.85,
+                    width: 85.w,
                     child: const Text(
                       'Add/Change Breakday',
                       textAlign: TextAlign.center,
@@ -103,7 +93,7 @@ class _BreakDayState extends State<BreakDay> {
                     color: const Color.fromARGB(255, 217, 217, 217),
                     borderRadius: BorderRadius.circular(15.0),
                   ),
-                  width: width * 0.85,
+                  width: 85.w,
                   child: const Padding(
                     padding: EdgeInsets.all(8.0),
                     child: Text(
@@ -117,7 +107,7 @@ class _BreakDayState extends State<BreakDay> {
                 Padding(
                   padding: const EdgeInsets.only(top: 18.0),
                   child: SizedBox(
-                    width: width * 0.6,
+                    width: 60.w,
                     child: Wrap(
                       alignment: WrapAlignment.center,
                       children: [
@@ -142,7 +132,7 @@ class _BreakDayState extends State<BreakDay> {
                 Padding(
                   padding: const EdgeInsets.only(top: 15.0, bottom: 10),
                   child: SizedBox(
-                    width: width * 0.40,
+                    width: 40.w,
                     height: 55,
                     child: ElevatedButton(
                       style: ElevatedButton.styleFrom(
@@ -154,8 +144,8 @@ class _BreakDayState extends State<BreakDay> {
                             borderRadius: BorderRadius.circular(20.0),
                           )),
                       onPressed: () {
-                        userAuthentication.addBreakDay(selectedIndex);
-                        Get.back(closeOverlays: true);
+                        firebaseController.addBreakDay(selectedIndex);
+                        Navigator.of(context).pop();
                       },
 
                       child: const Text(
@@ -170,7 +160,7 @@ class _BreakDayState extends State<BreakDay> {
                   ),
                 ),
                 SizedBox(
-                  width: width * 0.9,
+                  width: 90.w,
                   child: const Text(
                     'If you dont select a break day, we’ll balance out your workload throughout the week like normal',
                     textAlign: TextAlign.center,
