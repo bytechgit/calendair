@@ -1,5 +1,6 @@
 import 'dart:developer';
 
+import 'package:calendair/classes/authentication.dart';
 import 'package:calendair/models/schedule/scheduleElementAssignmentMain.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -42,7 +43,8 @@ class ScheduleElementAssignment extends ScheduleElementAssignmentMain {
   }
 
   @override
-  Future<void> addInSchedule({int? listIndex, int? index}) async {
+  Future<void> addInSchedule(
+      {int? listIndex, int? index, UserAuthentication? ua}) async {
     if (listIndex != null && index != null) {
       scheduleLists.scheduleElements.value[listIndex].insert(index, this);
       scheduleLists.addTimes(time, listIndex);

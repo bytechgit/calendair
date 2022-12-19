@@ -1,26 +1,31 @@
-import 'package:calendair/classes/googleClassroom.dart';
+import 'package:calendair/classes/authentication.dart';
 import 'package:calendair/student/add_class.dart';
-import 'package:calendair/models/CustomCourse.dart';
+import 'package:calendair/models/custom_course.dart';
 import 'package:calendair/student/rate_class_strength.dart';
 import 'package:calendair/student/settings.dart' as s;
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:provider/provider.dart';
 import 'package:sizer/sizer.dart';
-import '../classes/firestore.dart';
 import '../student_teacher/bottom_nav_bar.dart';
 import 'dashboard.dart';
 import '../models/nbar.dart';
 
 class Classes extends StatefulWidget {
   const Classes({Key? key}) : super(key: key);
-
   @override
   State<Classes> createState() => _ClassesState();
 }
 
 class _ClassesState extends State<Classes> {
-  final gc = Get.find<GoogleClassroom>();
+  late final UserAuthentication userAuthentication;
+  @override
+  void initState() {
+    userAuthentication = context.read<UserAuthentication>();
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -99,7 +104,7 @@ class _ClassesState extends State<Classes> {
                     child: Stack(
                       children: [
                         StreamBuilder(
-                            stream: Firestore().getStudentCourses(),
+                            stream: userAuthentication.getStudentCourses(),
                             builder: (context,
                                 AsyncSnapshot<QuerySnapshot> snapshot) {
                               if (snapshot.hasData) {

@@ -1,10 +1,10 @@
+import 'package:calendair/classes/authentication.dart';
 import 'package:calendair/models/UserModel.dart';
 import 'package:calendair/student/student_dashboard.dart';
 import 'package:calendair/teacher/teacher_dashboard.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import '../classes/firestore.dart';
-import '../classes/googleClassroom.dart';
+import 'package:provider/provider.dart';
 
 class ChooseUserType extends StatefulWidget {
   const ChooseUserType({Key? key}) : super(key: key);
@@ -14,7 +14,14 @@ class ChooseUserType extends StatefulWidget {
 }
 
 class _ChooseUserTypeState extends State<ChooseUserType> {
-  final gc = Get.find<GoogleClassroom>();
+  late final UserAuthentication userAuthentication;
+
+  @override
+  void initState() {
+    userAuthentication = context.read<UserAuthentication>();
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     final width = MediaQuery.of(context).size.width;
@@ -69,17 +76,19 @@ class _ChooseUserTypeState extends State<ChooseUserType> {
                     ),
                     InkWell(
                       onTap: (() {
-                        Firestore().addUserIfNotExist(
+                        userAuthentication.addUserIfNotExist(
                             user: UserModel(
-                                id: gc.ua.currentUser!.uid,
-                                name:
-                                    gc.ua.currentUser!.displayName ?? "no name",
-                                picture: gc.ua.currentUser!.photoURL ?? "",
+                                uid: userAuthentication.auth.currentUser!.uid,
+                                name: userAuthentication
+                                        .auth.currentUser!.displayName ??
+                                    "no name",
+                                picture: userAuthentication
+                                        .auth.currentUser?.photoURL ??
+                                    "",
                                 type: "student",
                                 breakday: -1,
                                 courses: [],
                                 times: {}));
-                        // gc.getCourseListStudent();
                         Get.to(
                           const StudentDashboard(),
                           transition: Transition.circularReveal,
@@ -113,12 +122,15 @@ class _ChooseUserTypeState extends State<ChooseUserType> {
                     ),
                     InkWell(
                       onTap: () {
-                        Firestore().addUserIfNotExist(
+                        userAuthentication.addUserIfNotExist(
                             user: UserModel(
-                                id: gc.ua.currentUser!.uid,
-                                name:
-                                    gc.ua.currentUser!.displayName ?? "no name",
-                                picture: gc.ua.currentUser!.photoURL ?? "",
+                                uid: userAuthentication.auth.currentUser!.uid,
+                                name: userAuthentication
+                                        .auth.currentUser!.displayName ??
+                                    "no name",
+                                picture: userAuthentication
+                                        .auth.currentUser!.photoURL ??
+                                    "",
                                 type: "teacher",
                                 breakday: -1,
                                 courses: [],

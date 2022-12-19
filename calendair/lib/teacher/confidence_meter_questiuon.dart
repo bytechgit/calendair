@@ -1,13 +1,18 @@
-import 'package:calendair/models/CustomCourse.dart';
+import 'package:calendair/models/custom_course.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import '../classes/googleClassroom.dart';
 import '../student_teacher/bottom_nav_bar.dart';
 import '../models/nbar.dart';
 
 class ConfidenceMeterQuestion extends StatefulWidget {
   final CustomCourse course;
-  const ConfidenceMeterQuestion({Key? key, required this.course})
+  final Function(String val) onSave;
+  final String question;
+  const ConfidenceMeterQuestion(
+      {Key? key,
+      required this.course,
+      required this.onSave,
+      required this.question})
       : super(key: key);
 
   @override
@@ -16,13 +21,10 @@ class ConfidenceMeterQuestion extends StatefulWidget {
 }
 
 class _ConfidenceMeterQuestionState extends State<ConfidenceMeterQuestion> {
-  final gc = Get.find<GoogleClassroom>();
   final con = TextEditingController();
   @override
   void initState() {
-    if (gc.confidence.isNotEmpty) {
-      con.text = gc.confidence;
-    }
+    con.text = widget.question;
     super.initState();
   }
 
@@ -143,7 +145,7 @@ class _ConfidenceMeterQuestionState extends State<ConfidenceMeterQuestion> {
                         borderRadius: BorderRadius.circular(10.0),
                       )),
                   onPressed: () {
-                    gc.confidence = con.text;
+                    widget.onSave(con.text);
                     Get.back();
                   },
                   child: const Text(

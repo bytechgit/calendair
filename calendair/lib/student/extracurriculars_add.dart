@@ -1,10 +1,10 @@
-import 'package:calendair/classes/firestore.dart';
-import 'package:calendair/student/extracurricularButton.dart';
-import 'package:calendair/models/ExtracurricularsModel.dart';
+import 'package:calendair/classes/authentication.dart';
+import 'package:calendair/student/break_day.dart';
+import 'package:calendair/models/extracurriculars_model.dart';
 import 'package:calendair/student/settings.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import '../classes/googleClassroom.dart';
+import 'package:provider/provider.dart';
 import '../student_teacher/bottom_nav_bar.dart';
 import 'dashboard.dart';
 import '../models/nbar.dart';
@@ -21,19 +21,21 @@ class _ExtracurricularsAddState extends State<ExtracurricularsAdd> {
   final titleController = TextEditingController();
   final minutesController = TextEditingController();
   int selectedIndex = -1;
+  late final UserAuthentication userAuthentication;
+
   @override
   void initState() {
+    userAuthentication = context.read<UserAuthentication>();
     if (widget.ext != null) {
       titleController.text = widget.ext!.title;
       minutesController.text = widget.ext!.time.toString();
       setState(() {
         selectedIndex = widget.ext!.dayIndex;
       });
+      super.initState();
     }
-    super.initState();
   }
 
-  final gc = Get.find<GoogleClassroom>();
   final days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 
   @override
@@ -94,10 +96,12 @@ class _ExtracurricularsAddState extends State<ExtracurricularsAdd> {
                   padding: const EdgeInsets.only(top: 10.0, bottom: 10),
                   child: SizedBox(
                     width: width * 0.85,
-                    child: const Text(
-                      'Add an Extracurricular',
+                    child: Text(
+                      widget.ext == null
+                          ? 'Add an Extracurricular'
+                          : 'Edit Extracurricular',
                       textAlign: TextAlign.center,
-                      style: TextStyle(
+                      style: const TextStyle(
                         color: Colors.black,
                         fontSize: 32,
                         fontWeight: FontWeight.w900,
@@ -139,16 +143,15 @@ class _ExtracurricularsAddState extends State<ExtracurricularsAdd> {
                       alignment: WrapAlignment.center,
                       children: [
                         for (int i = 0; i < days.length; i++)
-                          ExtracurricularButton(
-                            text: days[i],
-                            index: i,
-                            selectedIndex: selectedIndex,
-                            onClick: () {
-                              setState(() {
-                                selectedIndex = i;
-                              });
-                            },
-                          ),
+                          Dugme(
+                              day: days[i],
+                              index: i,
+                              selectedIndex: selectedIndex,
+                              ontap: () {
+                                setState(() {
+                                  selectedIndex = i;
+                                });
+                              }),
                       ],
                     ),
                   ),
@@ -209,13 +212,18 @@ class _ExtracurricularsAddState extends State<ExtracurricularsAdd> {
                               'Please enter title');
                           return;
                         }
+                        if (selectedIndex == -1) {
+                          Get.snackbar(
+                              "A required field is mising", 'Please enter day');
+                          return;
+                        }
                         if (minutesController.text.isEmpty ||
                             int.tryParse(minutesController.text) == null) {
                           Get.snackbar("A required field is mising",
                               'Please enter time');
                           return;
                         }
-                        if (Firestore().firebaseUser?.breakday ==
+                        if (userAuthentication.currentUser?.breakday ==
                             selectedIndex) {
                           Get.snackbar("Breakday", 'Please select another day');
                           return;
@@ -229,10 +237,10 @@ class _ExtracurricularsAddState extends State<ExtracurricularsAdd> {
                           widget.ext!.dayIndex = selectedIndex;
                           widget.ext!.time = int.parse(minutesController.text);
                           widget.ext!.title = titleController.text;
-                          Firestore().updateExtracurriculars(
+                          userAuthentication.updateExtracurriculars(
                               widget.ext!, prevIndex, prevTime);
                         } else {
-                          Firestore().addExtracurriculars(
+                          userAuthentication.addExtracurriculars(
                               int.parse(minutesController.text),
                               titleController.text,
                               selectedIndex);

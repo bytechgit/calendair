@@ -1,9 +1,11 @@
+import 'package:calendair/classes/authentication.dart';
 import 'package:calendair/classes/firestore.dart';
 import 'package:calendair/student/settings.dart';
 import 'package:expandable/expandable.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import '../classes/googleClassroom.dart';
+import 'package:provider/provider.dart';
+import '../classes/google_classroom.dart';
 import '../student_teacher/bottom_nav_bar.dart';
 import 'dashboard.dart';
 import '../models/nbar.dart';
@@ -16,6 +18,14 @@ class NotificationSettings extends StatefulWidget {
 }
 
 class _NotificationSettingsState extends State<NotificationSettings> {
+  late final UserAuthentication userAuthentication;
+
+  @override
+  void initState() {
+    userAuthentication = context.read<UserAuthentication>();
+    super.initState();
+  }
+
   final gc = Get.find<GoogleClassroom>();
   ExpandableController reminderController = ExpandableController();
   ExpandableController updatesController = ExpandableController();
@@ -128,9 +138,8 @@ class _NotificationSettingsState extends State<NotificationSettings> {
                     collapsed: const SizedBox(),
                     expanded: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
-                        children: Firestore()
-                            .firebaseUser!
-                            .remindersNotification
+                        children: userAuthentication
+                            .currentUser!.remindersNotification
                             .map(
                               (e) => Row(
                                 children: [
@@ -156,7 +165,7 @@ class _NotificationSettingsState extends State<NotificationSettings> {
                                         onChanged: (inputValue) {
                                           setState(() {
                                             e.checked = inputValue;
-                                            Firestore()
+                                            userAuthentication
                                                 .updateNotificationSettings(
                                                     "remindersNotification", e);
                                             // print(value);
@@ -193,9 +202,8 @@ class _NotificationSettingsState extends State<NotificationSettings> {
                       collapsed: const SizedBox(),
                       expanded: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
-                          children: Firestore()
-                              .firebaseUser!
-                              .updatesNotification
+                          children: userAuthentication
+                              .currentUser!.updatesNotification
                               .map(
                                 (e) => Row(
                                   children: [
@@ -222,7 +230,7 @@ class _NotificationSettingsState extends State<NotificationSettings> {
                                           onChanged: (inputValue) {
                                             setState(() {
                                               e.checked = inputValue;
-                                              Firestore()
+                                              userAuthentication
                                                   .updateNotificationSettings(
                                                       "updatesNotification", e);
                                               // print(value);
@@ -257,9 +265,8 @@ class _NotificationSettingsState extends State<NotificationSettings> {
                   collapsed: const SizedBox(),
                   expanded: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
-                    children: Firestore()
-                        .firebaseUser!
-                        .assignmentsNotification
+                    children: userAuthentication
+                        .currentUser!.assignmentsNotification
                         .map(
                           (e) => Row(
                             children: [
@@ -284,8 +291,9 @@ class _NotificationSettingsState extends State<NotificationSettings> {
                                     onChanged: (inputValue) {
                                       setState(() {
                                         e.checked = inputValue;
-                                        Firestore().updateNotificationSettings(
-                                            "assignmentsNotification", e);
+                                        userAuthentication
+                                            .updateNotificationSettings(
+                                                "assignmentsNotification", e);
                                         // print(value);
                                       });
                                     },

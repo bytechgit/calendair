@@ -1,11 +1,12 @@
+import 'package:calendair/classes/authentication.dart';
 import 'package:calendair/student/extracurriculars_add.dart';
-import 'package:calendair/models/ExtracurricularsModel.dart';
+import 'package:calendair/models/extracurriculars_model.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:provider/provider.dart';
 import 'package:sizer/sizer.dart';
-import '../classes/firestore.dart';
-import '../classes/googleClassroom.dart';
+import '../classes/google_classroom.dart';
 import '../student_teacher/bottom_nav_bar.dart';
 import 'dashboard.dart';
 import '../models/nbar.dart';
@@ -19,7 +20,14 @@ class Extracurriculars extends StatefulWidget {
 }
 
 class _ExtracurricularsState extends State<Extracurriculars> {
-  final gc = Get.find<GoogleClassroom>();
+  late final UserAuthentication userAuthentication;
+
+  @override
+  void initState() {
+    userAuthentication = context.read<UserAuthentication>();
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -88,7 +96,7 @@ class _ExtracurricularsState extends State<Extracurriculars> {
               Expanded(
                 flex: 8,
                 child: StreamBuilder(
-                    stream: Firestore().getExtracurriculars(),
+                    stream: userAuthentication.getExtracurriculars(),
                     builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
                       if (snapshot.hasData) {
                         return SingleChildScrollView(
@@ -172,7 +180,7 @@ class _ExtracurricularsState extends State<Extracurriculars> {
                                       padding: const EdgeInsets.all(8.0),
                                       child: InkWell(
                                         onTap: () {
-                                          Firestore()
+                                          userAuthentication
                                               .deleteExtracurriculars(ex);
                                         },
                                         child: Image.asset(

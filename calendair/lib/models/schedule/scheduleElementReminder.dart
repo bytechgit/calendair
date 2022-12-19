@@ -1,13 +1,13 @@
-import 'package:calendair/classes/firestore.dart';
+import 'package:calendair/classes/authentication.dart';
 import 'package:calendair/models/schedule/scheduleElement.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class ScheduleElementReminder extends ScheduleElement {
   @override
-  void addInSchedule({int? listIndex, int? index}) {
+  void addInSchedule({int? listIndex, int? index, UserAuthentication? ua}) {
     index = getDayIndex();
     if (index != -1) {
-      if (Firestore().firebaseUser!.breakday == index) {
+      if (ua!.currentUser?.breakday == index) {
         index += 1;
       }
       scheduleLists.scheduleElements.value[index].insert(0, this);

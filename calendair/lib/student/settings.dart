@@ -2,7 +2,7 @@ import 'package:calendair/student/account_settings.dart';
 import 'package:calendair/student/notification_settings.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import '../classes/googleClassroom.dart';
+import '../classes/google_classroom.dart';
 import '../student_teacher/bottom_nav_bar.dart';
 import 'dashboard.dart';
 import '../models/nbar.dart';

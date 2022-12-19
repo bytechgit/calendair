@@ -1,3 +1,4 @@
+import 'package:calendair/classes/authentication.dart';
 import 'package:calendair/models/schedule/scheduleElement.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
@@ -19,7 +20,8 @@ class ScheduleElementExtracurriculars extends ScheduleElement {
         );
 
   @override
-  Future<void> addInSchedule({int? listIndex, int? index}) async {
+  Future<void> addInSchedule(
+      {int? listIndex, int? index, UserAuthentication? ua}) async {
     if (listIndex != null && index != null) {
       dayIndex = listIndex % 7;
       if (index >= scheduleLists.scheduleElements.value[listIndex].length) {

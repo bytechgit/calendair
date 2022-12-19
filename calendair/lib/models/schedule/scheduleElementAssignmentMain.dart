@@ -1,10 +1,9 @@
 import 'dart:developer';
-
+import 'package:calendair/classes/authentication.dart';
 import 'package:calendair/models/schedule/scheduleElement.dart';
 import 'package:calendair/models/schedule/scheduleElementAssignment.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import '../../classes/firestore.dart';
 
 class ScheduleElementAssignmentMain extends ScheduleElement {
   List<DateTime> dates;
@@ -16,21 +15,21 @@ class ScheduleElementAssignmentMain extends ScheduleElement {
   List<int> indexes;
   String note;
 
-  Future<void> addDates() async {
+  Future<void> addDates(UserAuthentication ua) async {
     if (scheduleLists.timesList == null) {
       print("null");
     }
 
     final l = await FirebaseFirestore.instance
         .collection('Users')
-        .doc(Firestore().ua.currentUser!.uid)
+        .doc(ua.currentUser!.uid)
         .get();
     final List<int> extTimes =
         ((l.data()?['extracurricularsTimes'] ?? []) as List<dynamic>)
             .map((e) => e as int)
             .toList();
 
-    scheduleLists.timesList ??= await Firestore().getTimes();
+    scheduleLists.timesList ??= ua.currentUser?.times;
 
     int time = this.time;
     DateTime date = DateUtils.dateOnly(DateTime.now());
@@ -49,7 +48,7 @@ class ScheduleElementAssignmentMain extends ScheduleElement {
       indexes.add(1000);
       //inicijalno na 1000 jer se stavlj na kraj dana
       while (date.compareTo(dueDate) <= 0) {
-        if (date.weekday - 1 != Firestore().firebaseUser!.breakday) {
+        if (date.weekday - 1 != ua.currentUser!.breakday) {
           curTime =
               (scheduleLists.timesList?[DateUtils.dateOnly(date).toString()] ??
                       0) +
@@ -76,7 +75,7 @@ class ScheduleElementAssignmentMain extends ScheduleElement {
       "times": times,
       "remainingTimes": remainingTimes
     });
-    await Firestore().setTimes(scheduleLists.timesList!);
+    await ua.setTimes(scheduleLists.timesList!);
   }
 
   ScheduleElementAssignmentMain(
@@ -113,10 +112,10 @@ class ScheduleElementAssignmentMain extends ScheduleElement {
   }
 
   @override
-  Future<void> addInSchedule({int? listIndex, int? index}) async {
+  Future<void> addInSchedule(
+      {int? listIndex, int? index, UserAuthentication? ua}) async {
     if (dates.isEmpty) {
-      print("eeee");
-      await addDates();
+      await addDates(ua!);
     }
     ScheduleElementAssignment? s;
     for (int i = 0; i < dates.length; i++) {

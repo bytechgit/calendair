@@ -1,11 +1,8 @@
-import 'package:calendair/classes/firestore.dart';
-import 'package:calendair/classes/scheduleLists.dart';
-import 'package:calendair/student/extracurricularButton.dart';
+import 'package:calendair/classes/authentication.dart';
 import 'package:calendair/student/settings.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-
-import '../classes/googleClassroom.dart';
+import 'package:provider/provider.dart';
 import '../student_teacher/bottom_nav_bar.dart';
 import 'dashboard.dart';
 import '../models/nbar.dart';
@@ -18,18 +15,16 @@ class BreakDay extends StatefulWidget {
 }
 
 class _BreakDayState extends State<BreakDay> {
-  final gc = Get.find<GoogleClassroom>();
   final days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
-  final scheduleLists = Get.find<ScheduleLists>();
-
   int selectedIndex = -1;
-
+  late final UserAuthentication userAuthentication;
   @override
   void initState() {
-    super.initState();
+    userAuthentication = context.read<UserAuthentication>();
     setState(() {
-      selectedIndex = Firestore().firebaseUser?.breakday ?? -1;
+      selectedIndex = userAuthentication.currentUser?.breakday ?? -1;
     });
+    super.initState();
   }
 
   @override
@@ -127,25 +122,19 @@ class _BreakDayState extends State<BreakDay> {
                       alignment: WrapAlignment.center,
                       children: [
                         for (int i = 0; i < days.length; i++)
-                          ExtracurricularButton(
-                            text: days[i],
-                            index: i,
-                            selectedIndex: selectedIndex,
-                            onClick: () {
-                              setState(() {
-                                if (selectedIndex == i) {
-                                  selectedIndex = -1;
-                                } else {
-                                  if (!scheduleLists.breakDayIsEmpty(i)) {
-                                    Get.snackbar(
-                                        "Break day", "Choose another day");
-                                    return;
+                          Dugme(
+                              day: days[i],
+                              index: i,
+                              ontap: (() {
+                                setState(() {
+                                  if (selectedIndex == i) {
+                                    selectedIndex = -1;
+                                  } else {
+                                    selectedIndex = i;
                                   }
-                                  selectedIndex = i;
-                                }
-                              });
-                            },
-                          ),
+                                });
+                              }),
+                              selectedIndex: selectedIndex),
                       ],
                     ),
                   ),
@@ -165,7 +154,7 @@ class _BreakDayState extends State<BreakDay> {
                             borderRadius: BorderRadius.circular(20.0),
                           )),
                       onPressed: () {
-                        Firestore().addBreakDay(selectedIndex);
+                        userAuthentication.addBreakDay(selectedIndex);
                         Get.back(closeOverlays: true);
                       },
 
@@ -193,6 +182,54 @@ class _BreakDayState extends State<BreakDay> {
                   ),
                 ),
               ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class Dugme extends StatelessWidget {
+  final String day;
+  final int index;
+  final int selectedIndex;
+  final VoidCallback ontap;
+  const Dugme(
+      {super.key,
+      required this.day,
+      required this.index,
+      required this.selectedIndex,
+      required this.ontap});
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.all(5.0),
+      child: GestureDetector(
+        onTap: () => {ontap()},
+        child: Container(
+          width: 80,
+          decoration: BoxDecoration(
+            color: index == selectedIndex
+                ? const Color.fromRGBO(94, 159, 197, 1)
+                : const Color.fromRGBO(217, 217, 217, 1),
+            borderRadius: const BorderRadius.all(
+              Radius.circular(10),
+            ),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: FittedBox(
+              fit: BoxFit.scaleDown,
+              child: Text(
+                day,
+                textAlign: TextAlign.center,
+                style: const TextStyle(
+                  color: Colors.black,
+                  fontSize: 30,
+                ),
+              ),
             ),
           ),
         ),

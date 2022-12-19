@@ -1,5 +1,5 @@
+import 'package:calendair/classes/authentication.dart';
 import 'package:calendair/student/calendar.dart';
-import 'package:calendair/classes/firestore.dart';
 import 'package:calendair/student/settings.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -7,6 +7,7 @@ import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';
 import 'package:get/get.dart';
 // ignore: depend_on_referenced_packages
 import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
 import '../student_teacher/bottom_nav_bar.dart';
 import '../models/nbar.dart';
 
@@ -18,22 +19,15 @@ class Reminder extends StatefulWidget {
 }
 
 class _ReminderState extends State<Reminder> {
+  late final UserAuthentication userAuthentication;
   @override
   void initState() {
-    super.initState();
+    userAuthentication = context.read<UserAuthentication>();
     SystemChrome.setPreferredOrientations([
       DeviceOrientation.portraitUp,
       DeviceOrientation.portraitDown,
     ]);
-  }
-
-  @override
-  dispose() {
-    // SystemChrome.setPreferredOrientations([
-    //   DeviceOrientation.landscapeRight,
-    //   DeviceOrientation.landscapeLeft,
-    // ]);
-    super.dispose();
+    super.initState();
   }
 
   DateTime date = DateTime.now();
@@ -231,11 +225,11 @@ class _ReminderState extends State<Reminder> {
                           )),
                       onPressed: () {
                         if (date.weekday - 1 ==
-                            Firestore().firebaseUser?.breakday) {
+                            userAuthentication.currentUser?.breakday) {
                           Get.snackbar("Breakday", 'Select another day');
                           return;
                         }
-                        Firestore().addReminderStudent(
+                        userAuthentication.addReminderStudent(
                             date: date, title: titleController.text);
                         Get.off(
                           const Calendar(),

@@ -3,14 +3,14 @@ import 'package:calendair/models/schedule/scheduleElementReminder.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-import '../classes/googleClassroom.dart';
+import '../classes/google_classroom.dart';
 
 class CalendarScheduleElement extends StatefulWidget {
   final ScheduleElement scheduleElement;
-  const CalendarScheduleElement({
-    Key? key,
-    required this.scheduleElement,
-  }) : super(key: key);
+  final bool edit;
+  const CalendarScheduleElement(
+      {Key? key, required this.scheduleElement, required this.edit})
+      : super(key: key);
 
   @override
   State<CalendarScheduleElement> createState() =>
@@ -60,7 +60,7 @@ class _CalendarScheduleElementState extends State<CalendarScheduleElement> {
                     child: Obx(
                       () => Padding(
                         padding: const EdgeInsets.only(right: 3.0),
-                        child: !gc.edit.value
+                        child: !widget.edit
                             ? Checkbox(
                                 activeColor: Colors.green,
                                 shape: const RoundedRectangleBorder(

@@ -1,8 +1,8 @@
+import 'package:calendair/classes/google_classroom.dart';
 import 'package:calendair/student/joined_class_notification.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-
-import '../classes/googleClassroom.dart';
+import 'package:provider/provider.dart';
 
 class AddClass extends StatefulWidget {
   const AddClass({Key? key}) : super(key: key);
@@ -12,8 +12,14 @@ class AddClass extends StatefulWidget {
 }
 
 class _AddClassState extends State<AddClass> {
-  final gc = Get.find<GoogleClassroom>();
   final codeController = TextEditingController();
+  late final GoogleClassroom googleClassroom;
+  @override
+  void initState() {
+    googleClassroom = context.read<GoogleClassroom>();
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     final width = MediaQuery.of(context).size.width;
@@ -70,6 +76,7 @@ class _AddClassState extends State<AddClass> {
                           borderRadius: BorderRadius.all(Radius.circular(13))),
                     ),
                   ),
+                  //ssheigb
                   Padding(
                     padding: const EdgeInsets.only(top: 5.0),
                     child: SizedBox(
@@ -122,8 +129,8 @@ class _AddClassState extends State<AddClass> {
                         shape: const CircleBorder(),
                       ),
                       onPressed: () async {
-                        String name =
-                            await gc.enrolToCourse(codeController.text);
+                        String name = await googleClassroom
+                            .enrolToCourse(codeController.text);
                         if (name != "" && name != "Error") {
                           Get.to(
                             JoinedClassNotification(name: name),
@@ -131,8 +138,8 @@ class _AddClassState extends State<AddClass> {
                             duration: const Duration(milliseconds: 800),
                           );
                         }
+                        print(name);
                       },
-
                       child: const Icon(
                         Icons.arrow_forward_ios_rounded,
                         color: Colors.black,

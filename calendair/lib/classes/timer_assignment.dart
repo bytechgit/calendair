@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'package:calendair/classes/firestore.dart';
 import 'package:calendair/models/schedule/scheduleElementAssignment.dart';
 import 'package:get/get.dart';
 
@@ -35,16 +34,17 @@ class TimerAssignment extends GetxController {
         // NotificationService().showLocalNotification(id: 888, title: a.title_, body: time.value);
         if (a.timesec == 0) {
           time.value = 'Time\'s up';
-          if (Firestore()
-                  .firebaseUser!
-                  .assignmentsNotification
-                  .firstWhereOrNull(
-                      (element) => element.channel == "assignmentFinished")
-                  ?.checked ??
-              false) {
-            NotificationService().showLocalNotification(
-                id: 888, title: a.title_, body: time.value);
-          }
+          // if (Firestore()
+          //         .firebaseUser!
+          //         .assignmentsNotification
+          //         .firstWhereOrNull(
+          //             (element) => element.channel == "assignmentFinished")
+          //         ?.checked ??
+          //     false) {
+          //   NotificationService().showLocalNotification(
+          //       id: 888, title: a.title_, body: time.value);
+          // }
+          //TODO:treba da se otkomentarise
           a.finish(true, time: 0);
           timer.cancel();
         }

@@ -1,9 +1,10 @@
+import 'package:calendair/classes/google_classroom.dart';
 import 'package:calendair/teacher/generating_class_code.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:googleapis/classroom/v1.dart' as classroom;
+import 'package:provider/provider.dart';
 import 'package:sizer/sizer.dart';
-import '../classes/googleClassroom.dart';
 import '../student_teacher/bottom_nav_bar.dart';
 import '../models/nbar.dart';
 import 'package:form_field_validator/form_field_validator.dart';
@@ -18,10 +19,16 @@ class _MakeClassState extends State<MakeClass> {
   GlobalKey<FormState> formkey = GlobalKey<FormState>();
   final periodController = TextEditingController();
   final nameController = TextEditingController();
+  late final GoogleClassroom googleClassroom;
+
+  @override
+  void initState() {
+    googleClassroom = context.read<GoogleClassroom>();
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
-    final gc = Get.find<GoogleClassroom>();
-
     return Scaffold(
       resizeToAvoidBottomInset: false,
       appBar: AppBar(
@@ -181,7 +188,7 @@ class _MakeClassState extends State<MakeClass> {
                               fontWeight: FontWeight.w400,
                             ),
                             content: FutureBuilder<List<classroom.Course>>(
-                                future: gc.getCourseList(),
+                                future: googleClassroom.getCourseList(),
                                 builder: (context, snapshot) {
                                   if (snapshot.hasData) {
                                     return SizedBox(
@@ -236,7 +243,9 @@ class _MakeClassState extends State<MakeClass> {
                                                           child: IconButton(
                                                               iconSize: 30,
                                                               onPressed: () {
-                                                                gc.addClass(e);
+                                                                googleClassroom
+                                                                    .addClass(
+                                                                        e);
                                                                 Get.off(
                                                                   GeneratingClassCode(
                                                                       futureCode: Future.delayed(
@@ -286,7 +295,7 @@ class _MakeClassState extends State<MakeClass> {
                     if (formkey.currentState?.validate() == true) {
                       Get.to(
                         GeneratingClassCode(
-                            futureCode: gc.createCourse(
+                            futureCode: googleClassroom.createCourse(
                                 nameController.text, periodController.text)),
                         transition: Transition.circularReveal,
                         duration: const Duration(milliseconds: 800),

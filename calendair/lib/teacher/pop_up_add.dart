@@ -1,13 +1,12 @@
-import 'package:calendair/classes/firestore.dart';
-import 'package:calendair/models/CustomCourse.dart';
+import 'package:calendair/classes/authentication.dart';
+import 'package:calendair/models/custom_course.dart';
 import 'package:calendair/teacher/confidence_meter_questiuon.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';
 import 'package:get/get.dart';
 // ignore: depend_on_referenced_packages
 import 'package:intl/intl.dart';
-
-import '../classes/googleClassroom.dart';
+import 'package:provider/provider.dart';
 import '../student_teacher/bottom_nav_bar.dart';
 import '../models/nbar.dart';
 
@@ -22,12 +21,13 @@ class PopUpsAdd extends StatefulWidget {
 class _PopUpsAddState extends State<PopUpsAdd> {
   final titleController = TextEditingController();
   final dateController = TextEditingController();
-  final gc = Get.find<GoogleClassroom>();
   DateTime date = DateTime.now();
-  //final titleController=TextEditingController();
+  String confidenceQuestion = "";
+  late final UserAuthentication userAuthentication;
+
   @override
   void initState() {
-    gc.confidence = "";
+    userAuthentication = context.read<UserAuthentication>();
     super.initState();
   }
 
@@ -206,12 +206,15 @@ class _PopUpsAddState extends State<PopUpsAdd> {
                     Get.to(
                       ConfidenceMeterQuestion(
                         course: widget.course,
+                        question: confidenceQuestion,
+                        onSave: ((val) {
+                          confidenceQuestion = val;
+                        }),
                       ),
                       transition: Transition.circularReveal,
                       duration: const Duration(milliseconds: 800),
                     );
                   },
-
                   child: const Text(
                     'Confidence Meter',
                     textAlign: TextAlign.center,
@@ -238,12 +241,16 @@ class _PopUpsAddState extends State<PopUpsAdd> {
                         borderRadius: BorderRadius.circular(10.0),
                       )),
                   onPressed: () {
-                    Firestore().addPopUp(
+                    if (titleController.text.isEmpty) {
+                      Get.snackbar('Error', 'Enter popup title');
+                      return;
+                    }
+                    userAuthentication.addPopUp(
                         courseId: widget.course.id,
                         classId: widget.course.docid,
                         date: date,
                         title: titleController.text,
-                        cm: gc.confidence);
+                        cm: confidenceQuestion);
                     Get.back();
                   },
 

@@ -1,11 +1,13 @@
+import 'dart:developer';
+
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:calendair/classes/authentication.dart';
 import 'package:calendair/models/UserModel.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:provider/provider.dart';
 import 'package:sizer/sizer.dart';
-
-import '../classes/firestore.dart';
 import '../student_teacher/bottom_nav_bar.dart';
 import '../models/nbar.dart';
 
@@ -18,6 +20,13 @@ class Students extends StatefulWidget {
 
 class _StudentsState extends State<Students> {
   bool selected = false;
+  late final UserAuthentication userAuthentication;
+  @override
+  void initState() {
+    userAuthentication = context.read<UserAuthentication>();
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -88,9 +97,12 @@ class _StudentsState extends State<Students> {
               ),
               Expanded(
                 child: StreamBuilder(
-                    stream: Firestore().getStudents(widget.courseId),
-                    builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
+                    stream: userAuthentication.getStudents(widget.courseId),
+                    builder: (context,
+                        AsyncSnapshot<QuerySnapshot<Map<dynamic, dynamic>>>
+                            snapshot) {
                       if (snapshot.hasData) {
+                        inspect(snapshot.data?.docs[0].data());
                         return SingleChildScrollView(
                           child: Column(
                             children: [

@@ -1,15 +1,17 @@
-import 'package:calendair/classes/firestore.dart';
-import 'package:calendair/teacher/update_reminder.dart';
-import 'package:calendair/models/CustomCourse.dart';
+import 'package:calendair/classes/authentication.dart';
+import 'package:calendair/teacher/add_reminder.dart';
+import 'package:calendair/models/custom_course.dart';
 import 'package:calendair/models/reminderModel.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:intl/intl.dart';
-import 'add_class_reminder.dart';
+import 'package:provider/provider.dart';
+import 'update_reminder.dart';
 import '../student_teacher/bottom_nav_bar.dart';
 import '../models/nbar.dart';
 import 'package:sizer/sizer.dart';
+// ignore: depend_on_referenced_packages
+import 'package:intl/intl.dart';
 
 class Reminders extends StatefulWidget {
   final CustomCourse course;
@@ -20,6 +22,13 @@ class Reminders extends StatefulWidget {
 }
 
 class _RemindersState extends State<Reminders> {
+  late final UserAuthentication userAuthentication;
+  @override
+  void initState() {
+    userAuthentication = context.read<UserAuthentication>();
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -89,7 +98,8 @@ class _RemindersState extends State<Reminders> {
             ),
             Expanded(
               child: StreamBuilder(
-                  stream: Firestore().getTeacherRemider(widget.course.docid),
+                  stream:
+                      userAuthentication.getTeacherRemider(widget.course.docid),
                   builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
                     if (snapshot.hasData) {
                       return SingleChildScrollView(
@@ -150,19 +160,20 @@ class _RemindersState extends State<Reminders> {
                                       ),
                                       const Expanded(child: SizedBox()),
                                       IconButton(
-                                          iconSize: 40,
-                                          onPressed: () {
-                                            Get.to(
-                                              AddClassReminder(
-                                                  course: widget.course,
-                                                  reminder: r),
-                                              transition:
-                                                  Transition.circularReveal,
-                                              duration: const Duration(
-                                                  milliseconds: 800),
-                                            );
-                                          },
-                                          icon: const Icon(Icons.settings))
+                                        iconSize: 40,
+                                        onPressed: () {
+                                          Get.to(
+                                            UpdateReminder(
+                                                course: widget.course,
+                                                reminder: r),
+                                            transition:
+                                                Transition.circularReveal,
+                                            duration: const Duration(
+                                                milliseconds: 800),
+                                          );
+                                        },
+                                        icon: const Icon(Icons.settings),
+                                      )
                                     ],
                                   ),
                                 ),
@@ -198,7 +209,7 @@ class _RemindersState extends State<Reminders> {
                           )),
                       onPressed: () {
                         Get.to(
-                          UpdateReminder(
+                          AddReminder(
                             course: widget.course,
                           ),
                           transition: Transition.circularReveal,

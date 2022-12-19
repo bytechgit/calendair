@@ -1,4 +1,4 @@
-import 'package:calendair/classes/navBar.dart';
+import 'package:calendair/classes/nav_bar.dart';
 import 'package:calendair/models/nbar.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';

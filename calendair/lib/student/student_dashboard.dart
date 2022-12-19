@@ -1,4 +1,5 @@
 import 'dart:developer';
+import 'package:calendair/classes/authentication.dart';
 import 'package:calendair/classes/firestore.dart';
 import 'package:calendair/student_teacher/bottom_nav_bar.dart';
 import 'package:calendair/student/break_day.dart';
@@ -13,8 +14,8 @@ import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 // ignore: depend_on_referenced_packages
 import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
 import 'package:sizer/sizer.dart';
-import '../classes/googleClassroom.dart';
 import 'dashboard.dart';
 import '../models/nbar.dart';
 
@@ -27,10 +28,11 @@ class StudentDashboard extends StatefulWidget {
 
 class _StudentDashboardState extends State<StudentDashboard> {
   bool open = true;
-  final gc = Get.find<GoogleClassroom>();
+  late final UserAuthentication userAuthentication;
 
   @override
   void initState() {
+    userAuthentication = context.read<UserAuthentication>();
     SystemChrome.setPreferredOrientations([
       DeviceOrientation.portraitUp,
       DeviceOrientation.portraitDown,
@@ -258,7 +260,7 @@ class _StudentDashboardState extends State<StudentDashboard> {
                           ),
                           Expanded(
                             child: StreamBuilder(
-                                stream: Firestore().getStudentPopUps(),
+                                stream: userAuthentication.getStudentPopUps(),
                                 builder: (context,
                                     AsyncSnapshot<QuerySnapshot> snapshot) {
                                   if (snapshot.hasData) {

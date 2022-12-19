@@ -1,7 +1,9 @@
+import 'package:calendair/classes/authentication.dart';
 import 'package:calendair/classes/firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
+import 'package:provider/provider.dart';
 import 'package:syncfusion_flutter_core/theme.dart';
 import 'package:syncfusion_flutter_sliders/sliders.dart';
 
@@ -22,13 +24,15 @@ class ConfidenceMeter extends StatefulWidget {
 }
 
 class _ConfidenceMeterState extends State<ConfidenceMeter> {
+  late final UserAuthentication userAuthentication;
   @override
   void initState() {
-    super.initState();
+    userAuthentication = context.read<UserAuthentication>();
     SystemChrome.setPreferredOrientations([
       DeviceOrientation.landscapeRight,
       DeviceOrientation.landscapeLeft,
     ]);
+    super.initState();
   }
 
   @override
@@ -163,7 +167,8 @@ class _ConfidenceMeterState extends State<ConfidenceMeter> {
                             borderRadius: BorderRadius.circular(10.0),
                           )),
                       onPressed: () {
-                        Firestore().addPopUpRate(widget.id, _value.round());
+                        userAuthentication.addPopUpRate(
+                            widget.id, _value.round());
                         //posalji value
                         Get.back();
                       },

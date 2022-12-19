@@ -1,19 +1,20 @@
 import 'package:calendair/models/notificationSettingsModel.dart';
 
 class UserModel {
-  String id;
+  String uid;
   String name;
   String picture;
   String type;
   int breakday;
-  Map<String, dynamic> times;
+  List<dynamic> extracurricularsTimes = [];
+  Map<String, int> times;
   List<String> courses = [];
   List<NotificationSettingsModel> remindersNotification = [];
   List<NotificationSettingsModel> assignmentsNotification = [];
   List<NotificationSettingsModel> updatesNotification = [];
 
   UserModel(
-      {required this.id,
+      {required this.uid,
       required this.name,
       required this.picture,
       required this.type,
@@ -32,6 +33,8 @@ class UserModel {
       'assignmentsNotification':
           assignmentsNotification.map((e) => e.toMap()).toList(),
       'updatesNotification': updatesNotification.map((e) => e.toMap()).toList(),
+      'times': times,
+      'extracurricularsTimes': extracurricularsTimes
     };
   }
 
@@ -40,17 +43,16 @@ class UserModel {
       'name': name,
       'picture': picture,
       'courses': courses,
-      "breakday": breakday,
       'type': type,
     };
   }
 
   UserModel.fromMap(Map<String, dynamic> map, String idDoc)
-      : id = idDoc,
+      : uid = idDoc,
         name = map["name"] ?? " ",
         picture = map["picture"] ?? " ",
         type = map["type"] ?? " ",
-        times = map["times"] ?? {},
+        times = Map.from(map["times"] ?? {}),
         breakday = map["breakday"] ?? -1,
         courses = ((map["courses"] ?? []) as List<dynamic>)
             .map((e) => e.toString())
@@ -58,6 +60,10 @@ class UserModel {
         remindersNotification =
             ((map["remindersNotification"] ?? []) as List<dynamic>)
                 .map((e) => NotificationSettingsModel.fromMap(e))
+                .toList(),
+        extracurricularsTimes =
+            ((map["extracurricularsTimes"] ?? []) as List<dynamic>)
+                .map((e) => e)
                 .toList(),
         assignmentsNotification =
             ((map["assignmentsNotification"] ?? []) as List<dynamic>)

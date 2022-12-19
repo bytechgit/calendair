@@ -69,7 +69,6 @@ class _PopUpAverageResultState extends State<PopUpAverageResult> {
                         borderRadius: BorderRadius.circular(10.0),
                       )),
                   onPressed: () {},
-
                   child: const Text(
                     'Results',
                     style: TextStyle(

@@ -1,38 +1,35 @@
-import 'package:calendair/classes/firestore.dart';
-import 'package:calendair/models/CustomCourse.dart';
-import 'package:calendair/models/reminderModel.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:calendair/classes/authentication.dart';
+import 'package:calendair/models/custom_course.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';
 import 'package:get/get.dart';
 // ignore: depend_on_referenced_packages
 import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
 import '../student_teacher/bottom_nav_bar.dart';
 import '../models/nbar.dart';
 
-class AddClassReminder extends StatefulWidget {
+class AddReminder extends StatefulWidget {
   final CustomCourse course;
-  final ReminderModel reminder;
-  const AddClassReminder(
-      {Key? key, required this.course, required this.reminder})
-      : super(key: key);
+  const AddReminder({Key? key, required this.course}) : super(key: key);
 
   @override
-  State<AddClassReminder> createState() => _AddClassReminderState();
+  State<AddReminder> createState() => _AddReminderState();
 }
 
-class _AddClassReminderState extends State<AddClassReminder> {
+class _AddReminderState extends State<AddReminder> {
+  DateTime date = DateTime.now();
   final titleController = TextEditingController();
+  late final UserAuthentication userAuthentication;
   @override
   void initState() {
-    titleController.text = widget.reminder.title;
+    userAuthentication = context.read<UserAuthentication>();
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
     final width = MediaQuery.of(context).size.width;
-
     return Scaffold(
       appBar: AppBar(
         backgroundColor: const Color.fromRGBO(93, 159, 196, 1),
@@ -125,12 +122,9 @@ class _AddClassReminderState extends State<AddClassReminder> {
                       filled: true,
                       hintStyle: const TextStyle(
                           color: Color.fromRGBO(38, 64, 78, 1), fontSize: 25),
-                      //hintText: widget.reminder.title,
+                      hintText: "Please Enter",
                       fillColor: const Color.fromRGBO(94, 159, 197, 1),
                     ),
-                    onChanged: (text) {
-                      widget.reminder.title = text;
-                    },
                   ),
                 ),
               ),
@@ -153,7 +147,7 @@ class _AddClassReminderState extends State<AddClassReminder> {
                     DatePicker.showDatePicker(context,
                         showTitleActions: true,
                         minTime: DateTime.now(),
-                        maxTime: DateTime.now().add(const Duration(days: 600)),
+                        maxTime: DateTime.now().add(Duration(days: 600)),
                         theme: const DatePickerTheme(
                             headerColor: Color.fromARGB(255, 176, 176, 176),
                             backgroundColor: Color.fromRGBO(94, 159, 197, 1),
@@ -165,7 +159,7 @@ class _AddClassReminderState extends State<AddClassReminder> {
                                 TextStyle(color: Colors.white, fontSize: 16)),
                         onChanged: (date) {}, onConfirm: (d) {
                       setState(() {
-                        widget.reminder.date = Timestamp.fromDate(d);
+                        date = d;
                       });
                     }, currentTime: DateTime.now(), locale: LocaleType.en);
                   },
@@ -178,8 +172,7 @@ class _AddClassReminderState extends State<AddClassReminder> {
                     ),
                     child: Center(
                       child: Text(
-                        DateFormat("MM/dd/yy")
-                            .format(widget.reminder.date.toDate()),
+                        DateFormat("MM/dd/yy").format(date),
                         style: const TextStyle(
                             color: Color.fromRGBO(38, 64, 78, 1), fontSize: 25),
                       ),
@@ -202,14 +195,21 @@ class _AddClassReminderState extends State<AddClassReminder> {
                           borderRadius: BorderRadius.circular(10.0),
                         )),
                     onPressed: () {
-                      Firestore().updateReminder(r: widget.reminder);
+                      if (titleController.text.isEmpty) {
+                        Get.snackbar('Error', 'Enter reminder title');
+                        return;
+                      }
+                      userAuthentication.addReminder(
+                          classId: widget.course.docid,
+                          title: titleController.text,
+                          date: date);
                       Get.back();
                     },
 
                     child: const FittedBox(
                       fit: BoxFit.scaleDown,
                       child: Text(
-                        'Update',
+                        'Send',
                         textAlign: TextAlign.center,
                         style: TextStyle(
                           color: Colors.black,

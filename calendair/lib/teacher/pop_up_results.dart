@@ -1,4 +1,4 @@
-import 'package:calendair/models/CustomCourse.dart';
+import 'package:calendair/models/custom_course.dart';
 import 'package:calendair/models/PopUpModel.dart';
 import 'package:calendair/teacher/pop_up_average_results.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';

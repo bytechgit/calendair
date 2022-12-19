@@ -1,6 +1,3 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:quiver/iterables.dart';
-
 class ExtracurricularsModel {
   String id;
   String studentId;

@@ -1,5 +1,4 @@
 import 'package:calendair/models/schedule/scheduleElement.dart';
-
 class FindingResult {
   late int listId;
   late int elementId;

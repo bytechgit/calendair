@@ -1,17 +1,17 @@
-import 'package:calendair/classes/Authentication.dart';
-import 'package:calendair/student_teacher/enter_school_code.dart';
+import 'package:calendair/classes/authentication.dart';
+import 'package:calendair/classes/schedule_controller.dart';
 import 'package:calendair/student/student_dashboard.dart';
 import 'package:calendair/teacher/teacher_dashboard.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import '../classes/scheduleController.dart';
+import 'package:provider/provider.dart';
 
 class Login extends StatelessWidget {
   const Login({Key? key}) : super(key: key);
   @override
   Widget build(BuildContext context) {
-    final u = UserAuthentication();
-    final sc = Get.find<ScheduleController>();
+    final userAuthentication = context.read<UserAuthentication>();
+    final scheduleController = context.read<ScheduleController>();
     final width = MediaQuery.of(context).size.width;
     return Scaffold(
       resizeToAvoidBottomInset: false,
@@ -74,27 +74,26 @@ class Login extends StatelessWidget {
                             borderRadius: BorderRadius.circular(25.0),
                           )),
                       onPressed: () async {
-                        final result = await u.signInwithGoogle();
-                        if (result == "student") {
+                        final result =
+                            await userAuthentication.signInwithGoogle();
+                        if (result == null) {
+                          scheduleController.streamSubscription?.cancel();
+                          Get.snackbar('Register', 'Please register');
+                          return;
+                        }
+                        if (result.type == "student") {
                           //!treba da se izmeni
-                          sc.listen(u.currentUser!.uid);
+                          scheduleController
+                              .listen(userAuthentication.currentUser!.uid);
                           Get.to(
                             const StudentDashboard(),
                             transition: Transition.circularReveal,
                             duration: const Duration(milliseconds: 800),
                           );
-                        } else if (result == "teacher") {
-                          sc.streamSubscription?.cancel();
+                        } else if (result.type == "teacher") {
+                          scheduleController.streamSubscription?.cancel();
                           Get.to(
                             const TeacherDashboard(),
-                            transition: Transition.circularReveal,
-                            duration: const Duration(milliseconds: 800),
-                          );
-                        } else if (result == "") {
-                          sc.streamSubscription?.cancel();
-                          Get.snackbar('Register', 'Please register');
-                          Get.to(
-                            const EnterSchoolCode(),
                             transition: Transition.circularReveal,
                             duration: const Duration(milliseconds: 800),
                           );

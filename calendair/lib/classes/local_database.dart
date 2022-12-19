@@ -1,6 +1,6 @@
 import 'package:sqflite/sqflite.dart';
+// ignore: depend_on_referenced_packages
 import 'package:path/path.dart';
-import 'package:calendair/models/User.dart';
 
 class LocalDatabase {
   static final LocalDatabase _singleton = LocalDatabase._internal();
@@ -70,34 +70,5 @@ class LocalDatabase {
     // Get a reference to the database.
     final db = await subscribedTopics;
     await db?.delete("Topics");
-  }
-
-  Future<void> insertUser(UserData u) async {
-    // Get a reference to the database.
-    final db = await database;
-
-    await db?.delete("Users");
-    await db?.insert(
-      'Users',
-      u.toMap(),
-      conflictAlgorithm: ConflictAlgorithm.replace,
-    );
-  }
-
-  Future<UserData?> GetUser() async {
-    final db = await database;
-    if (db != null) {
-      final List<Map<String, dynamic>> maps = await db.query('Users');
-      // Convert the List<Map<String, dynamic> into a List<Dog>.
-      return List.generate(maps.length, (i) {
-        return UserData(
-          UID: maps[i]['UID'],
-          fullName: maps[i]['fullName'],
-          city: maps[i]['city'],
-          streetAddress: maps[i]['streetAddress'],
-        );
-      }).first;
-    }
-    return null;
   }
 }

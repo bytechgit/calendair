@@ -1,16 +1,18 @@
-import 'package:calendair/classes/firestore.dart';
-import 'package:calendair/models/CustomCourse.dart';
+import 'package:calendair/classes/authentication.dart';
+import 'package:calendair/models/custom_course.dart';
 import 'package:calendair/models/PopUpModel.dart';
 import 'package:calendair/teacher/pop_up_add.dart';
 import 'package:calendair/teacher/pop_up_results.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
 import 'package:sizer/sizer.dart';
-import '../classes/googleClassroom.dart';
+import '../classes/google_classroom.dart';
 import '../student_teacher/bottom_nav_bar.dart';
 import '../models/nbar.dart';
+// ignore: depend_on_referenced_packages
+import 'package:intl/intl.dart';
 
 class PopUps extends StatefulWidget {
   final CustomCourse course;
@@ -21,7 +23,13 @@ class PopUps extends StatefulWidget {
 }
 
 class _PopUpsState extends State<PopUps> {
-  final gc = Get.find<GoogleClassroom>();
+  late final UserAuthentication userAuthentication;
+  @override
+  void initState() {
+    userAuthentication = context.read<UserAuthentication>();
+    super.initState();
+  }
+
   List<QueryDocumentSnapshot<Object?>> popupsLis = [];
   @override
   Widget build(BuildContext context) {
@@ -93,7 +101,8 @@ class _PopUpsState extends State<PopUps> {
             ),
             Expanded(
               child: StreamBuilder(
-                  stream: Firestore().getTeacherPopUps(widget.course.docid),
+                  stream:
+                      userAuthentication.getTeacherPopUps(widget.course.docid),
                   builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
                     if (snapshot.hasData) {
                       popupsLis = snapshot.data!.docs;

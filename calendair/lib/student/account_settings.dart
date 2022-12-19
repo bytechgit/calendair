@@ -1,13 +1,13 @@
-import 'dart:developer';
 import 'dart:io';
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:calendair/classes/firestore.dart';
+import 'package:calendair/classes/authentication.dart';
 import 'package:calendair/models/nbar.dart';
 import 'package:calendair/student/settings.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:provider/provider.dart';
 import '../student_teacher/bottom_nav_bar.dart';
 import 'dashboard.dart';
 
@@ -22,10 +22,12 @@ class _AccountSettingsState extends State<AccountSettings> {
   String? imgUrl;
   final name = TextEditingController();
   bool uploading = false;
+  late final UserAuthentication userAuthentication;
+
   @override
   void initState() {
-    inspect(Firestore().firebaseUser);
-    name.text = Firestore().firebaseUser?.name ?? "";
+    userAuthentication = context.read<UserAuthentication>();
+    name.text = userAuthentication.currentUser?.name ?? " ";
     super.initState();
   }
 
@@ -128,7 +130,8 @@ class _AccountSettingsState extends State<AccountSettings> {
                                   height: 200,
                                   fit: BoxFit.cover,
                                   imageUrl:
-                                      Firestore().firebaseUser?.picture ?? "",
+                                      userAuthentication.currentUser?.picture ??
+                                          "",
                                   placeholder: (context, url) => const Center(
                                       child: CircularProgressIndicator()),
                                   errorWidget: (context, url, error) =>
@@ -226,19 +229,20 @@ class _AccountSettingsState extends State<AccountSettings> {
                           });
                           final storageRef = FirebaseStorage.instance.ref();
                           File file = File(imgUrl!);
-                          final mountainsRef = storageRef
-                              .child("${Firestore().ua.currentUser?.uid}.jpg");
+                          final mountainsRef = storageRef.child(
+                              "${userAuthentication.currentUser?.uid}.jpg");
                           try {
                             await mountainsRef.putFile(file);
                             final img = await mountainsRef.getDownloadURL();
-                            Firestore().updateUser(name: name.text, img: img);
+                            userAuthentication.updateUser(
+                                name: name.text, img: img);
                             setState(() {});
                           } on FirebaseException catch (e) {
                             //   // ...
                           }
-                        } else if (Firestore().firebaseUser?.name !=
+                        } else if (userAuthentication.currentUser?.name !=
                             name.text) {
-                          Firestore().updateUser(name: name.text);
+                          userAuthentication.updateUser(name: name.text);
                         }
                         setState(() {
                           uploading = false;

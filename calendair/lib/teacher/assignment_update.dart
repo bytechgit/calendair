@@ -1,8 +1,8 @@
-import 'dart:developer';
-import 'package:calendair/classes/firestore.dart';
+import 'package:calendair/classes/authentication.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import '../classes/googleClassroom.dart';
+import 'package:provider/provider.dart';
+import '../classes/google_classroom.dart';
 import '../student_teacher/bottom_nav_bar.dart';
 import '../models/nbar.dart';
 
@@ -18,19 +18,28 @@ class AssignmentUpdate extends StatefulWidget {
 }
 
 class _AssignmentUpdateState extends State<AssignmentUpdate> {
-  final gc = Get.find<GoogleClassroom>();
   final minscontroller = TextEditingController();
   final noteController = TextEditingController();
+  late final UserAuthentication userAuthentication;
+  late final GoogleClassroom googleClassroom;
+
+  @override
+  void initState() {
+    userAuthentication = context.read<UserAuthentication>();
+    googleClassroom = context.read<GoogleClassroom>();
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
     final width = MediaQuery.of(context).size.width;
 
     if (minscontroller.text.isEmpty) {
-      minscontroller.text =
-          gc.assignments.value[widget.assignmentIndex].duration.toString();
+      minscontroller.text = googleClassroom
+          .assignments[widget.assignmentIndex].duration
+          .toString();
       noteController.text =
-          gc.assignments.value[widget.assignmentIndex].note ?? "";
+          googleClassroom.assignments[widget.assignmentIndex].note ?? "";
     }
 
     return GestureDetector(
@@ -92,7 +101,7 @@ class _AssignmentUpdateState extends State<AssignmentUpdate> {
               ),
               FittedBox(
                 child: Text(
-                  gc.assignments.value[widget.assignmentIndex].coursework
+                  googleClassroom.assignments[widget.assignmentIndex].coursework
                           ?.title ??
                       "no name",
                   style: const TextStyle(
@@ -214,19 +223,11 @@ class _AssignmentUpdateState extends State<AssignmentUpdate> {
                           borderRadius: BorderRadius.circular(10.0),
                         )),
                     onPressed: () {
-                      gc.assignments.value[widget.assignmentIndex].note =
-                          noteController.text;
-                      gc.assignments.value[widget.assignmentIndex].duration =
-                          int.tryParse(minscontroller.text) ?? 0;
-
-                      gc.assignments.refresh();
-                      inspect(gc.assignments.value);
-                      // gc.updateAssignment(
-                      //   gc.assignments.value[widget.assignmentIndex]);
-                      Firestore().insertOrUpdateAssignment(
-                          gc.assignments.value[widget.assignmentIndex],
-                          widget.courseId);
-
+                      googleClassroom.updateAssignment(
+                          index: widget.assignmentIndex,
+                          note: noteController.text,
+                          min: minscontroller.text,
+                          courseId: widget.courseId);
                       Get.back();
                     },
 

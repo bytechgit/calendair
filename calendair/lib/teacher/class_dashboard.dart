@@ -1,11 +1,10 @@
 import 'package:calendair/teacher/assignments.dart';
-import 'package:calendair/models/CustomCourse.dart';
+import 'package:calendair/models/custom_course.dart';
 import 'package:calendair/teacher/pop_ups.dart';
 import 'package:calendair/teacher/reminders.dart';
 import 'package:calendair/teacher/students.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import '../classes/googleClassroom.dart';
 import '../student_teacher/bottom_nav_bar.dart';
 import '../models/nbar.dart';
 
@@ -18,7 +17,6 @@ class ClassDashboard extends StatefulWidget {
 }
 
 class _ClassDashboardState extends State<ClassDashboard> {
-  final gc = Get.find<GoogleClassroom>();
   @override
   Widget build(BuildContext context) {
     final width = MediaQuery.of(context).size.width;

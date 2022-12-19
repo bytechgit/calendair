@@ -1,17 +1,16 @@
-import 'package:calendair/classes/Authentication.dart';
+import 'package:calendair/classes/authentication.dart';
 import 'package:calendair/student_teacher/choose_user_type.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import '../classes/googleClassroom.dart';
+import 'package:provider/provider.dart';
 
 class Register extends StatelessWidget {
   const Register({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+    final userAuthentication = context.read<UserAuthentication>();
     final width = MediaQuery.of(context).size.width;
-    final gc = Get.find<GoogleClassroom>();
-    final u = UserAuthentication();
     return Scaffold(
       resizeToAvoidBottomInset: false,
       body: Container(
@@ -73,7 +72,7 @@ class Register extends StatelessWidget {
                             borderRadius: BorderRadius.circular(25.0),
                           )),
                       onPressed: () async {
-                        await u.signInwithGoogle();
+                        await userAuthentication.signInwithGoogle();
                         // gc.getCourseListTeacher();
                       },
                       icon: Image.asset(
@@ -101,7 +100,7 @@ class Register extends StatelessWidget {
                           borderRadius: BorderRadius.circular(18.0),
                         )),
                     onPressed: () {
-                      if (gc.ua.googleSignIn.currentUser != null) {
+                      if (userAuthentication.googleSignIn.currentUser != null) {
                         Get.to(
                           const ChooseUserType(),
                           transition: Transition.circularReveal,

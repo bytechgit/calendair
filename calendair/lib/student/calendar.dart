@@ -1,6 +1,6 @@
+import 'package:calendair/classes/authentication.dart';
+import 'package:calendair/classes/schedule_controller.dart';
 import 'package:calendair/student/calendar_schedule_element.dart';
-import 'package:calendair/classes/firestore.dart';
-import 'package:calendair/classes/scheduleController.dart';
 import 'package:calendair/student/add_reminder.dart';
 import 'package:calendair/student/to_do.dart';
 import 'package:drag_and_drop_lists/drag_and_drop_lists.dart';
@@ -8,8 +8,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:linked_scroll_controller/linked_scroll_controller.dart';
-import '../classes/googleClassroom.dart';
-import '../classes/scheduleLists.dart';
+import 'package:provider/provider.dart';
+import '../classes/google_classroom.dart';
+import '../classes/schedule_lists.dart';
+// ignore: depend_on_referenced_packages
 import 'package:intl/intl.dart';
 
 class Calendar extends StatefulWidget {
@@ -20,18 +22,41 @@ class Calendar extends StatefulWidget {
 }
 
 class _CalendarState extends State<Calendar> {
-  final gc = Get.find<GoogleClassroom>();
-  final sc = Get.find<ScheduleController>();
-  final scheduleLists = Get.find<ScheduleLists>();
   late final List<DragAndDropList> _contents = [];
+  late final UserAuthentication userAuthentication;
+  late final ScheduleController scheduleController;
+  @override
+  void initState() {
+    userAuthentication = context.read<UserAuthentication>();
+    scheduleController = context.read<ScheduleController>();
+    SystemChrome.setPreferredOrientations([
+      DeviceOrientation.landscapeRight,
+      DeviceOrientation.landscapeLeft,
+    ]);
+    _controllers = LinkedScrollControllerGroup();
+    calendarController = _controllers.addAndGet();
+    avgController = _controllers.addAndGet();
+    gridController = _controllers.addAndGet();
+    appBarController = _controllers.addAndGet();
+    calendarController.addListener(() {
+      int offset = (calendarController.offset / (Get.width / 7)).floor();
+      if (offset != dayOffset) {
+        setState(() {
+          dayOffset = offset;
+        });
+      }
+    });
+    super.initState();
+  }
+
   _onItemReorder(
       int oldItemIndex, int oldListIndex, int newItemIndex, int newListIndex) {
-    if (newListIndex != Firestore().firebaseUser!.breakday &&
-        newListIndex != Firestore().firebaseUser!.breakday + 7) {
+    if (newListIndex != userAuthentication.currentUser!.breakday &&
+        newListIndex != userAuthentication.currentUser!.breakday + 7) {
       setState(() {
-        var movedI = sc.removeFromScheduleElements(
+        var movedI = scheduleController.removeFromScheduleElements(
             listIndex: oldListIndex, index: oldItemIndex);
-        sc.addInScheduleElements(
+        scheduleController.addInScheduleElements(
             newListIndex: newListIndex,
             index: newItemIndex,
             se: movedI,
@@ -61,28 +86,6 @@ class _CalendarState extends State<Calendar> {
       DateTime.now().subtract(Duration(days: DateTime.now().weekday - 1));
 
   @override
-  void initState() {
-    super.initState();
-    SystemChrome.setPreferredOrientations([
-      DeviceOrientation.landscapeRight,
-      DeviceOrientation.landscapeLeft,
-    ]);
-    _controllers = LinkedScrollControllerGroup();
-    calendarController = _controllers.addAndGet();
-    avgController = _controllers.addAndGet();
-    gridController = _controllers.addAndGet();
-    appBarController = _controllers.addAndGet();
-    calendarController.addListener(() {
-      int offset = (calendarController.offset / (Get.width / 7)).floor();
-      if (offset != dayOffset) {
-        setState(() {
-          dayOffset = offset;
-        });
-      }
-    });
-  }
-
-  @override
   dispose() {
     SystemChrome.setPreferredOrientations([
       DeviceOrientation.portraitUp,
@@ -93,6 +96,7 @@ class _CalendarState extends State<Calendar> {
     super.dispose();
   }
 
+  bool edit = false;
   final days = [
     'Mon',
     'Tues',
@@ -181,178 +185,156 @@ class _CalendarState extends State<Calendar> {
         children: [
           Expanded(
             flex: 10,
-            child: Obx(
-              () => Stack(
-                children: [
-                  SingleChildScrollView(
-                    physics: const ClampingScrollPhysics(),
-                    scrollDirection: Axis.horizontal,
-                    controller: gridController,
-                    child: Row(
-                      children: days
-                          .map(
-                            (e) => Container(
-                              width: width / 7,
-                              decoration: BoxDecoration(
-                                  border: Border.all(
-                                      color:
-                                          const Color.fromRGBO(94, 158, 197, 1),
-                                      width: 2)),
-                            ),
-                          )
-                          .toList(),
-                    ),
-                  ),
-                  Obx(
-                    () => DragAndDropLists(
-                      removeTopPadding: true,
-                      scrollController: calendarController,
-                      itemDragHandle: !gc.edit.value
-                          ? const DragHandle(child: SizedBox())
-                          : null,
-                      listDragHandle: !gc.edit.value
-                          ? const DragHandle(child: SizedBox())
-                          : null,
-                      lastListTargetSize: 0,
-                      lastItemTargetHeight: 100,
-                      //disableScrolling: true,
-                      children: [
-                        for (int i = 0;
-                            i < scheduleLists.scheduleElements.value.length;
-                            i++) ...{
-                          if (Firestore().firebaseUser!.breakday == -1 ||
-                              Firestore().firebaseUser!.breakday != i &&
-                                  Firestore().firebaseUser!.breakday !=
-                                      i - 7) ...{
-                            DragAndDropList(
-                                contentsWhenEmpty: const SizedBox(),
-                                verticalAlignment: CrossAxisAlignment.stretch,
-                                children:
-                                    scheduleLists.scheduleElements.value[i]
-                                        .map(
-                                          (e) => DragAndDropItem(
-                                            child: CalendarScheduleElement(
-                                              scheduleElement: e,
-                                            ),
-                                            canDrag: true,
-                                            // e.type == "reminder" ? false : true,
-                                          ),
-                                        )
-                                        .toList(),
-                                canDrag: false),
-                          } else
-                            DragAndDropList(
-                                contentsWhenEmpty: const SizedBox(),
-                                verticalAlignment: CrossAxisAlignment.stretch,
-                                children: [
-                                  DragAndDropItem(
-                                      child: const Center(
-                                          child: Text(
-                                        'Break day',
-                                        textAlign: TextAlign.center,
-                                        style: TextStyle(
-                                            fontSize: 30,
-                                            fontWeight: FontWeight.bold),
-                                      )),
-                                      canDrag: false)
-                                ],
-                                canDrag: false),
-                        }
-                      ],
-
-                      // children: sc.scheduleElements.value.map((list) {
-                      //   return DragAndDropList(
-                      //       contentsWhenEmpty: const SizedBox(),
-                      //       verticalAlignment: CrossAxisAlignment.stretch,
-                      //       children: list
-                      //           .map(
-                      //             (e) => DragAndDropItem(
-                      //               child: CalendarAssignment(
-                      //                 scheduleElement: e,
-                      //               ),
-                      //               canDrag: true,
-                      //               // e.type == "reminder" ? false : true,
-                      //             ),
-                      //           )
-                      //           .toList(),
-                      //       canDrag: false);
-                      // }).toList(),
-                      onItemReorder: _onItemReorder,
-                      onListReorder: _onListReorder,
-                      axis: Axis.horizontal,
-                      listWidth: width / 7,
-                      listPadding: const EdgeInsets.symmetric(
-                          horizontal: 0, vertical: 0),
-                    ),
-                  ),
-                  if (!gc.edit.value)
-                    Align(
-                      alignment: Alignment.bottomLeft,
-                      child: Padding(
-                        padding: const EdgeInsets.only(
-                            left: 80, bottom: 8.0, right: 8.0),
-                        child: InkWell(
-                          onTap: () {
-                            gc.edit.value = !gc.edit.value;
-                          },
-                          child: Image.asset(
-                            'assets/images/calendarhammer.png',
-                            width: 40,
+            child: Stack(
+              children: [
+                SingleChildScrollView(
+                  physics: const ClampingScrollPhysics(),
+                  scrollDirection: Axis.horizontal,
+                  controller: gridController,
+                  child: Row(
+                    children: days
+                        .map(
+                          (e) => Container(
+                            width: width / 7,
+                            decoration: BoxDecoration(
+                                border: Border.all(
+                                    color:
+                                        const Color.fromRGBO(94, 158, 197, 1),
+                                    width: 2)),
                           ),
-                        ),
-                      ),
-                    ),
+                        )
+                        .toList(),
+                  ),
+                ),
+                DragAndDropLists(
+                  removeTopPadding: true,
+                  scrollController: calendarController,
+                  itemDragHandle:
+                      !edit ? const DragHandle(child: SizedBox()) : null,
+                  listDragHandle:
+                      !edit ? const DragHandle(child: SizedBox()) : null,
+                  lastListTargetSize: 0,
+                  lastItemTargetHeight: 100,
+                  //disableScrolling: true,
+                  children: [
+                    for (int i = 0;
+                        i < scheduleController.scheduleElements.length;
+                        i++) ...{
+                      if (userAuthentication.currentUser?.breakday == -1 ||
+                          userAuthentication.currentUser?.breakday != i &&
+                              userAuthentication.currentUser?.breakday !=
+                                  i - 7) ...{
+                        DragAndDropList(
+                            contentsWhenEmpty: const SizedBox(),
+                            verticalAlignment: CrossAxisAlignment.stretch,
+                            children: scheduleController.scheduleElements[i]
+                                .map(
+                                  (e) => DragAndDropItem(
+                                    child: CalendarScheduleElement(
+                                      edit: edit,
+                                      scheduleElement: e,
+                                    ),
+                                    canDrag: true,
+                                    // e.type == "reminder" ? false : true,
+                                  ),
+                                )
+                                .toList(),
+                            canDrag: false),
+                      } else
+                        DragAndDropList(
+                            contentsWhenEmpty: const SizedBox(),
+                            verticalAlignment: CrossAxisAlignment.stretch,
+                            children: [
+                              DragAndDropItem(
+                                  child: const Center(
+                                      child: Text(
+                                    'Break day',
+                                    textAlign: TextAlign.center,
+                                    style: TextStyle(
+                                        fontSize: 30,
+                                        fontWeight: FontWeight.bold),
+                                  )),
+                                  canDrag: false)
+                            ],
+                            canDrag: false),
+                    }
+                  ],
+                  onItemReorder: _onItemReorder,
+                  onListReorder: _onListReorder,
+                  axis: Axis.horizontal,
+                  listWidth: width / 7,
+                  listPadding:
+                      const EdgeInsets.symmetric(horizontal: 0, vertical: 0),
+                ),
+                if (!edit)
                   Align(
                     alignment: Alignment.bottomLeft,
                     child: Padding(
-                      padding: const EdgeInsets.all(8.0),
+                      padding: const EdgeInsets.only(
+                          left: 80, bottom: 8.0, right: 8.0),
                       child: InkWell(
-                          onTap: () {
-                            Get.back();
-                          },
-                          child: ClipRRect(
-                            borderRadius: BorderRadius.circular(50),
-                            child: Container(
-                              width: 40,
-                              height: 40,
-                              color: Color.fromARGB(255, 210, 210, 210),
-                              child: Icon(
-                                Icons.arrow_back,
-                                color: Colors.black,
-                              ),
-                            ),
-                          )),
-                    ),
-                  ),
-                  Align(
-                    alignment: Alignment.bottomRight,
-                    child: Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: InkWell(
-                        onTap: () async {
-                          if (gc.edit.value == true) {
-                            gc.edit.value = false;
-                          } else {
-                            Get.off(
-                              const Reminder(),
-                              transition: Transition.circularReveal,
-                              duration: const Duration(milliseconds: 800),
-                            );
-                          }
+                        onTap: () {
+                          setState(() {
+                            edit = !edit;
+                          });
                         },
-                        child: Obx(
-                          () => Image.asset(
-                            gc.edit.value
-                                ? 'assets/images/calendaredited.png'
-                                : 'assets/images/calendarplus.png',
-                            width: 40,
-                          ),
+                        child: Image.asset(
+                          'assets/images/calendarhammer.png',
+                          width: 40,
                         ),
                       ),
                     ),
                   ),
-                ],
-              ),
+                Align(
+                  alignment: Alignment.bottomLeft,
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: InkWell(
+                        onTap: () {
+                          Get.back();
+                        },
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(50),
+                          child: Container(
+                            width: 40,
+                            height: 40,
+                            color: Color.fromARGB(255, 210, 210, 210),
+                            child: Icon(
+                              Icons.arrow_back,
+                              color: Colors.black,
+                            ),
+                          ),
+                        )),
+                  ),
+                ),
+                Align(
+                  alignment: Alignment.bottomRight,
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: InkWell(
+                      onTap: () async {
+                        if (edit == true) {
+                          setState(() {
+                            edit = false;
+                          });
+                        } else {
+                          Get.off(
+                            const Reminder(),
+                            transition: Transition.circularReveal,
+                            duration: const Duration(milliseconds: 800),
+                          );
+                        }
+                      },
+                      child: Image.asset(
+                        edit
+                            ? 'assets/images/calendaredited.png'
+                            : 'assets/images/calendarplus.png',
+                        width: 40,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
             ),
           ),
           Expanded(
@@ -383,13 +365,10 @@ class _CalendarState extends State<Calendar> {
                           Expanded(
                             child: Center(
                               child: FittedBox(
-                                child: Obx(
-                                  () => Text(
-                                    "${scheduleLists.totalTimes.value[d]} Minutes",
-                                    style: const TextStyle(
-                                        color:
-                                            Color.fromRGBO(144, 144, 144, 1)),
-                                  ),
+                                child: Text(
+                                  "${scheduleController.totalTimes[d]} Minutes",
+                                  style: const TextStyle(
+                                      color: Color.fromRGBO(144, 144, 144, 1)),
                                 ),
                               ),
                             ),
