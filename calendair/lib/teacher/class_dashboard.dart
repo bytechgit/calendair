@@ -50,7 +50,7 @@ class ClassDashboar extends StatelessWidget {
                   child: FittedBox(
                     fit: BoxFit.scaleDown,
                     child: Text(
-                      course.name,
+                      course.className,
                       style: const TextStyle(
                         color: Colors.black,
                         fontSize: 35,
@@ -69,7 +69,7 @@ class ClassDashboar extends StatelessWidget {
                 ),
               ),
               Text(
-                'JOIN CODE: ${course.code}',
+                'JOIN CODE: ${course.classCode}',
                 style: const TextStyle(
                   color: Colors.black,
                   fontSize: 22,
@@ -87,7 +87,7 @@ class ClassDashboar extends StatelessWidget {
                     child: InkWell(
                       onTap: (() {
                         Get.to(
-                          Students(courseId: course.docid),
+                          Students(courseId: course.docId),
                         );
                       }),
                       child: SizedBox(

@@ -1,12 +1,12 @@
 import 'dart:developer';
 
 import 'package:calendair/models/assignment_model.dart';
-import 'package:calendair/models/extracurricular_model.dart';
 import 'package:calendair/models/notification_settings_model.dart';
 import 'package:calendair/models/popup_model.dart';
 import 'package:calendair/models/remider_model.dart';
 import 'package:calendair/models/user_model.dart';
 import 'package:calendair/models/course_model.dart';
+import 'package:calendair/schedule/schedule_element_extracurricular.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -30,11 +30,13 @@ class FirebaseController {
       FirebaseFirestore.instance.collection('Schedule');
   CollectionReference<Map<String, dynamic>> courses =
       FirebaseFirestore.instance.collection('Courses');
+  CollectionReference<Map<String, dynamic>> extracurriculars =
+      FirebaseFirestore.instance.collection('Extracurriculars');
   CollectionReference<Map<String, dynamic>> assignments =
       FirebaseFirestore.instance.collection('Assignments');
   CollectionReference<Map<String, dynamic>> popups =
       FirebaseFirestore.instance.collection('Popups');
-  CollectionReference<Map<String, dynamic>> reminder =
+  CollectionReference<Map<String, dynamic>> reminders =
       FirebaseFirestore.instance.collection('Reminders');
   final googleSignIn = GoogleSignIn(
     scopes: [
@@ -85,11 +87,8 @@ class FirebaseController {
     if (uid == null) {
       return null;
     }
-    print(uid);
     final ds = await users.doc(uid).get();
-    inspect(ds);
     if (ds.exists) {
-      print("eee");
       return UserModel.fromMap(ds.data()!, ds.id);
     }
     return null;
@@ -121,18 +120,22 @@ class FirebaseController {
   }
 
   //_____teacher___________
-
+//!testirano
   Future<List<AssignmentModel>> getFirestoreAssignmet(String courseId) async {
     final docs = await assignments.where('courseId', isEqualTo: courseId).get();
     return docs.docs
-        .map((e) => AssignmentModel.fromMap(e.data(), e.id))
+        .map(
+          (e) => AssignmentModel.fromMap(e.data(), e.id),
+        )
         .toList();
   }
 
+//!testirana
   Stream<QuerySnapshot<Map<String, dynamic>>> getTeacherCourses() {
-    return courses.where("owner", isEqualTo: currentUser!.uid).snapshots();
+    return courses.where("creatorId", isEqualTo: currentUser!.uid).snapshots();
   }
 
+//!testirana
   Stream<QuerySnapshot<Map<String, dynamic>>> getStudents(String courseId) {
     return users
         .where("type", isEqualTo: "student")
@@ -156,11 +159,15 @@ class FirebaseController {
             null) {
           list.add(AssignmentModel(
               courseId: courseDocId,
-              materials: cw.materials,
+              materials: getMaterials(cw.materials),
               assignmentId: cw.id!,
               title: cw.title!,
               duration: 0,
-              docId: ""));
+              docId: "",
+              dueDate: cw.dueDate != null
+                  ? DateTime(
+                      cw.dueDate!.year!, cw.dueDate!.month!, cw.dueDate!.day!)
+                  : DateTime.now().add(const Duration(days: 7))));
         }
       }
       return list + assignmets;
@@ -169,35 +176,30 @@ class FirebaseController {
   }
 
   Future<List<DocumentReference<Map<String, dynamic>>>>
-      insertAssignmentCopyForStudents(AssignmentModel assignment,
-          CourseModel course, List<String> materials) async {
+      insertAssignmentCopyForStudents(
+          AssignmentModel assignment, CourseModel course) async {
     List<DocumentReference<Map<String, dynamic>>> ids = [];
     for (var student in course.students) {
       final doc = await FirebaseFirestore.instance.collection('Schedule').add({
         "studentId": student,
         "note": assignment.note,
         "type": "assignment",
-        "date": DateTime(2100),
-        "index": 100,
-        "time": assignment.duration,
+        "index": 1000,
+        "duration": assignment.duration,
         "times": [],
         "indexes": [],
-        "finishedList": [],
         "dates": [],
+        "remainingTimes": [],
         "title": assignment.title,
-        "dueDate": assignment.dueDate ??
-            DateUtils.dateOnly(
-              DateTime.now().add(
-                const Duration(days: 7),
-              ),
-            ),
-        "materials": materials
+        "dueDate": assignment.dueDate,
+        "materials": assignment.materials
       });
       ids.add(FirebaseFirestore.instance.doc("Schedule/${doc.id}"));
     }
     return ids;
   }
 
+//!radi valjda
   List<String> getMaterials(List<google_api.Material>? materials) {
     List<String> mat = [];
     for (google_api.Material element in materials ?? []) {
@@ -216,59 +218,52 @@ class FirebaseController {
       {required AssignmentModel assignment,
       required CourseModel course}) async {
     if (assignment.docId != "") {
-      assignments.doc(assignment.docId).get().then((value) async {
-        if (value.exists) {
-          assignments.doc(assignment.docId).update({
+      final value = await assignments.doc(assignment.docId).get();
+      if (value.exists) {
+        assignments.doc(assignment.docId).update({
+          "note": assignment.note,
+          "duration": assignment.duration,
+          "dueDate": assignment.dueDate
+        });
+        inspect(assignment.studentsCopy);
+        for (var element in assignment.studentsCopy) {
+          element.update({
             "note": assignment.note,
             "duration": assignment.duration,
-            "dueDate": assignment.dueDate ??
-                DateTime.now().add(const Duration(days: 17))
+            "dueDate": assignment.dueDate
           });
-        } else {
-          final List<String> materials = getMaterials(assignment.materials);
-          final ids = await insertAssignmentCopyForStudents(
-              assignment, course, materials);
-
-          assignment.studentsCopy = ids
-              .map((e) => FirebaseFirestore.instance.doc("Schedule/$e"))
-              .toList();
-          assignments
-              .add(assignment.toMap())
-              .then((value) => assignment.docId = value.id);
         }
-      });
-    } else {
-      final List<String> materials = getMaterials(assignment.materials);
-      final ids =
-          await insertAssignmentCopyForStudents(assignment, course, materials);
-
-      assignment.studentsCopy = ids;
-      assignments
-          .add(assignment.toMap())
-          .then((value) => assignment.docId = value.id);
+        return;
+      }
     }
+    final ids = await insertAssignmentCopyForStudents(assignment, course);
+    assignment.studentsCopy = ids;
+    assignments
+        .add(assignment.toMap())
+        .then((value) => assignment.docId = value.id);
   }
 
-  Future<List<ReminderModel>> getTeacherRemider(String id) async {
+//!testirana
+  Future<List<ReminderModel>> getTeacherRemider(String courseId) async {
     return (await FirebaseFirestore.instance
             .collection('Reminders')
-            .where("classId", isEqualTo: id)
+            .where("courseId", isEqualTo: courseId)
             .get())
         .docs
         .map((e) => ReminderModel.fromMap(e.data(), e.id))
         .toList();
   }
 
+//!testirano moze da se proveri ponovo kad se doda student
   Future<List<String>> addRemindersCopyForStudents(
-      {required String classId,
+      {required CourseModel course,
       required DateTime date,
       required String title}) async {
     List<String> ids = [];
-    for (var student
-        in ((await courses.doc(classId).get()).data()!)["students"] ?? []) {
+    for (var student in course.students) {
       final doc = await FirebaseFirestore.instance.collection('Schedule').add({
         "studentId": student,
-        "date": DateUtils.dateOnly(date),
+        "dueDate": DateUtils.dateOnly(date),
         "title": title,
         "type": "reminder",
         "index": -1
@@ -278,44 +273,43 @@ class FirebaseController {
     return ids;
   }
 
+//!testirano moze da se proveri ponovo kad se doda student
   Future<ReminderModel> addReminder(
-      {required String classId,
+      {required CourseModel course,
       required DateTime date,
       required String title}) async {
     final ids = await addRemindersCopyForStudents(
-        classId: classId, date: date, title: title);
-    final doc = await reminder.add({
-      "classId": classId,
-      "date": DateUtils.dateOnly(date),
-      "title": title,
-      "studentsCopy":
-          ids.map((e) => FirebaseFirestore.instance.doc("Schedule/$e")).toList()
-    });
-    return ReminderModel(
-        classId: classId,
-        date: Timestamp.fromDate(date),
-        docId: doc.id,
+        course: course, date: date, title: title);
+    final reminder = ReminderModel(
+        courseId: course.docId,
+        date: Timestamp.fromDate(DateUtils.dateOnly(date)),
+        docId: "",
         studentsCopy: ids
             .map((e) => FirebaseFirestore.instance.doc("Schedule/$e"))
             .toList(),
         title: title);
+    final doc = await reminders.add(reminder.toMap());
+    reminder.docId = doc.id;
+    return reminder;
   }
 
+//!testirano moze da se proveri ponovo kad se doda student
   void updateReminder({required ReminderModel r}) {
-    reminder.doc(r.docId).update({
+    reminders.doc(r.docId).update({
       "title": r.title,
-      "date": r.date,
+      "dueDate": r.date,
     });
     for (var s in r.studentsCopy) {
       s.update({
         "title": r.title,
-        "date": r.date,
+        "dueDate": r.date,
       });
     }
   }
 
-  Future<List<PopUpModel>> getTeacherPopUps(String id) async {
-    return (await popups.where("classId", isEqualTo: id).get())
+//!testirano
+  Future<List<PopUpModel>> getTeacherPopUps(String classId) async {
+    return (await popups.where("courseId", isEqualTo: classId).get())
         .docs
         .map(
           (e) => PopUpModel.fromMap(e.data(), e.id),
@@ -323,35 +317,19 @@ class FirebaseController {
         .toList();
   }
 
-  Future<PopUpModel> addPopUp(
-      {required String classId,
-      required String courseId,
-      required DateTime date,
-      required String title,
-      required List<String> students,
-      required String cm}) async {
-    final p = await popups.add({
-      "classId": classId,
-      "dueDate": DateUtils.dateOnly(date),
-      "title": title,
-      "numRate": 0,
-      "sumRate": 0,
-      "question": cm,
-      "order": DateUtils.dateOnly(DateTime.now()),
-      "students": students
-    });
-    return PopUpModel.fromMap({
-      "classId": classId,
-      "dueDate": Timestamp.fromDate(DateUtils.dateOnly(date)),
-      "title": title,
-      "numRate": 0,
-      "sumRate": 0,
-      "question": cm,
-      "order": DateUtils.dateOnly(DateTime.now()),
-      "students": students
-    }, p.id);
+//!testirano
+  Future<PopUpModel> getPopUp(String popupId) async {
+    final popup = await popups.doc(popupId).get();
+    return PopUpModel.fromMap(popup.data()!, popup.id);
   }
 
+  Future<PopUpModel> addPopUp({required PopUpModel popUpModel}) async {
+    final p = await popups.add(popUpModel.toMap());
+    popUpModel.docId = p.id;
+    return popUpModel;
+  }
+
+//!testirano
   Future<List<google_api.Course>> getCourseList() async {
     if (googleSignIn.currentUser != null) {
       final baseClient = Client();
@@ -369,29 +347,34 @@ class FirebaseController {
     return [];
   }
 
+//!testirano
   void addCourse({required google_api.Course course}) {
     FirebaseFirestore.instance.collection('Courses').add({
-      "id": course.id,
-      "code": course.enrollmentCode,
-      "name": course.name,
-      "owner": currentUser!.uid,
+      "classroomId": course.id,
+      "classCode": course.enrollmentCode,
+      "className": course.name,
+      "creatorId": currentUser!.uid,
       "students": []
     });
+    currentUser!.courses.add(course.id!);
     addCourseToUser(course.id!);
   }
 
+//!testirano
   void addCourseToUser(String classid) {
     users.doc(currentUser!.uid).update({
       "courses": FieldValue.arrayUnion([classid])
     });
   }
 
-  void addUserToCourse(String id) {
-    courses.doc(id).update({
+//!testirano
+  void addUserToCourse(String courseId) {
+    courses.doc(courseId).update({
       "students": FieldValue.arrayUnion([currentUser!.uid])
     });
   }
 
+//!testirano
   Future<String> createCourse(String name, String period) async {
     if (googleSignIn.currentUser != null) {
       final baseClient = Client();
@@ -433,41 +416,22 @@ class FirebaseController {
         .update({"breakday": dayIndex});
   }
 
-  Future<List<ExtracurricularModel>> getExtracurriculars() async {
-    return (await schedule
+  Future<List<ScheduleElementExtracurricular>> getExtracurriculars() async {
+    return (await extracurriculars
             .where("studentId", isEqualTo: currentUser!.uid)
             .where("type", isEqualTo: "extracurricular")
             .get())
         .docs
-        .map((e) => ExtracurricularModel.fromMap(e.data(), e.id))
+        .map((e) => ScheduleElementExtracurricular.fromMap(
+            map: e.data(), docId: e.id, changeType: DocumentChangeType.added))
         .toList();
   }
 
-  Future<ExtracurricularModel> addExtracurricular(
-      {required String title, required int time, required int day}) async {
-    final doc = await FirebaseFirestore.instance.collection('Schedule').add({
-      "title": title,
-      "time": time,
-      "dayIndex": day,
-      "studentId": currentUser!.uid,
-      "type": "extracurricular",
-      "index": 1000,
-      "date": null
-    });
-    currentUser!.extracurricularsTimes[day] += time;
-    FirebaseFirestore.instance
-        .collection('Users')
-        .doc(currentUser!.uid)
-        .update({"extracurricularsTimes": currentUser!.extracurricularsTimes});
-    return ExtracurricularModel.fromMap({
-      "title": title,
-      "time": time,
-      "dayIndex": day,
-      "studentId": currentUser!.uid,
-      "type": "extracurricular",
-      "index": 1000,
-      "date": null
-    }, doc.id);
+  Future<ScheduleElementExtracurricular> addExtracurricular(
+      {required ScheduleElementExtracurricular extracurricularModel}) async {
+    final doc = await extracurriculars.add(extracurricularModel.toMap());
+    extracurricularModel.docId = doc.id;
+    return extracurricularModel;
   }
 
   Future<void> setTimes(Map<String, dynamic> t) async {
@@ -481,49 +445,32 @@ class FirebaseController {
       {required DateTime date, required String title}) async {
     await FirebaseFirestore.instance.collection('Schedule').add({
       "studentId": currentUser!.uid,
-      "date": DateUtils.dateOnly(date),
+      "dueDate": DateUtils.dateOnly(date),
       "title": title,
       "type": "reminder",
       "index": -1
     });
   }
 
-  void deleteExtracurriculars(ExtracurricularModel ex) {
-    FirebaseFirestore.instance.collection('Schedule').doc(ex.docId).delete();
-    currentUser!.extracurricularsTimes[ex.dayIndex] -= ex.time;
-    FirebaseFirestore.instance
-        .collection('Users')
-        .doc(currentUser!.uid)
-        .update({"extracurricularsTimes": currentUser!.extracurricularsTimes});
+  void deleteExtracurriculars(ScheduleElementExtracurricular ex) {
+    extracurriculars.doc(ex.docId).delete();
   }
 
-  void updateExtracurriculars(
-      ExtracurricularModel ex, int prevIndex, int prevTime) {
-    FirebaseFirestore.instance
-        .collection('Schedule')
-        .doc(ex.docId)
-        .update(ex.toMap());
-    currentUser!.extracurricularsTimes[ex.dayIndex] += ex.time;
-    currentUser!.extracurricularsTimes[prevIndex] -= prevTime;
-    FirebaseFirestore.instance
-        .collection('Users')
-        .doc(currentUser!.uid)
-        .update({"extracurricularsTimes": currentUser!.extracurricularsTimes});
+  void updateExtracurriculars(ScheduleElementExtracurricular ex) {
+    extracurriculars.doc(ex.docId).update(ex.toMap());
   }
 
-  Future<List<CourseModel>> getStudentCourses() async {
-    return (await courses
-            .where("students", arrayContains: currentUser!.uid)
-            .get())
-        .docs
-        .map((e) => CourseModel.fromMap(e.data(), e.id))
-        .toList();
+  Stream<QuerySnapshot<Map<String, dynamic>>> getStudentCourses() {
+    return courses
+        .where("students", arrayContains: currentUser!.uid)
+        .snapshots();
   }
 
+//!testirano
   Future<CourseModel?> getCourse({
     required String code,
   }) async {
-    final doc = (await courses.where('code', isEqualTo: code).get()).docs;
+    final doc = (await courses.where('classCode', isEqualTo: code).get()).docs;
     if (doc.isNotEmpty) {
       return CourseModel.fromMap(doc.first.data(), doc.first.id);
     }
@@ -535,17 +482,16 @@ class FirebaseController {
       String name = "";
       try {
         final c = await getCourse(code: code);
-        inspect(c);
         if (c != null) {
-          name = c.name;
+          name = c.className;
           final baseClient = Client();
           final authenticateClient = AuthenticateClient(
               await googleSignIn.currentUser!.authHeaders, baseClient);
           final cra = google_api.ClassroomApi(authenticateClient);
-          addCourseToUser(c.docid);
-          addUserToCourse(c.docid);
+          addCourseToUser(c.docId);
+          addUserToCourse(c.docId);
           await cra.courses.students.create(
-              google_api.Student(userId: 'me'), c.courseId,
+              google_api.Student(userId: 'me'), c.classroomId,
               enrollmentCode: code);
           return name;
         } else {
@@ -580,7 +526,6 @@ class FirebaseController {
         .doc(currentUser!.uid)
         .update({'notifications': currentUser!.notifications});
   }
-//bzlg7r5
 //______student____________
 }
 

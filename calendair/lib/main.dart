@@ -1,8 +1,9 @@
 import 'package:calendair/controllers/firebase_controller.dart';
 import 'package:calendair/controllers/nav_bar_controller.dart';
-import 'package:calendair/controllers/schedule_controller.dart';
 import 'package:calendair/controllers/student_state.dart';
 import 'package:calendair/controllers/teacher_state.dart';
+import 'package:calendair/controllers/timer.dart';
+import 'package:calendair/schedule/schedule_controller.dart';
 import 'package:calendair/student_teacher/login_register.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
@@ -11,11 +12,8 @@ import 'package:get/get.dart';
 import 'package:provider/provider.dart';
 import 'package:sizer/sizer.dart';
 
-import 'controllers/schedule_lists.dart';
-
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  Get.put(ScheduleLists());
   await Firebase.initializeApp();
   SystemChrome.setPreferredOrientations(
       [DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]).then((_) {
@@ -31,7 +29,10 @@ class MyApp extends StatelessWidget {
       return MultiProvider(
         providers: [
           ChangeNotifierProvider<StudentState>(create: (_) => StudentState()),
+          ChangeNotifierProvider<ScheduleController>(
+              create: (_) => ScheduleController()),
           ChangeNotifierProvider<TeacherState>(create: (_) => TeacherState()),
+          ChangeNotifierProvider<Time>(create: (_) => Time()),
           ChangeNotifierProvider<NavBarController>(
               create: (_) => NavBarController()),
 

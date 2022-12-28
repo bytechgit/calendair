@@ -26,7 +26,7 @@ class _AssignmentsState extends State<Assignments> {
   void initState() {
     context
         .read<FirebaseController>()
-        .getAssigments(widget.course.courseId, widget.course.docid)
+        .getAssigments(widget.course.classroomId, widget.course.docId)
         .then((value) {
       setState(() {
         assignments = value;
@@ -73,7 +73,7 @@ class _AssignmentsState extends State<Assignments> {
                   child: FittedBox(
                     fit: BoxFit.scaleDown,
                     child: Text(
-                      widget.course.name,
+                      widget.course.className,
                       style: const TextStyle(
                         color: Colors.black,
                         fontSize: 35,

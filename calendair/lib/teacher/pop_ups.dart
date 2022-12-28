@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:calendair/controllers/firebase_controller.dart';
 import 'package:calendair/controllers/teacher_state.dart';
 import 'package:calendair/models/course_model.dart';
@@ -27,11 +25,9 @@ class _PopUpsState extends State<PopUps> {
   void initState() {
     firebaseController = context.read<FirebaseController>();
     final state = context.read<TeacherState>();
-    inspect(state);
-    inspect(widget.course);
-    if (!state.popupsExist(widget.course.docid)) {
-      firebaseController.getTeacherPopUps(widget.course.docid).then((value) {
-        state.addPopUps(value, widget.course.docid);
+    if (!state.popupsExist(widget.course.docId)) {
+      firebaseController.getTeacherPopUps(widget.course.docId).then((value) {
+        state.addPopUps(value, widget.course.docId);
       });
     }
     super.initState();
@@ -74,7 +70,7 @@ class _PopUpsState extends State<PopUps> {
                 child: FittedBox(
                   fit: BoxFit.scaleDown,
                   child: Text(
-                    widget.course.name,
+                    widget.course.className,
                     style: const TextStyle(
                       color: Colors.black,
                       fontSize: 35,
@@ -105,12 +101,12 @@ class _PopUpsState extends State<PopUps> {
             const SizedBox(
               height: 10,
             ),
-            if (state.popupsExist(widget.course.docid))
+            if (state.popupsExist(widget.course.docId))
               Expanded(
                   child: SingleChildScrollView(
                 child: Column(
                   children: [
-                    ...state.popups[widget.course.docid]!.map((pu) {
+                    ...state.popups[widget.course.docId]!.map((pu) {
                       return Padding(
                         padding: const EdgeInsets.all(8.0),
                         child: SizedBox(
@@ -145,7 +141,7 @@ class _PopUpsState extends State<PopUps> {
                   ],
                 ),
               )),
-            if (!state.popupsExist(widget.course.docid))
+            if (!state.popupsExist(widget.course.docId))
               const Expanded(child: Center(child: CircularProgressIndicator())),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -168,7 +164,7 @@ class _PopUpsState extends State<PopUps> {
                       onPressed: () {
                         Get.to(
                           PopUpResults(
-                            popups: state.popups[widget.course.docid] ?? [],
+                            popups: state.popups[widget.course.docId] ?? [],
                             course: widget.course,
                           ),
                         );

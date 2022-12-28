@@ -1,8 +1,6 @@
 // ignore_for_file: use_build_context_synchronously
-
 import 'package:calendair/controllers/firebase_controller.dart';
 import 'package:calendair/student/navigation.dart';
-import 'package:calendair/student/student_dashboard.dart';
 import 'package:calendair/teacher/teacher_dashboard.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -107,7 +105,7 @@ class Login extends StatelessWidget {
                 ),
               ],
             ),
-          )
+          ),
         ]),
       ),
     );

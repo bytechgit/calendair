@@ -60,7 +60,7 @@ class AssignmentUpdate extends StatelessWidget {
                   child: FittedBox(
                     fit: BoxFit.scaleDown,
                     child: Text(
-                      course.name,
+                      course.className,
                       style: const TextStyle(
                         color: Colors.black,
                         fontSize: 35,

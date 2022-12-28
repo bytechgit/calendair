@@ -1,5 +1,4 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:googleapis/classroom/v1.dart';
 
 class AssignmentModel {
   String? note;
@@ -7,10 +6,10 @@ class AssignmentModel {
   String docId;
   String assignmentId;
   int duration;
-  DateTime? dueDate;
+  DateTime dueDate;
   String title;
   List<DocumentReference<Map<String, dynamic>>> studentsCopy = [];
-  List<Material>? materials;
+  List<String> materials;
   AssignmentModel(
       {this.note,
       required this.assignmentId,
@@ -18,16 +17,18 @@ class AssignmentModel {
       required this.courseId,
       required this.title,
       required this.duration,
-      this.materials});
+      required this.materials,
+      required this.dueDate});
   Map<String, dynamic> toMap() {
     return {
       'note': note,
       'courseId': courseId,
       'duration': duration,
-      'dueDate': dueDate ?? DateTime.now().add(const Duration(days: 7)),
+      'dueDate': dueDate,
       'title': title,
       "assignmentId": assignmentId,
-      "studentsCopy": studentsCopy
+      "studentsCopy": studentsCopy,
+      "materials": materials,
     };
   }
 
@@ -37,5 +38,11 @@ class AssignmentModel {
         assignmentId = map["assignmentId"],
         title = map["title"] ?? "no title",
         duration = map["duration"] ?? 0,
-        dueDate = ((map["dueDate"] ?? Timestamp(0, 0)) as Timestamp).toDate() {}
+        dueDate = ((map["dueDate"] ?? Timestamp(0, 0)) as Timestamp).toDate(),
+        studentsCopy = ((map["studentsCopy"] ?? []) as List<dynamic>)
+            .map((e) => e as DocumentReference<Map<String, dynamic>>)
+            .toList(),
+        materials = (map["materials"] as List<dynamic>)
+            .map((e) => e.toString())
+            .toList();
 }

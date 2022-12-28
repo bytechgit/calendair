@@ -1,6 +1,6 @@
 import 'package:calendair/controllers/firebase_controller.dart';
-import 'package:calendair/controllers/schedule_controller.dart';
 import 'package:calendair/models/popup_model.dart';
+import 'package:calendair/schedule/schedule_controller.dart';
 import 'package:calendair/student/add_edit_breakday.dart';
 import 'package:calendair/student/confidence_merer.dart';
 import 'package:flutter/material.dart';
@@ -24,13 +24,17 @@ class StudentDashboard extends StatefulWidget {
 class _StudentDashboardState extends State<StudentDashboard> {
   bool open = true;
   late final FirebaseController firebaseController;
+  late final ScheduleController scheduleController;
   List<PopUpModel> popups = [];
   @override
   void initState() {
     firebaseController = context.read<FirebaseController>();
-    Get.put(ScheduleController(firebaseController));
-    final sc = Get.find<ScheduleController>();
-    sc.listen(firebaseController.currentUser!.uid);
+    scheduleController = context.read<ScheduleController>();
+    firebaseController.getExtracurriculars().then((value) {
+      scheduleController.addExtracurriculars(value);
+      scheduleController.listen(firebaseController.currentUser!.uid);
+    });
+
     firebaseController.getStudentPopUps().listen((event) {
       setState(() {
         popups =
@@ -47,8 +51,7 @@ class _StudentDashboardState extends State<StudentDashboard> {
 
   @override
   void dispose() {
-    final sc = Get.find<ScheduleController>();
-    sc.streamSubscription?.cancel();
+    scheduleController.cancel();
     super.dispose();
   }
 
@@ -60,31 +63,6 @@ class _StudentDashboardState extends State<StudentDashboard> {
         leading: null,
         automaticallyImplyLeading: false,
       ),
-      // bottomNavigationBar: NavBar(
-      //   navBarItems: [
-      //     NavBarItem(
-      //         image: 'calendar',
-      //         onclick: () {
-      //           Get.to(
-      //             const Dashboard(),
-      //           );
-      //         }),
-      //     NavBarItem(
-      //         image: 'home',
-      //         onclick: () {
-      //           setState(() {
-      //             open = true;
-      //           });
-      //         }),
-      //     NavBarItem(
-      //         image: 'settings',
-      //         onclick: () {
-      //           Get.to(
-      //             const StudentSettings(),
-      //           );
-      //         })
-      //   ],
-      // ),
       body: SafeArea(
         child: SizedBox(
           child: Stack(

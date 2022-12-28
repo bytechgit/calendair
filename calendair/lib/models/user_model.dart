@@ -3,9 +3,7 @@ class UserModel {
   String name;
   String picture;
   String type;
-  int breakday = 2;
-  List<int> extracurricularsTimes = [];
-  Map<String, int> times = {};
+  int breakday = -1;
   Map<String, bool> notifications = {};
   List<String> courses = [];
   UserModel({
@@ -13,7 +11,7 @@ class UserModel {
     required this.name,
     required this.picture,
     required this.type,
-    required this.breakday,
+    this.breakday = -1,
   });
 
   Map<String, dynamic> toMapStudent() {
@@ -23,8 +21,6 @@ class UserModel {
       'courses': courses,
       "breakday": breakday,
       'type': type,
-      'times': times,
-      'extracurricularsTimes': extracurricularsTimes,
       'notifications': notifications
     };
   }
@@ -43,30 +39,9 @@ class UserModel {
         name = map["name"] ?? " ",
         picture = map["picture"] ?? " ",
         type = map["type"] ?? " ",
-        times = Map.from(map["times"] ?? {}),
         notifications = Map.from(map["notifications"] ?? {}),
         breakday = map["breakday"] ?? -1,
         courses = ((map["courses"] ?? []) as List<dynamic>)
             .map((e) => e.toString())
-            .toList(),
-        extracurricularsTimes =
-            ((map["extracurricularsTimes"] ?? []) as List<dynamic>)
-                .map((e) => e as int)
-                .toList();
-  // remindersNotification =
-  //     ((map["remindersNotification"] ?? []) as List<dynamic>)
-  //         .map((e) => NotificationSettingsModel.fromMap(e))
-  //         .toList(),
-  // extracurricularsTimes =
-  //     ((map["extracurricularsTimes"] ?? []) as List<dynamic>)
-  //         .map((e) => e)
-  //         .toList(),
-  // assignmentsNotification =
-  //     ((map["assignmentsNotification"] ?? []) as List<dynamic>)
-  //         .map((e) => NotificationSettingsModel.fromMap(e))
-  //         .toList(),
-  // updatesNotification =
-  //     ((map["updatesNotification"] ?? []) as List<dynamic>)
-  //         .map((e) => NotificationSettingsModel.fromMap(e))
-  //         .toList();
+            .toList();
 }

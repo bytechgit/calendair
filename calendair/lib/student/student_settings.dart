@@ -13,31 +13,6 @@ class StudentSettings extends StatelessWidget {
       appBar: AppBar(
         backgroundColor: const Color.fromRGBO(93, 159, 196, 1),
       ),
-      // bottomNavigationBar: NavBar(
-      //   navBarItems: [
-      //     NavBarItem(
-      //         image: 'calendar',
-      //         onclick: () {
-      //           Get.to(
-      //             const Dashboard(),
-      //           );
-      //         }),
-      //     NavBarItem(
-      //         image: 'home',
-      //         // widget: const studentDashboard(),
-      //         onclick: () {
-      //           Get.until((route) =>
-      //               (route as GetPageRoute).routeName == '/StudentDashboard');
-      //         }),
-      //     NavBarItem(
-      //         image: 'settings',
-      //         onclick: () {
-      //           Get.to(
-      //             const StudentSettings(),
-      //           );
-      //         })
-      //   ],
-      // ),
       body: SafeArea(
         child: Center(
           child: Column(

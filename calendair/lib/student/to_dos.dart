@@ -1,14 +1,17 @@
+import 'package:calendair/schedule/schedule_controller.dart';
+import 'package:calendair/schedule/schedule_element_assignment.dart';
+import 'package:calendair/student/todo.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:get/get.dart';
 // ignore: depend_on_referenced_packages
 import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
 
-class ToDo extends StatefulWidget {
+class ToDos extends StatefulWidget {
   final bool fromCalendar;
   final String day;
   final int index;
-  const ToDo(
+  const ToDos(
       {Key? key,
       required this.day,
       required this.index,
@@ -16,14 +19,14 @@ class ToDo extends StatefulWidget {
       : super(key: key);
 
   @override
-  State<ToDo> createState() => _ToDoState();
+  State<ToDos> createState() => _ToDosState();
 }
 
-class _ToDoState extends State<ToDo> {
-  //late final ScheduleController scheduleController;
+class _ToDosState extends State<ToDos> {
+  late final ScheduleController scheduleController;
   @override
   void initState() {
-    // scheduleController = context.read<ScheduleController>();
+    scheduleController = context.read<ScheduleController>();
     SystemChrome.setPreferredOrientations([
       DeviceOrientation.portraitUp,
       DeviceOrientation.portraitDown,
@@ -43,7 +46,7 @@ class _ToDoState extends State<ToDo> {
             color: Colors.black,
           ),
           onPressed: () {
-            Get.back();
+            Navigator.of(context).pop();
           },
         ),
       ),
@@ -88,20 +91,28 @@ class _ToDoState extends State<ToDo> {
                     ),
                   ),
                 ),
+                const SizedBox(
+                  height: 30,
+                ),
                 Expanded(
                   child: SingleChildScrollView(
                     child: Column(
                       children: [
-                        // ...scheduleController.scheduleElements[widget.index]
-                        //     .map((el) {
-                        //   if (el is ScheduleElementAssignment) {
-                        //     return ToDoCheck(el: el);
-                        //   } else {
-                        //     return const SizedBox.shrink();
-                        //   }
-                        // }).toList(),
-                        const SizedBox(
-                          height: 20,
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            ...scheduleController.days[widget.index].elements
+                                .map((el) {
+                              if (el is ScheduleElementAssignment) {
+                                return ToDo(element: el);
+                              } else {
+                                return const SizedBox.shrink();
+                              }
+                            }).toList(),
+                            const SizedBox(
+                              height: 40,
+                            ),
+                          ],
                         ),
                         SizedBox(
                           width: width * 0.6,

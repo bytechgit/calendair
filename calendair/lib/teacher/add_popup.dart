@@ -1,7 +1,9 @@
 import 'package:calendair/controllers/firebase_controller.dart';
 import 'package:calendair/controllers/teacher_state.dart';
 import 'package:calendair/models/course_model.dart';
+import 'package:calendair/models/popup_model.dart';
 import 'package:calendair/student_teacher/bottom_nav_bar.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';
 import 'package:get/get.dart';
@@ -37,7 +39,9 @@ class _AddPopUpState extends State<AddPopUp> {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
+      onTap: () {
+        FocusManager.instance.primaryFocus?.unfocus();
+      },
       child: Scaffold(
         resizeToAvoidBottomInset: false,
         appBar: AppBar(
@@ -72,7 +76,7 @@ class _AddPopUpState extends State<AddPopUp> {
                   child: FittedBox(
                     fit: BoxFit.scaleDown,
                     child: Text(
-                      widget.course.name,
+                      widget.course.className,
                       style: const TextStyle(
                         color: Colors.black,
                         fontSize: 40,
@@ -208,18 +212,22 @@ class _AddPopUpState extends State<AddPopUp> {
                     onPressed: () {
                       Get.to(
                         ConfidenceMeterQuestion(
-                          courseName: widget.course.name,
+                          courseName: widget.course.className,
                           question: confidenceQuestion,
                           onSave: ((val) {
-                            confidenceQuestion = val;
+                            setState(() {
+                              confidenceQuestion = val;
+                            });
                           }),
                         ),
                       );
                     },
-                    child: const Text(
-                      'Confidence Meter',
+                    child: Text(
+                      confidenceQuestion.isEmpty
+                          ? 'Confidence Meter'
+                          : confidenceQuestion,
                       textAlign: TextAlign.center,
-                      style: TextStyle(
+                      style: const TextStyle(
                           color: Color.fromRGBO(38, 64, 78, 1),
                           fontSize: 25,
                           fontWeight: FontWeight.w400),
@@ -253,14 +261,19 @@ class _AddPopUpState extends State<AddPopUp> {
                       }
                       firebaseController
                           .addPopUp(
-                              courseId: widget.course.docid,
-                              students: widget.course.students,
-                              classId: widget.course.docid,
-                              date: date,
-                              title: titleController.text,
-                              cm: confidenceQuestion)
+                              popUpModel: PopUpModel(
+                                  courseId: widget.course.docId,
+                                  dueDate: Timestamp.fromDate(
+                                      DateUtils.dateOnly(date)),
+                                  title: titleController.text,
+                                  numRate: 0,
+                                  sumRate: 0,
+                                  question: confidenceQuestion,
+                                  createdAt: Timestamp.fromDate(
+                                      DateUtils.dateOnly(DateTime.now())),
+                                  students: widget.course.students))
                           .then((value) {
-                        teacherState.addPopUp(value, widget.course.docid);
+                        teacherState.addPopUp(value, widget.course.docId);
                       });
                       Get.back();
                     },

@@ -1,7 +1,8 @@
 import 'package:calendair/controllers/firebase_controller.dart';
-import 'package:calendair/controllers/student_state.dart';
+import 'package:calendair/models/course_model.dart';
 import 'package:calendair/student/add_class.dart';
 import 'package:calendair/student/rate_class_strength.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:persistent_bottom_nav_bar/persistent_tab_view.dart';
 import 'package:provider/provider.dart';
@@ -16,21 +17,16 @@ class Classes extends StatefulWidget {
 
 class _ClassesState extends State<Classes> {
   late FirebaseController firebaseController;
+  late Stream<QuerySnapshot<Map<String, dynamic>>> snapshot;
   @override
   void initState() {
     firebaseController = context.read<FirebaseController>();
-    final state = context.read<StudentState>();
-    if (state.courses == null) {
-      firebaseController.getStudentCourses().then((value) {
-        state.addCourses(value);
-      });
-    }
+    snapshot = firebaseController.getStudentCourses();
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
-    final studentState = context.watch<StudentState>();
     return Scaffold(
       appBar: AppBar(
         backgroundColor: const Color.fromRGBO(93, 159, 196, 1),
@@ -44,30 +40,6 @@ class _ClassesState extends State<Classes> {
           },
         ),
       ),
-      // bottomNavigationBar: NavBar(
-      //   navBarItems: [
-      //     NavBarItem(
-      //         image: 'calendar',
-      //         onclick: () {
-      //           Get.off(
-      //             const Dashboard(),
-      //           );
-      //         }),
-      //     NavBarItem(
-      //         image: 'home',
-      //         onclick: () {
-      //           Get.until((route) =>
-      //               (route as GetPageRoute).routeName == '/StudentDashboard');
-      //         }),
-      //     NavBarItem(
-      //         image: 'settings',
-      //         onclick: () {
-      //           Get.to(
-      //             const StudentSettings(),
-      //           );
-      //         })
-      //   ],
-      // ),
       body: SafeArea(
         child: Center(
           child: Column(
@@ -101,88 +73,104 @@ class _ClassesState extends State<Classes> {
                     ),
                     child: Stack(
                       children: [
-                        if (studentState.courses != null)
-                          SingleChildScrollView(
-                            child: Column(children: [
-                              ...studentState.courses!.map((c) {
-                                return Padding(
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 20, vertical: 10),
-                                  child: InkWell(
-                                    onTap: (() {}),
-                                    child: Container(
-                                      padding: const EdgeInsets.all(10),
-                                      decoration: const BoxDecoration(
-                                          color:
-                                              Color.fromRGBO(94, 159, 197, 1),
-                                          borderRadius: BorderRadius.all(
-                                              Radius.circular(10))),
-                                      height: 65,
-                                      child: Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceBetween,
-                                        children: [
-                                          SizedBox(
-                                            width: 50.w,
-                                            child: Padding(
-                                              padding: const EdgeInsets.only(
-                                                  left: 10),
-                                              child: FittedBox(
-                                                fit: BoxFit.scaleDown,
-                                                alignment: Alignment.centerLeft,
-                                                child: Text(
-                                                  c.name,
-                                                  textAlign: TextAlign.left,
-                                                  style: const TextStyle(
-                                                    color: Color.fromRGBO(
-                                                        38, 65, 78, 1),
-                                                    fontSize: 30,
+                        StreamBuilder(
+                            stream: snapshot,
+                            builder: (context,
+                                AsyncSnapshot<
+                                        QuerySnapshot<Map<String, dynamic>>>
+                                    snapshot) {
+                              if (snapshot.hasData) {
+                                return SingleChildScrollView(
+                                  child: Column(children: [
+                                    ...snapshot.data!.docs.map((doc) {
+                                      final c = CourseModel.fromMap(
+                                          doc.data(), doc.id);
+                                      return Padding(
+                                        padding: const EdgeInsets.symmetric(
+                                            horizontal: 20, vertical: 10),
+                                        child: InkWell(
+                                          onTap: (() {}),
+                                          child: Container(
+                                            padding: const EdgeInsets.all(10),
+                                            decoration: const BoxDecoration(
+                                                color: Color.fromRGBO(
+                                                    94, 159, 197, 1),
+                                                borderRadius: BorderRadius.all(
+                                                    Radius.circular(10))),
+                                            height: 65,
+                                            child: Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment
+                                                      .spaceBetween,
+                                              children: [
+                                                SizedBox(
+                                                  width: 50.w,
+                                                  child: Padding(
+                                                    padding:
+                                                        const EdgeInsets.only(
+                                                            left: 10),
+                                                    child: FittedBox(
+                                                      fit: BoxFit.scaleDown,
+                                                      alignment:
+                                                          Alignment.centerLeft,
+                                                      child: Text(
+                                                        c.className,
+                                                        textAlign:
+                                                            TextAlign.left,
+                                                        style: const TextStyle(
+                                                          color: Color.fromRGBO(
+                                                              38, 65, 78, 1),
+                                                          fontSize: 30,
+                                                        ),
+                                                      ),
+                                                    ),
                                                   ),
                                                 ),
-                                              ),
+                                                Expanded(child: Container()),
+                                                GestureDetector(
+                                                  child: Padding(
+                                                    padding:
+                                                        const EdgeInsets.only(
+                                                            right: 5),
+                                                    child: Image.asset(
+                                                      'assets/images/settings.png',
+                                                      width: 30,
+                                                    ),
+                                                  ),
+                                                  onTap: () {
+                                                    PersistentNavBarNavigator
+                                                        .pushNewScreen(
+                                                      context,
+                                                      screen: RateClassStrength(
+                                                        name: c.className,
+                                                        //back3: false,
+                                                      ),
+                                                      withNavBar: false,
+                                                      pageTransitionAnimation:
+                                                          PageTransitionAnimation
+                                                              .fade,
+                                                    );
+                                                  },
+                                                )
+                                              ],
                                             ),
                                           ),
-                                          Expanded(child: Container()),
-                                          GestureDetector(
-                                            child: Padding(
-                                              padding: const EdgeInsets.only(
-                                                  right: 5),
-                                              child: Image.asset(
-                                                'assets/images/settings.png',
-                                                width: 30,
-                                              ),
-                                            ),
-                                            onTap: () {
-                                              PersistentNavBarNavigator
-                                                  .pushNewScreen(
-                                                context,
-                                                screen: RateClassStrength(
-                                                  name: c.name,
-                                                  //back3: false,
-                                                ),
-                                                withNavBar: false,
-                                                pageTransitionAnimation:
-                                                    PageTransitionAnimation
-                                                        .fade,
-                                              );
-                                            },
-                                          )
-                                        ],
+                                        ),
+                                      );
+                                    }).toList(),
+                                    Padding(
+                                      padding: const EdgeInsets.all(8.0),
+                                      child: Container(
+                                        height: 100,
                                       ),
                                     ),
-                                  ),
+                                  ]),
                                 );
-                              }).toList(),
-                              Padding(
-                                padding: const EdgeInsets.all(8.0),
-                                child: Container(
-                                  height: 100,
-                                ),
-                              ),
-                            ]),
-                          ),
-                        if (studentState.courses == null)
-                          const Center(child: CircularProgressIndicator()),
+                              } else {
+                                return const Center(
+                                    child: CircularProgressIndicator());
+                              }
+                            }),
                         Align(
                           alignment: Alignment.bottomRight,
                           child: Padding(

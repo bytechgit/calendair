@@ -1,5 +1,5 @@
 import 'package:calendair/controllers/firebase_controller.dart';
-import 'package:calendair/controllers/student_state.dart';
+import 'package:calendair/schedule/schedule_controller.dart';
 import 'package:calendair/student/add_edit_extracurriculars.dart';
 import 'package:flutter/material.dart';
 import 'package:persistent_bottom_nav_bar/persistent_tab_view.dart';
@@ -17,19 +17,13 @@ class _ExtracurricularsState extends State<Extracurriculars> {
   late FirebaseController firebaseController;
   @override
   void initState() {
-    final state = context.read<StudentState>();
     firebaseController = context.read<FirebaseController>();
-    if (state.extracurriculars == null) {
-      firebaseController.getExtracurriculars().then((value) {
-        state.addExtracurriculars(value);
-      });
-    }
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
-    final state = context.watch<StudentState>();
+    final state = context.watch<ScheduleController>();
     return Scaffold(
       appBar: AppBar(
         backgroundColor: const Color.fromRGBO(93, 159, 196, 1),
@@ -43,30 +37,6 @@ class _ExtracurricularsState extends State<Extracurriculars> {
           },
         ),
       ),
-      // bottomNavigationBar: NavBar(
-      //   navBarItems: [
-      //     NavBarItem(
-      //         image: 'calendar',
-      //         onclick: () {
-      //           Get.off(
-      //             const Dashboard(),
-      //           );
-      //         }),
-      //     NavBarItem(
-      //         image: 'home',
-      //         onclick: () {
-      //           Get.until((route) =>
-      //               (route as GetPageRoute).routeName == '/StudentDashboard');
-      //         }),
-      //     NavBarItem(
-      //         image: 'settings',
-      //         onclick: () {
-      //           Get.to(
-      //             const StudentSettings(),
-      //           );
-      //         })
-      //   ],
-      // ),
       body: SafeArea(
         child: Center(
           child: Column(
@@ -87,105 +57,100 @@ class _ExtracurricularsState extends State<Extracurriculars> {
                   ),
                 ),
               ),
-              if (state.extracurriculars != null)
-                Expanded(
-                  flex: 8,
-                  child: SingleChildScrollView(
-                    child: Column(
-                      children: [
-                        ...state.extracurriculars!.map((ex) {
-                          return Container(
-                            width: double.infinity,
-                            decoration: BoxDecoration(
-                              color: const Color.fromRGBO(217, 217, 217, 1),
-                              border: Border.all(color: Colors.black, width: 1),
-                            ),
-                            height: 65,
-                            child: Row(children: [
-                              SizedBox(
-                                width: 50.w,
-                                child: FittedBox(
-                                  alignment: Alignment.centerLeft,
-                                  fit: BoxFit.scaleDown,
-                                  child: Padding(
-                                    padding: const EdgeInsets.only(
-                                        left: 10, right: 10),
-                                    child: Text(
-                                      ex.title,
-                                      style: const TextStyle(
-                                        color: Colors.black,
-                                        fontSize: 25,
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              ),
-                              const Expanded(
-                                flex: 2,
-                                child: SizedBox(),
-                              ),
-                              SizedBox(
-                                width: 30.w,
-                                height: 45,
-                                child: ElevatedButton(
-                                  style: ElevatedButton.styleFrom(
-                                    shadowColor:
-                                        const Color.fromRGBO(247, 247, 247, 1),
-                                    backgroundColor:
-                                        const Color.fromRGBO(94, 159, 197, 1),
-                                    elevation: 0,
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(20.0),
-                                    ),
-                                  ),
-                                  onPressed: () {
-                                    PersistentNavBarNavigator.pushNewScreen(
-                                      context,
-                                      screen: AddEditExtracurriculars(
-                                          extracurricular: ex),
-                                      withNavBar: true,
-                                      pageTransitionAnimation:
-                                          PageTransitionAnimation.fade,
-                                    );
-                                  },
-                                  child: const Text(
-                                    'Edit',
-                                    textAlign: TextAlign.center,
-                                    style: TextStyle(
+              Expanded(
+                flex: 8,
+                child: SingleChildScrollView(
+                  child: Column(
+                    children: [
+                      ...state.extracurriculars.map((ex) {
+                        return Container(
+                          width: double.infinity,
+                          decoration: BoxDecoration(
+                            color: const Color.fromRGBO(217, 217, 217, 1),
+                            border: Border.all(color: Colors.black, width: 1),
+                          ),
+                          height: 65,
+                          child: Row(children: [
+                            SizedBox(
+                              width: 50.w,
+                              child: FittedBox(
+                                alignment: Alignment.centerLeft,
+                                fit: BoxFit.scaleDown,
+                                child: Padding(
+                                  padding: const EdgeInsets.only(
+                                      left: 10, right: 10),
+                                  child: Text(
+                                    ex.title,
+                                    style: const TextStyle(
                                       color: Colors.black,
-                                      fontSize: 26,
+                                      fontSize: 25,
                                     ),
                                   ),
                                 ),
                               ),
-                              const Expanded(
-                                flex: 1,
-                                child: SizedBox(),
-                              ),
-                              Padding(
-                                padding: const EdgeInsets.all(8.0),
-                                child: InkWell(
-                                  onTap: () {
-                                    firebaseController
-                                        .deleteExtracurriculars(ex);
-                                    state.deleteExtracurricular(ex);
-                                  },
-                                  child: Image.asset(
-                                    'assets/images/remove.png',
-                                    height: 35,
+                            ),
+                            const Expanded(
+                              flex: 2,
+                              child: SizedBox(),
+                            ),
+                            SizedBox(
+                              width: 30.w,
+                              height: 45,
+                              child: ElevatedButton(
+                                style: ElevatedButton.styleFrom(
+                                  shadowColor:
+                                      const Color.fromRGBO(247, 247, 247, 1),
+                                  backgroundColor:
+                                      const Color.fromRGBO(94, 159, 197, 1),
+                                  elevation: 0,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(20.0),
                                   ),
                                 ),
-                              )
-                            ]),
-                          );
-                        }).toList()
-                      ],
-                    ),
+                                onPressed: () {
+                                  PersistentNavBarNavigator.pushNewScreen(
+                                    context,
+                                    screen: AddEditExtracurriculars(
+                                        extracurricular: ex),
+                                    withNavBar: true,
+                                    pageTransitionAnimation:
+                                        PageTransitionAnimation.fade,
+                                  );
+                                },
+                                child: const Text(
+                                  'Edit',
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(
+                                    color: Colors.black,
+                                    fontSize: 26,
+                                  ),
+                                ),
+                              ),
+                            ),
+                            const Expanded(
+                              flex: 1,
+                              child: SizedBox(),
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: InkWell(
+                                onTap: () {
+                                  firebaseController.deleteExtracurriculars(ex);
+                                  state.deleteExtracurricular(ex);
+                                },
+                                child: Image.asset(
+                                  'assets/images/remove.png',
+                                  height: 35,
+                                ),
+                              ),
+                            )
+                          ]),
+                        );
+                      }).toList()
+                    ],
                   ),
                 ),
-              if (state.extracurriculars == null)
-                const Expanded(
-                    flex: 8, child: Center(child: CircularProgressIndicator())),
+              ),
               Padding(
                 padding: const EdgeInsets.only(top: 15.0),
                 child: SizedBox(

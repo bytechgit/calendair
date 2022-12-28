@@ -97,7 +97,7 @@ class TeacherDashboard extends StatelessWidget {
                                           child: Center(
                                             child: FittedBox(
                                               child: Text(
-                                                course.name,
+                                                course.className,
                                                 textAlign: TextAlign.center,
                                                 style: const TextStyle(
                                                   color: Color.fromRGBO(

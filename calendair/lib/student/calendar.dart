@@ -1,15 +1,18 @@
-import 'dart:developer';
-
 import 'package:calendair/controllers/firebase_controller.dart';
-import 'package:calendair/controllers/schedule_controller.dart';
-import 'package:calendair/controllers/schedule_lists.dart';
+import 'package:calendair/schedule/schedule_controller.dart';
+import 'package:calendair/schedule/schedule_element_assignment.dart';
+import 'package:calendair/schedule/schedule_element_extracurricular.dart';
+import 'package:calendair/schedule/schedule_element_reminder.dart';
 import 'package:calendair/student/add_reminder.dart';
-import 'package:calendair/student/calendar_schedule_element.dart';
-import 'package:calendair/student/to_do.dart';
+import 'package:calendair/student/calendar_assignment.dart';
+import 'package:calendair/student/calendar_extracurricular.dart';
+import 'package:calendair/student/calendar_reminder.dart';
+import 'package:calendair/student/to_dos.dart';
 import 'package:drag_and_drop_lists/drag_and_drop_lists.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
+
 import 'package:linked_scroll_controller/linked_scroll_controller.dart';
 // ignore: depend_on_referenced_packages
 import 'package:intl/intl.dart';
@@ -23,28 +26,27 @@ class Calendar extends StatefulWidget {
 }
 
 class _CalendarState extends State<Calendar> {
-  final sc = Get.find<ScheduleController>();
-  final scheduleLists = Get.find<ScheduleLists>();
   late final List<DragAndDropList> _contents = [];
+  int weeksBetween(DateTime from, DateTime to) {
+    from = DateTime.utc(from.year, from.month, from.day);
+    to = DateTime.utc(to.year, to.month, to.day);
+    return (to.difference(from).inDays / 7).ceil();
+  }
+
+  late ScheduleController scheduleController;
   bool edit = false;
   _onItemReorder(
       int oldItemIndex, int oldListIndex, int newItemIndex, int newListIndex) {
-    if (newListIndex != firebaseController.currentUser!.breakday &&
-        newListIndex != firebaseController.currentUser!.breakday + 7) {
-      setState(() {
-        var movedI = sc.removeFromScheduleElements(
-            listIndex: oldListIndex, index: oldItemIndex);
-        sc.addInScheduleElements(
-            newListIndex: newListIndex,
-            index: newItemIndex,
-            se: movedI,
-            oldListIndex: oldListIndex);
-        // gc.scheduleElements.value[oldListIndex].removeAt(oldItemIndex);
-        //gc.scheduleElements.value[newListIndex].insert(newItemIndex, movedI);
-        // var movedItem = _contents[oldListIndex].children.removeAt(oldItemIndex);
-        // _contents[newListIndex].children.insert(newItemIndex, movedItem);
-      });
+    if ((firebaseController.currentUser!.breakday != -1 &&
+        (newListIndex == firebaseController.currentUser!.breakday ||
+            newListIndex == firebaseController.currentUser!.breakday + 7))) {
+      return;
     }
+    scheduleController.itemReorder(
+        oldListIndex: oldListIndex,
+        newListIndex: newListIndex,
+        oldItemIndex: oldItemIndex,
+        newItemIndex: newItemIndex);
   }
 
   _onListReorder(int oldListIndex, int newListIndex) {
@@ -67,6 +69,7 @@ class _CalendarState extends State<Calendar> {
   void initState() {
     super.initState();
     firebaseController = context.read<FirebaseController>();
+    scheduleController = context.read<ScheduleController>();
     SystemChrome.setPreferredOrientations([
       DeviceOrientation.landscapeRight,
       DeviceOrientation.landscapeLeft,
@@ -113,9 +116,11 @@ class _CalendarState extends State<Calendar> {
     'Sat',
     'Sun'
   ];
+
   @override
   Widget build(BuildContext context) {
     final width = MediaQuery.of(context).size.width;
+    final sc = context.watch<ScheduleController>();
     return Scaffold(
       resizeToAvoidBottomInset: false,
       appBar: AppBar(
@@ -144,7 +149,7 @@ class _CalendarState extends State<Calendar> {
                       InkWell(
                         onTap: (() {
                           Get.off(
-                            ToDo(
+                            ToDos(
                               index: i,
                               day: days[i],
                               fromCalendar: true,
@@ -206,85 +211,83 @@ class _CalendarState extends State<Calendar> {
                         .toList(),
                   ),
                 ),
-                Obx(
-                  () => DragAndDropLists(
-                    removeTopPadding: true,
-                    scrollController: calendarController,
-                    itemDragHandle:
-                        !edit ? const DragHandle(child: SizedBox()) : null,
-                    listDragHandle:
-                        !edit ? const DragHandle(child: SizedBox()) : null,
-                    lastListTargetSize: 0,
-                    lastItemTargetHeight: 100,
-                    //disableScrolling: true,
-                    children: [
-                      for (int i = 0;
-                          i < scheduleLists.scheduleElements.value.length;
-                          i++) ...{
-                        if (firebaseController.currentUser!.breakday == -1 ||
-                            firebaseController.currentUser!.breakday != i &&
-                                firebaseController.currentUser!.breakday !=
-                                    i - 7) ...{
-                          DragAndDropList(
-                              contentsWhenEmpty: const SizedBox(),
-                              verticalAlignment: CrossAxisAlignment.stretch,
-                              children: scheduleLists.scheduleElements.value[i]
-                                  .map(
-                                    (e) => DragAndDropItem(
-                                      child: CalendarScheduleElement(
-                                        scheduleElement: e,
-                                        edit: edit,
-                                      ),
-                                      canDrag: true,
-                                      // e.type == "reminder" ? false : true,
-                                    ),
-                                  )
-                                  .toList(),
-                              canDrag: false),
-                        } else
-                          DragAndDropList(
-                              contentsWhenEmpty: const SizedBox(),
-                              verticalAlignment: CrossAxisAlignment.stretch,
-                              children: [
-                                DragAndDropItem(
-                                    child: const Center(
-                                        child: Text(
-                                      'Break day',
-                                      textAlign: TextAlign.center,
-                                      style: TextStyle(
-                                          fontSize: 30,
-                                          fontWeight: FontWeight.bold),
-                                    )),
-                                    canDrag: false)
-                              ],
-                              canDrag: false),
-                      }
-                    ],
-
-                    // children: sc.scheduleElements.value.map((list) {
-                    //   return DragAndDropList(
-                    //       contentsWhenEmpty: const SizedBox(),
-                    //       verticalAlignment: CrossAxisAlignment.stretch,
-                    //       children: list
-                    //           .map(
-                    //             (e) => DragAndDropItem(
-                    //               child: CalendarAssignment(
-                    //                 scheduleElement: e,
-                    //               ),
-                    //               canDrag: true,
-                    //               // e.type == "reminder" ? false : true,
-                    //             ),
-                    //           )
-                    //           .toList(),
-                    //       canDrag: false);
-                    // }).toList(),
-                    onItemReorder: _onItemReorder,
-                    onListReorder: _onListReorder,
-                    axis: Axis.horizontal,
-                    listWidth: width / 7,
-                    listPadding:
-                        const EdgeInsets.symmetric(horizontal: 0, vertical: 0),
-                  ),
+                DragAndDropLists(
+                  removeTopPadding: true,
+                  scrollController: calendarController,
+                  itemDragHandle:
+                      !edit ? const DragHandle(child: SizedBox()) : null,
+                  listDragHandle:
+                      !edit ? const DragHandle(child: SizedBox()) : null,
+                  lastListTargetSize: 0,
+                  lastItemTargetHeight: 100,
+                  //disableScrolling: true,
+                  children: [
+                    for (int i = 0; i < sc.days.length; i++) ...{
+                      if (firebaseController.currentUser?.breakday == -1 ||
+                          firebaseController.currentUser?.breakday != i &&
+                              firebaseController.currentUser?.breakday !=
+                                  i - 7) ...{
+                        DragAndDropList(
+                            contentsWhenEmpty: const SizedBox(),
+                            verticalAlignment: CrossAxisAlignment.stretch,
+                            children: sc.days[i].elements
+                                .map(
+                                  (e) => DragAndDropItem(
+                                    child: (e is ScheduleElementAssignment)
+                                        ? CalendarAssignment(
+                                            assignment: e,
+                                            edit: edit,
+                                          )
+                                        : (e is ScheduleElementExtracurricular)
+                                            ? CalendarExtracurricular(
+                                                extracurricular: e,
+                                                edit: edit,
+                                                week: weeksBetween(
+                                                    DateTime.utc(
+                                                        startDate
+                                                            .add(Duration(
+                                                                days: i))
+                                                            .year,
+                                                        1,
+                                                        1),
+                                                    startDate.add(
+                                                        Duration(days: i))),
+                                              )
+                                            : edit
+                                                ? const SizedBox()
+                                                : CalendarReminder(
+                                                    reminder: e
+                                                        as ScheduleElementReminder),
+                                    canDrag: true,
+                                  ),
+                                )
+                                .toList(),
+                            canDrag: false),
+                      } else
+                        DragAndDropList(
+                            contentsWhenEmpty: const SizedBox(),
+                            verticalAlignment: CrossAxisAlignment.stretch,
+                            children: [
+                              DragAndDropItem(
+                                  child: const Center(
+                                      child: Text(
+                                    'Break day',
+                                    textAlign: TextAlign.center,
+                                    style: TextStyle(
+                                        fontSize: 30,
+                                        fontWeight: FontWeight.bold),
+                                  )),
+                                  canDrag: false)
+                            ],
+                            canDrag: false),
+                    }
+                  ],
+                  onItemReorder: _onItemReorder,
+                  onListReorder: _onListReorder,
+                  axis: Axis.horizontal,
+                  listWidth: width / 7,
+                  listPadding:
+                      const EdgeInsets.symmetric(horizontal: 0, vertical: 0),
                 ),
                 if (!edit)
                   Align(
@@ -318,8 +321,8 @@ class _CalendarState extends State<Calendar> {
                           child: Container(
                             width: 40,
                             height: 40,
-                            color: Color.fromARGB(255, 210, 210, 210),
-                            child: Icon(
+                            color: const Color.fromARGB(255, 210, 210, 210),
+                            child: const Icon(
                               Icons.arrow_back,
                               color: Colors.black,
                             ),
@@ -385,13 +388,10 @@ class _CalendarState extends State<Calendar> {
                           Expanded(
                             child: Center(
                               child: FittedBox(
-                                child: Obx(
-                                  () => Text(
-                                    "${scheduleLists.totalTimes.value[d]} Minutes",
-                                    style: const TextStyle(
-                                        color:
-                                            Color.fromRGBO(144, 144, 144, 1)),
-                                  ),
+                                child: Text(
+                                  "${sc.days[d].time} Minutes",
+                                  style: const TextStyle(
+                                      color: Color.fromRGBO(144, 144, 144, 1)),
                                 ),
                               ),
                             ),

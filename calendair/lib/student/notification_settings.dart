@@ -80,30 +80,6 @@ class _NotificationSettingsState extends State<NotificationSettings> {
           },
         ),
       ),
-      // bottomNavigationBar: NavBar(
-      //   navBarItems: [
-      //     NavBarItem(
-      //         image: 'calendar',
-      //         onclick: () {
-      //           Get.off(
-      //             const Dashboard(),
-      //           );
-      //         }),
-      //     NavBarItem(
-      //         image: 'home',
-      //         onclick: () {
-      //           Get.until((route) =>
-      //               (route as GetPageRoute).routeName == '/StudentDashboard');
-      //         }),
-      //     NavBarItem(
-      //         image: 'settings',
-      //         onclick: () {
-      //           Get.to(
-      //             const StudentSettings(),
-      //           );
-      //         })
-      //   ],
-      // ),
       body: SafeArea(
         child: SingleChildScrollView(
           child: Column(

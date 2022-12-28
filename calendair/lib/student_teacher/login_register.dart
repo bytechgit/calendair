@@ -10,83 +10,48 @@ class LoginRegister extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      resizeToAvoidBottomInset: false,
-      body: Container(
-        color: const Color.fromRGBO(247, 247, 247, 1),
-        child: Stack(children: [
-          Align(
-            alignment: Alignment.topCenter,
-            child: Image.asset('assets/images/backgroundTop.png'),
-          ),
-          Align(
-            alignment: Alignment.bottomCenter,
-            child: Image.asset('assets/images/backgroundBottom.png'),
-          ),
-          Align(
-            alignment: Alignment.center,
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Padding(
-                  padding: const EdgeInsets.only(top: 25.0),
-                  child: SizedBox(
-                    width: 55.w,
-                    height: 60,
-                    child: ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                          shadowColor: const Color.fromRGBO(247, 247, 247, 1),
-                          backgroundColor:
-                              const Color.fromRGBO(94, 159, 197, 1),
-                          elevation: 0,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12.0),
-                          )),
-                      onPressed: () {
-                        Get.to(const Login());
-                      },
-                      child: const Text(
-                        'Login',
-                        style: TextStyle(
-                          color: Colors.black,
-                          fontSize: 30,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ), // <-- Text
-                    ),
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.only(top: 25.0),
-                  child: SizedBox(
-                    width: 55.w,
-                    height: 60,
-                    child: ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                          shadowColor: const Color.fromRGBO(247, 247, 247, 1),
-                          backgroundColor:
-                              const Color.fromRGBO(94, 159, 197, 1),
-                          elevation: 0,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12.0),
-                          )),
-                      onPressed: () {
-                        Get.to(const EnterSchoolCode());
-                      },
-                      child: const Text(
-                        'Register',
-                        style: TextStyle(
-                          color: Colors.black,
-                          fontSize: 30,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ), // <-- Text
-                    ),
-                  ),
-                ),
-              ],
+      appBar: AppBar(
+        title: Text('Profil'),
+      ),
+      body: Column(
+        children: [
+          Container(
+            width: double.infinity,
+            height: 200,
+            child: Image.network(
+              'https://pbs.twimg.com/profile_images/1234567890/profile_picture.jpg',
+              fit: BoxFit.cover,
             ),
-          )
-        ]),
+          ),
+          SizedBox(height: 20),
+          Text(
+            'Ime Prezime',
+            style: TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          SizedBox(height: 5),
+          Text('Kratki opis o sebi'),
+          SizedBox(height: 20),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: [
+              Column(
+                children: [
+                  Text('30'),
+                  Text('Pratioci'),
+                ],
+              ),
+              Column(
+                children: [
+                  Text('20'),
+                  Text('Pratim'),
+                ],
+              ),
+            ],
+          ),
+        ],
       ),
     );
   }

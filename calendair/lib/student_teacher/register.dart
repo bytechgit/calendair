@@ -1,7 +1,6 @@
 // ignore_for_file: use_build_context_synchronously
 import 'package:calendair/controllers/firebase_controller.dart';
 import 'package:calendair/student/navigation.dart';
-import 'package:calendair/student/student_dashboard.dart';
 import 'package:calendair/student_teacher/choose_user_type.dart';
 import 'package:calendair/teacher/teacher_dashboard.dart';
 import 'package:flutter/material.dart';
@@ -76,8 +75,16 @@ class Register extends StatelessWidget {
                             borderRadius: BorderRadius.circular(25.0),
                           )),
                       onPressed: () async {
-                        await firebaseController.signInwithGoogle();
-                        // gc.getCourseListTeacher();
+                        final rez = await firebaseController.signInwithGoogle();
+                        if (rez != null) {
+                          if (rez.type == 'student') {
+                            Get.to(const Navigation());
+                          } else {
+                            Get.to(const TeacherDashboard());
+                          }
+                        } else {
+                          Get.to(const ChooseUserType());
+                        }
                       },
                       icon: Image.asset(
                         'assets/images/google.png',
@@ -104,28 +111,12 @@ class Register extends StatelessWidget {
                           borderRadius: BorderRadius.circular(18.0),
                         )),
                     onPressed: () async {
-                      if (firebaseController.auth.currentUser != null) {
-                        final rez = await firebaseController
-                            .register(firebaseController.auth.currentUser!.uid);
-                        if (rez == null) {
-                          //ne postoji user
-                          Get.to(const ChooseUserType());
-                        } else {
-                          if (rez.type == 'student') {
-                            Get.to(const Navigation());
-                          } else {
-                            Get.to(const TeacherDashboard());
-                          }
-                        }
-                      } else {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Text("Please sign in first"),
-                          ),
-                        );
-                      }
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text("Please sign in first"),
+                        ),
+                      );
                     },
-
                     child: const FittedBox(
                       child: Text(
                         'REGISTER',

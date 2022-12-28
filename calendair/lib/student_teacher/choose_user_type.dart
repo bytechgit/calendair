@@ -1,9 +1,7 @@
 // ignore_for_file: use_build_context_synchronously
-
 import 'package:calendair/controllers/firebase_controller.dart';
 import 'package:calendair/models/user_model.dart';
 import 'package:calendair/student/navigation.dart';
-import 'package:calendair/student/student_dashboard.dart';
 import 'package:calendair/teacher/teacher_dashboard.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -66,7 +64,7 @@ class ChooseUserType extends StatelessWidget {
                     ),
                     InkWell(
                       onTap: (() async {
-                        final rez = await firebaseController.addUser(
+                        await firebaseController.addUser(
                             user: UserModel(
                           uid: firebaseController.auth.currentUser!.uid,
                           name: firebaseController
@@ -106,19 +104,18 @@ class ChooseUserType extends StatelessWidget {
                       height: 10,
                     ),
                     InkWell(
-                      onTap: () {
-                        firebaseController.addUser(
+                      onTap: () async {
+                        await firebaseController.addUser(
                             user: UserModel(
-                                uid: firebaseController.auth.currentUser!.uid,
-                                name: firebaseController
-                                        .auth.currentUser!.displayName ??
-                                    "no name",
-                                picture: firebaseController
-                                        .auth.currentUser!.photoURL ??
-                                    " ",
-                                type: "teacher",
-                                breakday: -1));
-                        //gc.getCourseListTeacher();
+                          uid: firebaseController.auth.currentUser!.uid,
+                          name: firebaseController
+                                  .auth.currentUser!.displayName ??
+                              "no name",
+                          picture:
+                              firebaseController.auth.currentUser!.photoURL ??
+                                  " ",
+                          type: "teacher",
+                        ));
                         Navigator.push(
                           context,
                           MaterialPageRoute(

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 import 'package:sizer/sizer.dart';
 import 'package:syncfusion_flutter_sliders/sliders.dart';
 // ignore: depend_on_referenced_packages
@@ -29,7 +28,6 @@ class _RateClassStrengthState extends State<RateClassStrength> {
           ),
           onPressed: () {
             Navigator.of(context).popUntil((route) {
-              print(route.settings.name);
               return route.settings.name == "/Navigation";
             });
           },
@@ -126,7 +124,6 @@ class _RateClassStrengthState extends State<RateClassStrength> {
                       return route.settings.name == "/Navigation";
                     });
                   },
-
                   child: const Text(
                     'Save',
                     style: TextStyle(

@@ -1,3 +1,4 @@
+import 'package:calendair/controllers/firebase_controller.dart';
 import 'package:calendair/models/course_model.dart';
 import 'package:calendair/models/popup_model.dart';
 import 'package:calendair/student_teacher/bottom_nav_bar.dart';
@@ -6,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 // ignore: depend_on_referenced_packages
 import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
 import 'package:sizer/sizer.dart';
 
 class PopUpResults extends StatelessWidget {
@@ -15,6 +17,7 @@ class PopUpResults extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final firebaseController = context.read<FirebaseController>();
     return Scaffold(
       resizeToAvoidBottomInset: false,
       appBar: AppBar(
@@ -49,7 +52,7 @@ class PopUpResults extends StatelessWidget {
                 child: FittedBox(
                   fit: BoxFit.scaleDown,
                   child: Text(
-                    course.name,
+                    course.className,
                     style: const TextStyle(
                       color: Colors.black,
                       fontSize: 40,
@@ -102,11 +105,16 @@ class PopUpResults extends StatelessWidget {
                                     borderRadius: BorderRadius.circular(10.0),
                                   )),
                               onPressed: () {
-                                double a = (p.sumRate);
-                                int b = p.numRate;
-                                Get.to(
-                                  PopUpAverageResult(rez: a / (b == 0 ? 1 : b)),
-                                );
+                                firebaseController
+                                    .getPopUp(p.docId)
+                                    .then((value) {
+                                  double a = value.sumRate;
+                                  int b = value.numRate;
+                                  Get.to(
+                                    PopUpAverageResult(
+                                        rez: a / (b == 0 ? 1 : b)),
+                                  );
+                                });
                               },
                               child: Padding(
                                 padding: const EdgeInsets.all(8.0),

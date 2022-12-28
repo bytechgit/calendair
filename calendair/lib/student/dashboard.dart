@@ -1,4 +1,4 @@
-import 'package:calendair/student/to_do.dart';
+import 'package:calendair/student/to_dos.dart';
 import 'package:flutter/material.dart';
 import 'package:persistent_bottom_nav_bar/persistent_tab_view.dart';
 import 'package:sizer/sizer.dart';
@@ -43,11 +43,11 @@ class Dashboard extends StatelessWidget {
                               onTap: (() {
                                 PersistentNavBarNavigator.pushNewScreen(
                                   context,
-                                  screen: ToDo(
+                                  screen: ToDos(
                                     index: i,
                                     day: days[i],
                                   ),
-                                  withNavBar: false,
+                                  withNavBar: true,
                                   pageTransitionAnimation:
                                       PageTransitionAnimation.fade,
                                 );

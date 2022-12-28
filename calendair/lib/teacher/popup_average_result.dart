@@ -26,8 +26,6 @@ class _PopUpAverageResultState extends State<PopUpAverageResult> {
   @override
   dispose() {
     SystemChrome.setPreferredOrientations([
-      DeviceOrientation.landscapeRight,
-      DeviceOrientation.landscapeLeft,
       DeviceOrientation.portraitUp,
       DeviceOrientation.portraitDown,
     ]);
@@ -61,24 +59,23 @@ class _PopUpAverageResultState extends State<PopUpAverageResult> {
                 child: SizedBox(
                   width: width * 0.70,
                   height: 55,
-                  child: ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      shadowColor: const Color.fromRGBO(247, 247, 247, 1),
-                      backgroundColor: const Color.fromRGBO(94, 159, 197, 1),
-                      elevation: 0,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10.0),
+                  child: Container(
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(10.0),
+                      color: const Color.fromRGBO(94, 159, 197, 1),
+                    ),
+                    width: width * 0.70,
+                    height: 55,
+                    child: const Center(
+                      child: Text(
+                        'Results',
+                        style: TextStyle(
+                          color: Colors.black,
+                          fontSize: 35,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                     ),
-                    onPressed: () {},
-                    child: const Text(
-                      'Results',
-                      style: TextStyle(
-                        color: Colors.black,
-                        fontSize: 35,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ), // <-- Text
                   ),
                 ),
               ),

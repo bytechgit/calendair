@@ -40,7 +40,7 @@ class _AddUpdateReminderState extends State<AddUpdateReminder> {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-   onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
+      onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
       child: Scaffold(
         appBar: AppBar(
           backgroundColor: const Color.fromRGBO(93, 159, 196, 1),
@@ -75,7 +75,7 @@ class _AddUpdateReminderState extends State<AddUpdateReminder> {
                     child: FittedBox(
                       fit: BoxFit.scaleDown,
                       child: Text(
-                        widget.course.name,
+                        widget.course.className,
                         style: const TextStyle(
                           color: Colors.black,
                           fontSize: 35,
@@ -157,7 +157,8 @@ class _AddUpdateReminderState extends State<AddUpdateReminder> {
                       DatePicker.showDatePicker(context,
                           showTitleActions: true,
                           minTime: DateTime.now(),
-                          maxTime: DateTime.now().add(const Duration(days: 600)),
+                          maxTime:
+                              DateTime.now().add(const Duration(days: 600)),
                           theme: const DatePickerTheme(
                               headerColor: Color.fromARGB(255, 176, 176, 176),
                               backgroundColor: Color.fromRGBO(94, 159, 197, 1),
@@ -184,7 +185,8 @@ class _AddUpdateReminderState extends State<AddUpdateReminder> {
                         child: Text(
                           DateFormat("MM/dd/yy").format(date),
                           style: const TextStyle(
-                              color: Color.fromRGBO(38, 64, 78, 1), fontSize: 25),
+                              color: Color.fromRGBO(38, 64, 78, 1),
+                              fontSize: 25),
                         ),
                       ),
                     ),
@@ -199,7 +201,8 @@ class _AddUpdateReminderState extends State<AddUpdateReminder> {
                     child: ElevatedButton(
                       style: ElevatedButton.styleFrom(
                           shadowColor: const Color.fromRGBO(247, 247, 247, 1),
-                          backgroundColor: const Color.fromRGBO(94, 159, 197, 1),
+                          backgroundColor:
+                              const Color.fromRGBO(94, 159, 197, 1),
                           elevation: 0,
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(10.0),
@@ -216,16 +219,18 @@ class _AddUpdateReminderState extends State<AddUpdateReminder> {
                         if (widget.reminder == null) {
                           firebaseController
                               .addReminder(
-                                  classId: widget.course.docid,
+                                  course: widget.course,
                                   date: date,
                                   title: titleController.text)
                               .then((value) {
-                            teacherState.addReminder(value, widget.course.docid);
+                            teacherState.addReminder(
+                                value, widget.course.docId);
                           });
                         } else {
                           widget.reminder!.date = Timestamp.fromDate(date);
                           widget.reminder!.title = titleController.text;
-                          firebaseController.updateReminder(r: widget.reminder!);
+                          firebaseController.updateReminder(
+                              r: widget.reminder!);
                           teacherState.update();
                         }
                         Get.back();

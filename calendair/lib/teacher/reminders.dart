@@ -1,4 +1,3 @@
-import 'dart:developer';
 import 'package:calendair/controllers/firebase_controller.dart';
 import 'package:calendair/controllers/teacher_state.dart';
 import 'package:calendair/models/course_model.dart';
@@ -25,9 +24,9 @@ class _RemindersState extends State<Reminders> {
   void initState() {
     firebaseController = context.read<FirebaseController>();
     final state = context.read<TeacherState>();
-    if (!state.reminderExist(widget.course.docid)) {
-      firebaseController.getTeacherRemider(widget.course.docid).then((value) {
-        state.addReminders(value, widget.course.docid);
+    if (!state.reminderExist(widget.course.docId)) {
+      firebaseController.getTeacherRemider(widget.course.docId).then((value) {
+        state.addReminders(value, widget.course.docId);
       });
     }
     super.initState();
@@ -36,7 +35,6 @@ class _RemindersState extends State<Reminders> {
   @override
   Widget build(BuildContext context) {
     final state = context.watch<TeacherState>();
-    inspect(state);
     return Scaffold(
       appBar: AppBar(
         backgroundColor: const Color.fromRGBO(93, 159, 196, 1),
@@ -69,7 +67,7 @@ class _RemindersState extends State<Reminders> {
               child: FittedBox(
                 fit: BoxFit.scaleDown,
                 child: Text(
-                  widget.course.name,
+                  widget.course.className,
                   style: const TextStyle(
                     color: Colors.black,
                     fontSize: 35,
@@ -100,12 +98,12 @@ class _RemindersState extends State<Reminders> {
           const SizedBox(
             height: 10,
           ),
-          if (state.reminderExist(widget.course.docid))
+          if (state.reminderExist(widget.course.docId))
             Expanded(
                 child: SingleChildScrollView(
               child: Column(
                 children: [
-                  ...state.reminders[widget.course.docid]!.map((r) {
+                  ...state.reminders[widget.course.docId]!.map((r) {
                     return Padding(
                       padding: const EdgeInsets.all(8.0),
                       child: SizedBox(
@@ -173,7 +171,7 @@ class _RemindersState extends State<Reminders> {
                 ],
               ),
             )),
-          if (!state.reminderExist(widget.course.docid))
+          if (!state.reminderExist(widget.course.docId))
             const Expanded(child: Center(child: CircularProgressIndicator())),
           Row(
             children: [
