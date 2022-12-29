@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:calendair/controllers/firebase_controller.dart';
 import 'package:calendair/controllers/nav_bar_controller.dart';
 import 'package:calendair/controllers/student_state.dart';

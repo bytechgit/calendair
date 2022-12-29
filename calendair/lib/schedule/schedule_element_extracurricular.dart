@@ -5,10 +5,12 @@ import 'package:flutter/material.dart';
 class ScheduleElementExtracurricular extends ScheduleElement {
   int day;
   late List<int> finishedWeek;
+  late Map<String, int> indexes;
   ScheduleElementExtracurricular(
       {required this.day,
       required int duration,
       String? docId,
+      Map<String, int>? indexes,
       DocumentChangeType? changeType,
       required int index,
       required String title,
@@ -25,6 +27,7 @@ class ScheduleElementExtracurricular extends ScheduleElement {
             color: color,
             duration: duration,
             changeType: changeType) {
+    this.indexes = indexes ?? {};
     this.finishedWeek = finishedWeek ?? [];
   }
 
@@ -34,6 +37,7 @@ class ScheduleElementExtracurricular extends ScheduleElement {
       'day': day,
       'duration': duration,
       "finishedWeek": finishedWeek,
+      "indexes": indexes,
       ...super.toMap()
     };
   }
@@ -43,6 +47,7 @@ class ScheduleElementExtracurricular extends ScheduleElement {
       required String docId,
       DocumentChangeType? changeType})
       : day = map["day"],
+        indexes = Map.from(map["indexes"]),
         finishedWeek = (map["finishedWeek"] as List<dynamic>)
             .map((e) => e as int)
             .toList(),
@@ -62,5 +67,20 @@ class ScheduleElementExtracurricular extends ScheduleElement {
         .collection('Extracurriculars')
         .doc(docId)
         .update({"finishedWeek": finishedWeek});
+  }
+
+  @override
+  int getIndex({int? week}) {
+    if (week == null) {
+      return 0x7fffffff;
+    }
+    return indexes[week.toString()] ?? 0x7fffffff;
+  }
+
+  @override
+  void setIndex({int? week, required int index}) {
+    if (week != null) {
+      indexes[week.toString()] = index;
+    }
   }
 }

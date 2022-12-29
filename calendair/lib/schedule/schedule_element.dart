@@ -12,6 +12,13 @@ class ScheduleElement {
   String studentId;
   int duration = 0;
   late Color color;
+  int getIndex({int? week}) {
+    return index;
+  }
+
+  void setIndex({int? week, required int index}) {
+    this.index = index;
+  }
 
   final List<Color> _colors = [
     const Color.fromRGBO(217, 237, 249, 1),

@@ -42,6 +42,7 @@ class _AddUpdateReminderState extends State<AddUpdateReminder> {
     return GestureDetector(
       onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
       child: Scaffold(
+        resizeToAvoidBottomInset: false,
         appBar: AppBar(
           backgroundColor: const Color.fromRGBO(93, 159, 196, 1),
           leading: IconButton(

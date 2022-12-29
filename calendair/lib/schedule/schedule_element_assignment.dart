@@ -14,7 +14,7 @@ class ScheduleElementAssignment extends ScheduleElement {
   ScheduleElementAssignment(
       {required this.positionIndex, required this.assignmentRef})
       : super(
-            index: assignmentRef.index,
+            index: assignmentRef.getIndex(),
             title: assignmentRef.title,
             studentId: assignmentRef.studentId,
             type: assignmentRef.type,
@@ -75,7 +75,6 @@ class ScheduleElementAssignment extends ScheduleElement {
     return assignmentRef.remainingTimes[positionIndex];
   }
 
-  @override
   void finish(bool finished) {
     this.finished = finished;
     FirebaseFirestore.instance

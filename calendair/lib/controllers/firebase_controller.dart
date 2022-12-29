@@ -184,7 +184,7 @@ class FirebaseController {
         "studentId": student,
         "note": assignment.note,
         "type": "assignment",
-        "index": 1000,
+        "index": 0x7fffffff,
         "duration": assignment.duration,
         "times": [],
         "indexes": [],
@@ -266,7 +266,7 @@ class FirebaseController {
         "dueDate": DateUtils.dateOnly(date),
         "title": title,
         "type": "reminder",
-        "index": -1
+        "index": 0x7fffffff
       });
       ids.add(doc.id);
     }
@@ -303,6 +303,7 @@ class FirebaseController {
       s.update({
         "title": r.title,
         "dueDate": r.date,
+        "index": 0x7fffffff,
       });
     }
   }
@@ -409,11 +410,13 @@ class FirebaseController {
   }
 
   void addBreakDay(int dayIndex) {
-    currentUser?.breakday = dayIndex;
-    FirebaseFirestore.instance
-        .collection('Users')
-        .doc(currentUser!.uid)
-        .update({"breakday": dayIndex});
+    if (currentUser!.breakday != dayIndex) {
+      currentUser!.breakday = dayIndex;
+      FirebaseFirestore.instance
+          .collection('Users')
+          .doc(currentUser!.uid)
+          .update({"breakday": dayIndex});
+    }
   }
 
   Future<List<ScheduleElementExtracurricular>> getExtracurriculars() async {
@@ -448,7 +451,7 @@ class FirebaseController {
       "dueDate": DateUtils.dateOnly(date),
       "title": title,
       "type": "reminder",
-      "index": -1
+      "index": 0x7fffffff
     });
   }
 

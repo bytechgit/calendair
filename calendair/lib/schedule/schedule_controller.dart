@@ -1,4 +1,6 @@
 import 'dart:async';
+import 'dart:developer';
+
 import 'package:calendair/controllers/schedule_algorithm.dart';
 import 'package:calendair/schedule/assignment_element.dart';
 import 'package:calendair/schedule/result.dart';
@@ -12,6 +14,16 @@ import 'package:flutter/material.dart';
 
 class ScheduleController extends ChangeNotifier {
   List<ScheduleElementExtracurricular> extracurriculars = [];
+  late DateTime startDate;
+  late DateTime endDate;
+  ScheduleController() {
+    DateTime dtn = DateTime.now();
+    final nd = dtn.weekday;
+    startDate = DateUtils.dateOnly(dtn.subtract(Duration(days: nd - 1)));
+    endDate = DateUtils.dateOnly(startDate.add(const Duration(days: 13)));
+    days = List.generate(
+        14, (index) => ScheduleDay(date: startDate.add(Duration(days: index))));
+  }
   ScheduleAlgorithm scheduleAlgorithm = ScheduleAlgorithm();
   void addExtracurricular(ScheduleElementExtracurricular extracurricular) {
     extracurriculars.add(extracurricular);
@@ -36,11 +48,8 @@ class ScheduleController extends ChangeNotifier {
     notifyListeners();
   }
 
-  List<ScheduleDay> days = List.generate(14, (index) => ScheduleDay());
+  late List<ScheduleDay> days;
   StreamSubscription? scheduleSubscription;
-  StreamSubscription? reminderSubscription;
-  StreamSubscription? assignmentSupscription;
-  StreamSubscription? extracurricularSubscription;
   void cancel() {
     scheduleSubscription?.cancel();
   }
@@ -49,10 +58,6 @@ class ScheduleController extends ChangeNotifier {
     for (var element in extracurriculars) {
       addInSchedule(element);
     }
-    DateTime dtn = DateTime.now();
-    final nd = dtn.weekday;
-    final startDate = DateUtils.dateOnly(dtn.subtract(Duration(days: nd - 1)));
-    final endDate = DateUtils.dateOnly(startDate.add(const Duration(days: 13)));
     cancel();
     scheduleSubscription = FirebaseFirestore.instance
         .collection('Schedule')
@@ -107,14 +112,14 @@ class ScheduleController extends ChangeNotifier {
     });
   }
 
-  void addInSchedule(ScheduleElement element) async {
+  void addInSchedule(ScheduleElement element) {
     if (element is ScheduleElementReminder) {
       if (element.dayIndex != -1) {
-        days[element.dayIndex].add(element);
+        days[element.dayIndex].add(element: element);
       }
     } else if (element is ScheduleElementExtracurricular) {
-      days[element.day].add(element);
-      days[element.day + 7].add(element);
+      days[element.day].add(element: element);
+      days[element.day + 7].add(element: element);
     } else if (element is AssignmentElement) {
       if (element.dates.isEmpty) {
         final dtn = DateTime.now();
@@ -132,7 +137,7 @@ class ScheduleController extends ChangeNotifier {
           if (newTimes[i] != 0) {
             element.dates.add(dtn.add(Duration(days: i)));
             element.times.add(newTimes[i]);
-            element.indexes.add(1000);
+            element.indexes.add(0x7fffffff);
             element.remainingTimes.add(newTimes[i] * 60);
           }
         }
@@ -146,7 +151,7 @@ class ScheduleController extends ChangeNotifier {
         assignment =
             ScheduleElementAssignment(positionIndex: i, assignmentRef: element);
         if (assignment.dayIndex != -1) {
-          days[assignment.dayIndex].add(assignment);
+          days[assignment.dayIndex].add(element: assignment);
         }
       }
       if (assignment != null) {
@@ -154,7 +159,7 @@ class ScheduleController extends ChangeNotifier {
       }
     } else if (element is ScheduleElementAssignment) {
       if (element.dayIndex != -1) {
-        days[element.dayIndex].add(element);
+        days[element.dayIndex].add(element: element);
       }
     }
     notifyListeners();
@@ -210,6 +215,8 @@ class ScheduleController extends ChangeNotifier {
             .collection('Schedule')
             .doc(element.docId)
             .update(element.toMap());
+        removeElement(element);
+        addInSchedule(element);
       } else if (timeDifference > 0) {
         final dtn = DateTime.now();
         final nd = dtn.weekday;
@@ -253,9 +260,10 @@ class ScheduleController extends ChangeNotifier {
             .collection('Schedule')
             .doc(element.docId)
             .update(element.toMap());
+        removeElement(element);
+        addInSchedule(element);
       }
-      removeElement(element);
-      addInSchedule(element);
+
       return;
     }
 
@@ -325,20 +333,25 @@ class ScheduleController extends ChangeNotifier {
 
 //add deo
     if (oldListIndex != newListIndex) {
-      updateDate(
-        element: element,
-        days: newListIndex - oldListIndex,
-      );
+      if (element is ScheduleElementReminder) {
+        element.date =
+            element.date.add(Duration(days: newListIndex - oldListIndex));
+      } else if (element is ScheduleElementExtracurricular) {
+        element.day += newListIndex - oldListIndex;
+      } else if (element is ScheduleElementAssignment) {
+        element.date =
+            element.date.add(Duration(days: newListIndex - oldListIndex));
+      }
     }
     if (element is ScheduleElementExtracurricular) {
-      days[(newListIndex + 7) % 14].add(element);
+      days[(newListIndex + 7) % 14].add(element: element, update: true);
     }
     if (element is ScheduleElementReminder) {
-      days[newListIndex].addAt(0, element);
+      days[newListIndex].addAt(0, element, true);
       return;
     }
 
-    days[newListIndex].add(element);
+    days[newListIndex].addAt(newItemIndex, element, true);
     if (element is ScheduleElementAssignment) {
       addPrefix(element);
     }
@@ -377,30 +390,30 @@ class ScheduleController extends ChangeNotifier {
     }
   }
 
-  void updateDate({
-    required ScheduleElement element,
-    required int days,
-  }) {
-    final doc =
-        FirebaseFirestore.instance.collection('Schedule').doc(element.docId);
-    if (element is ScheduleElementReminder) {
-      element.date = element.date.add(Duration(days: days));
-      doc.update({
-        "dueDate": element.date,
-      });
-    } else if (element is ScheduleElementExtracurricular) {
-      element.day += days;
-      FirebaseFirestore.instance
-          .collection('Extracurriculars')
-          .doc(element.docId)
-          .update({
-        "day": element.day,
-      });
-    } else if (element is ScheduleElementAssignment) {
-      element.date = element.date.add(Duration(days: days));
-      doc.update({
-        "dates": element.assignmentRef.dates,
-      });
-    }
-  }
+  // void _updateDate({
+  //   required ScheduleElement element,
+  //   required int days,
+  // }) {
+  //   final doc =
+  //       FirebaseFirestore.instance.collection('Schedule').doc(element.docId);
+  //   if (element is ScheduleElementReminder) {
+  //     element.date = element.date.add(Duration(days: days));
+  //     doc.update({
+  //       "dueDate": element.date,
+  //     });
+  //   } else if (element is ScheduleElementExtracurricular) {
+  //     element.day += days;
+  //     FirebaseFirestore.instance
+  //         .collection('Extracurriculars')
+  //         .doc(element.docId)
+  //         .update({
+  //       "day": element.day,
+  //     });
+  //   } else if (element is ScheduleElementAssignment) {
+  //     element.date = element.date.add(Duration(days: days));
+  //     doc.update({
+  //       "dates": element.assignmentRef.dates,
+  //     });
+  //   }
+  // }
 }

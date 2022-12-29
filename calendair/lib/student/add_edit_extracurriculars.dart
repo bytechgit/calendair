@@ -202,7 +202,8 @@ class _AddEditExtracurricularsState extends State<AddEditExtracurriculars> {
                           if (widget.extracurricular != null) {
                             if (widget.extracurricular!.day != selectedIndex) {
                               widget.extracurricular!.day = selectedIndex;
-                              widget.extracurricular!.index = 1000;
+                              widget.extracurricular!.indexes.updateAll(
+                                  (key, value) => value = 0x7fffffff);
                               state
                                   .editExtracurricular(widget.extracurricular!);
                             }
@@ -224,7 +225,7 @@ class _AddEditExtracurricularsState extends State<AddEditExtracurriculars> {
                                       docId: "",
                                       studentId:
                                           firebaseController.currentUser!.uid,
-                                      index: 1000,
+                                      index: 0x7fffffff,
                                       type: 'extracurricular'),
                             )
                                 .then((value) {

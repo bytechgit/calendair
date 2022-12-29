@@ -242,19 +242,9 @@ class _CalendarState extends State<Calendar> {
                                             ? CalendarExtracurricular(
                                                 extracurricular: e,
                                                 edit: edit,
-                                                week: weeksBetween(
-                                                    DateTime.utc(
-                                                        startDate
-                                                            .add(Duration(
-                                                                days: i))
-                                                            .year,
-                                                        1,
-                                                        1),
-                                                    startDate.add(
-                                                        Duration(days: i))),
-                                              )
+                                                week: sc.days[i].week)
                                             : edit
-                                                ? const SizedBox()
+                                                ? const SizedBox.shrink()
                                                 : CalendarReminder(
                                                     reminder: e
                                                         as ScheduleElementReminder),

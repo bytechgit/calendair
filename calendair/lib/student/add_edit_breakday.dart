@@ -1,5 +1,7 @@
 import 'package:calendair/controllers/firebase_controller.dart';
+import 'package:calendair/schedule/schedule_controller.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:provider/provider.dart';
 import 'package:sizer/sizer.dart';
 
@@ -14,9 +16,11 @@ class _AddEditBreakdayState extends State<AddEditBreakday> {
   final days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
   int selectedIndex = -1;
   late FirebaseController firebaseController;
+  late ScheduleController scheduleController;
   @override
   void initState() {
     firebaseController = context.read<FirebaseController>();
+    scheduleController = context.read<ScheduleController>();
     setState(() {
       selectedIndex = firebaseController.currentUser?.breakday ?? -1;
     });
@@ -39,30 +43,6 @@ class _AddEditBreakdayState extends State<AddEditBreakday> {
           },
         ),
       ),
-      // bottomNavigationBar: NavBar(
-      //   navBarItems: [
-      //     NavBarItem(
-      //         image: 'calendar',
-      //         onclick: () {
-      //           Get.off(
-      //             const Dashboard(),
-      //           );
-      //         }),
-      //     NavBarItem(
-      //         image: 'home',
-      //         onclick: () {
-      //           Get.until((route) =>
-      //               (route as GetPageRoute).routeName == '/StudentDashboard');
-      //         }),
-      //     NavBarItem(
-      //         image: 'settings',
-      //         onclick: () {
-      //           Get.to(
-      //             const StudentSettings(),
-      //           );
-      //         })
-      //   ],
-      // ),
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(8.0),
@@ -144,8 +124,18 @@ class _AddEditBreakdayState extends State<AddEditBreakday> {
                             borderRadius: BorderRadius.circular(20.0),
                           )),
                       onPressed: () {
-                        firebaseController.addBreakDay(selectedIndex);
-                        Navigator.of(context).pop();
+                        if (selectedIndex == -1 ||
+                            (scheduleController
+                                    .days[selectedIndex].elements.isEmpty &&
+                                scheduleController.days[selectedIndex + 7]
+                                    .elements.isEmpty)) {
+                          firebaseController.addBreakDay(selectedIndex);
+
+                          Navigator.of(context).pop();
+                        } else {
+                          Get.snackbar('Error',
+                              'You have scheduled assignments that day');
+                        }
                       },
 
                       child: const Text(
